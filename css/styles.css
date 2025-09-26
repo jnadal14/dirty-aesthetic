@@ -1,0 +1,80 @@
+:root{
+  --bg:#20170f;
+  --ink:#f0e6d8;
+  --muted:#c7b69e;
+  --accent:#b07a3f;
+  --card:#2a1f16;
+  --highlight:#7a3600;
+}
+*{box-sizing:border-box}
+@font-face{font-family:'Fodrocy';src:url('../assets/fonts/Fodrocy-OVDK4.otf') format('opentype');font-display:swap}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Fodrocy',Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:17px;line-height:1.6}
+a{color:var(--ink);text-decoration:none}
+img{max-width:100%;display:block}
+
+/* header */
+.site-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);backdrop-filter:saturate(120%) blur(6px);position:sticky;top:0;background:linear-gradient(180deg,rgba(32,23,15,.8),rgba(32,23,15,.2))}
+.brand{font-family:'Fodrocy',"Bebas Neue",system-ui;font-size:28px;letter-spacing:.5px}
+.nav a{margin-left:16px;opacity:.9}
+.nav a.active{border-bottom:2px solid var(--accent);padding-bottom:2px}
+
+/* hero */
+.hero{position:relative;height:70vh;background:url('../assets/images/profile_hero.jpg') center 55%/cover no-repeat}
+.hero-overlay{position:absolute;inset:0;background:rgba(32,23,15,.68);filter:sepia(50%)}
+.hero-inner{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 16px}
+.hero h1{font-family:'Fodrocy',"Bebas Neue";font-size:64px;letter-spacing:1px;margin:0}
+.hero p{margin:12px 0 24px;color:var(--muted)}
+.btn{display:inline-block;padding:10px 18px;background:var(--accent);color:#120c07;border-radius:999px;font-weight:600}
+.btn.ghost{background:transparent;border:1px solid var(--ink);color:var(--ink);margin-left:10px}
+.btn:hover,.btn.ghost:hover{background:var(--highlight);color:var(--ink);border-color:var(--highlight)}
+
+/* layouts */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:40px 20px}
+@media (max-width:900px){.two-col{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:20px}
+@media (max-width:900px){.grid{grid-template-columns:1fr;}}
+.card{background:var(--card);border-radius:14px;border:1px solid rgba(255,255,255,.06)}
+.card-body{padding:16px}
+
+/* inner pages */
+.page{padding:32px 20px;max-width:980px;margin:0 auto;text-align:center}
+.shows{list-style:none;padding:0;margin:0 0 24px 0}
+.shows li{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.release-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:1100px){.release-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.release-grid{grid-template-columns:1fr}}
+.release img{border-radius:10px;border:1px solid rgba(255,255,255,.08)}
+.video-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media (max-width:800px){.video-grid{grid-template-columns:1fr}}
+.video-thumb{aspect-ratio:16/9;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden}
+.link{color:var(--muted);text-decoration:underline}
+
+/* footer */
+.site-footer{display:flex;justify-content:space-between;align-items:center;padding:20px;border-top:1px solid rgba(255,255,255,.06)}
+.social a{margin-right:14px;color:var(--muted)}
+.legal{color:var(--muted)}
+
+/* epk */
+.epk-block{margin-bottom:28px}
+.lineup,.releases{list-style:none;padding:0;margin:0}
+.press-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.embed{margin:12px 0}
+
+/* homepage buttons */
+.button-row{display:flex;gap:12px;justify-content:center;align-items:center;padding:28px 20px}
+.button-row .btn{min-width:120px;text-align:center;margin-left:0}
+
+.center-links{text-align:center;padding:8px 0 0}
+
+.page h1.center{text-align:center}
+
+/* centered page blocks */
+.center-page{display:flex;align-items:center;justify-content:center;min-height:60vh}
+.center-box{text-align:center}
+.center-box .coming{font-size:28px;color:var(--muted)}
+
+/* contact form */
+.contact-form{max-width:560px;margin:0 auto;display:grid;gap:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px}
+.contact-form label{display:grid;gap:6px}
+.contact-form input,.contact-form textarea{background:#0f0b08;color:var(--ink);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px}
+.contact-form input:focus,.contact-form textarea:focus{outline:2px solid #4c48ff}

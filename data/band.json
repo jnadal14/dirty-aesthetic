@@ -1,0 +1,20 @@
+{
+  "name": "Dirty Aesthetic",
+  "city": "Vancouver BC",
+  "tagline": "Looks dirty, sounds dirtier",
+  "genre": "Indie garage rock",
+  "lineup": [
+    "Ethan Billings, keyboards",
+    "Josh Chapman, drums",
+    "Dylan Iwaschuck, lead vocals",
+    "Jacob Nadal, rhythm guitar and backing vocals",
+    "Josh Seaman, bass",
+    "Bardia Tarjoman, lead guitar"
+  ],
+  "links": {
+    "linktree": "https://linktr.ee/dirtyaesthetic",
+    "instagram": "https://instagram.com/dirtyaestheticband",
+    "spotify": "https://open.spotify.com/artist/6LJB3zSDmtQ3NxA6GjUwlt",
+    "youtube": "https://youtube.com/@dirtyaestheticband"
+  }
+}
