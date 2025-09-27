@@ -13,7 +13,7 @@ a{color:var(--ink);text-decoration:none}
 img{max-width:100%;display:block}
 
 /* header */
-.site-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);backdrop-filter:saturate(120%) blur(6px);position:sticky;top:0;background:linear-gradient(180deg,rgba(32,23,15,.8),rgba(32,23,15,.2))}
+.site-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);backdrop-filter:saturate(120%) blur(6px);position:sticky;top:0;z-index:1000;background:linear-gradient(180deg,rgba(32,23,15,.8),rgba(32,23,15,.2))}
 .brand{font-family:'Fodrocy',"Bebas Neue",system-ui;font-size:28px;letter-spacing:.5px}
 .nav a{margin-left:16px;opacity:.9}
 .nav a.active{border-bottom:2px solid var(--accent);padding-bottom:2px}
@@ -59,18 +59,30 @@ img{max-width:100%;display:block}
 .lineup,.releases{list-style:none;padding:0;margin:0}
 .press-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .embed{margin:12px 0}
+.embed iframe,.embed blockquote{margin:0 auto}
+
+/* social embed grid */
+.embed-grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media (min-width:900px){.embed-grid{grid-template-columns:1fr 1fr}}
+.embed-card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:6px;overflow:hidden}
+blockquote.tiktok-embed{background:var(--card)!important;border:0!important;box-shadow:none!important}
+blockquote.tiktok-embed section{margin:0!important}
+.embed-grid{justify-items:center}
 
 /* homepage buttons */
-.button-row{display:flex;gap:12px;justify-content:center;align-items:center;padding:28px 20px}
+.button-row{display:flex;gap:12px;justify-content:center;align-items:center;padding:18px 20px 14px}
 .button-row .btn{min-width:120px;text-align:center;margin-left:0}
 
-.center-links{text-align:center;padding:8px 0 0}
+.center-links{text-align:center;padding:6px 20px 18px}
 
 .page h1.center{text-align:center}
 
 /* compact first block spacing */
-.page-compact{padding-top:16px;padding-bottom:12px}
-.page-compact .embed{margin-bottom:8px}
+.page-compact{padding-top:10px;padding-bottom:0}
+.page-compact .embed{margin-bottom:4px}
+
+/* tighter upcoming section */
+.page-tight{padding-top:6px;padding-bottom:10px}
 
 /* small button */
 .btn-sm{padding:8px 14px;font-size:0.9em}
