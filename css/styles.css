@@ -97,3 +97,18 @@ blockquote.tiktok-embed section{margin:0!important}
 .contact-form label{display:grid;gap:6px}
 .contact-form input,.contact-form textarea{background:#0f0b08;color:var(--ink);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px}
 .contact-form input:focus,.contact-form textarea:focus{outline:2px solid #4c48ff}
+
+/* mobile adjustments */
+@media (max-width:640px){
+  .hero{height:60vh;background-position:center 48%}
+  .hero h1{font-size:48px}
+  .page{padding:24px 16px}
+  .button-row{gap:8px;padding:14px 16px 10px}
+  .btn,.btn.ghost{padding:9px 14px}
+  .btn-sm{padding:7px 12px;font-size:.88em}
+  .center-links{padding:6px 16px 16px}
+  .site-footer{flex-direction:column;align-items:center;gap:8px;text-align:center}
+  .social{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+  .social a{margin-right:0}
+  .legal{white-space:nowrap;font-size:.9em}
+}
