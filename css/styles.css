@@ -68,6 +68,13 @@ img{max-width:100%;display:block}
 
 .page h1.center{text-align:center}
 
+/* compact first block spacing */
+.page-compact{padding-top:16px;padding-bottom:12px}
+.page-compact .embed{margin-bottom:8px}
+
+/* small button */
+.btn-sm{padding:8px 14px;font-size:0.9em}
+
 /* centered page blocks */
 .center-page{display:flex;align-items:center;justify-content:center;min-height:60vh}
 .center-box{text-align:center}
