@@ -8,7 +8,8 @@
 }
 *{box-sizing:border-box}
 @font-face{font-family:'Fodrocy';src:url('../assets/fonts/Fodrocy-OVDK4.otf') format('opentype');font-display:swap}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Fodrocy',Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:17px;line-height:1.6}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Fodrocy',Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:17px;line-height:1.6;overflow-x:hidden}
+body{min-height:100vh;position:relative}
 a{color:var(--ink);text-decoration:none}
 img{max-width:100%;display:block}
 
@@ -38,6 +39,7 @@ img{max-width:100%;display:block}
 
 /* inner pages */
 .page{padding:32px 20px;max-width:980px;margin:0 auto;text-align:center}
+.page .text-left{text-align:left}
 .shows{list-style:none;padding:0;margin:0 0 24px 0}
 .shows li{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}
 .release-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
@@ -64,13 +66,13 @@ img{max-width:100%;display:block}
 /* social embed grid */
 .embed-grid{display:grid;grid-template-columns:1fr;gap:16px}
 @media (min-width:900px){.embed-grid{grid-template-columns:1fr 1fr}}
-.embed-card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:6px;overflow:hidden}
+.embed-card{background:transparent;border:none;padding:0;overflow:hidden}
 blockquote.tiktok-embed{background:var(--card)!important;border:0!important;box-shadow:none!important}
 blockquote.tiktok-embed section{margin:0!important}
 .embed-grid{justify-items:center}
 
 /* homepage buttons */
-.button-row{display:flex;gap:12px;justify-content:center;align-items:center;padding:18px 20px 14px}
+.button-row{display:flex;gap:12px;justify-content:center;align-items:center;padding:0 20px 14px}
 .button-row .btn{min-width:120px;text-align:center;margin-left:0}
 
 .center-links{text-align:center;padding:6px 20px 18px}
@@ -80,9 +82,15 @@ blockquote.tiktok-embed section{margin:0!important}
 /* compact first block spacing */
 .page-compact{padding-top:10px;padding-bottom:0}
 .page-compact .embed{margin-bottom:4px}
+.page-compact p{text-align:left!important}
 
 /* tighter upcoming section */
-.page-tight{padding-top:6px;padding-bottom:10px}
+.page-tight{padding-top:6px;padding-bottom:0}
+
+/* left-aligned text */
+.text-left{text-align:left}
+
+
 
 /* small button */
 .btn-sm{padding:8px 14px;font-size:0.9em}

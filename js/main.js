@@ -1,3 +1,14 @@
+// Set active navigation
+const currentPage = window.location.pathname.split('/').pop() || 'index.html'
+const navLinks = document.querySelectorAll('.nav a')
+navLinks.forEach(link => {
+  const linkHref = link.getAttribute('href')
+  if (linkHref === currentPage || (currentPage === '' && linkHref === 'index.html')) {
+    link.classList.add('active')
+  }
+})
+
+// Load shows
 fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const ul=document.getElementById('upcoming')
   if(!ul)return
