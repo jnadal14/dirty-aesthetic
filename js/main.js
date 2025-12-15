@@ -20,7 +20,11 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   }
   data.upcoming.slice(0,4).forEach(s=>{
     const li=document.createElement('li')
-    li.textContent=`${s.date} • ${s.city} • ${s.venue}`
+    li.innerHTML=`
+      <span class="show-date">${s.date}</span>
+      <span class="show-venue">${s.venue}</span>
+      <span class="show-city">${s.city}</span>
+    `
     ul.appendChild(li)
   })
 }).catch(()=>{
