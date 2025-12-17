@@ -33,11 +33,48 @@
     </div>
   </section>
 
-  <section class="page page-compact">
-    <h2>Latest Release</h2>
-    <p>Sugar Bottom, released August 29, 2025</p>
-    <div class="embed">
-      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/4JQE8SO7E9kqkfikmz6Zzc" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+  <section class="page ep-promo">
+    <h2>New EP</h2>
+    <div class="ep-showcase">
+      <div class="ep-cover">
+        <img src="assets/images/covers/cover_sugar_on_the_rocks.jpg" alt="Sugar on the Rocks EP cover">
+      </div>
+      <div class="ep-info">
+        <h3>Sugar on the Rocks</h3>
+        <p class="ep-date">Out January 9, 2026</p>
+        <ul class="ep-tracklist">
+          <li class="track locked">
+            <span class="track-number">1</span>
+            <span class="track-name">Corduroy</span>
+          </li>
+          <li class="track locked">
+            <span class="track-number">2</span>
+            <span class="track-name">Take What You Need</span>
+          </li>
+          <li class="track locked">
+            <span class="track-number">3</span>
+            <span class="track-name">Heart Home</span>
+          </li>
+          <li class="track locked">
+            <span class="track-number">4</span>
+            <span class="track-name">Sugar Bottom</span>
+          </li>
+          <li class="track locked">
+            <span class="track-number">5</span>
+            <span class="track-name">Out of Key</span>
+          </li>
+          <li class="track locked">
+            <span class="track-number">6</span>
+            <span class="track-name">White Flag</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="home-video-section">
+    <div class="video-embed-feature">
+      <iframe src="https://www.youtube.com/embed/XfPulnL0OHc?rel=0&modestbranding=1" title="Dirty Aesthetic Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
   </section>
 
@@ -78,5 +115,60 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script>
+let currentPlaying = null;
+
+function toggleTrack(id) {
+  const audio = document.querySelector(`audio[data-id="${id}"]`);
+  const track = document.querySelector(`[data-track="${id}"]`);
+  
+  // Stop other tracks
+  if (currentPlaying && currentPlaying !== id) {
+    const otherAudio = document.querySelector(`audio[data-id="${currentPlaying}"]`);
+    const otherTrack = document.querySelector(`[data-track="${currentPlaying}"]`);
+    otherAudio.pause();
+    otherTrack.classList.remove('playing');
+  }
+  
+  if (audio.paused) {
+    audio.play();
+    track.classList.add('playing');
+    currentPlaying = id;
+  } else {
+    audio.pause();
+    track.classList.remove('playing');
+    currentPlaying = null;
+  }
+}
+
+function seekTrack(e, id) {
+  const audio = document.querySelector(`audio[data-id="${id}"]`);
+  const bar = e.currentTarget;
+  const percent = e.offsetX / bar.offsetWidth;
+  audio.currentTime = percent * audio.duration;
+}
+
+document.querySelectorAll('audio[data-id]').forEach(audio => {
+  const id = audio.dataset.id;
+  const track = document.querySelector(`[data-track="${id}"]`);
+  const progressFill = track.querySelector('.progress-fill');
+  const timeDisplay = track.querySelector('.track-time');
+  
+  audio.addEventListener('timeupdate', () => {
+    const percent = (audio.currentTime / audio.duration) * 100;
+    progressFill.style.width = percent + '%';
+    const mins = Math.floor(audio.currentTime / 60);
+    const secs = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+    timeDisplay.textContent = mins + ':' + secs;
+  });
+  
+  audio.addEventListener('ended', () => {
+    track.classList.remove('playing');
+    progressFill.style.width = '0%';
+    timeDisplay.textContent = '0:00';
+    currentPlaying = null;
+  });
+});
+</script>
 </body>
 </html>
