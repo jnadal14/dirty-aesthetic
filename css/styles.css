@@ -11,6 +11,7 @@
 @font-face{font-family:'Nafta';src:url('../assets/fonts/NaftaLight-Regular.ttf') format('truetype');font-display:swap}
 
 /* Base with subtle noise texture */
+sup{font-size:.65em;vertical-align:super;line-height:0}
 html{scroll-behavior:smooth}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:17px;line-height:1.65;overflow-x:hidden}
 body{min-height:100vh;position:relative;padding-bottom:env(safe-area-inset-bottom)}
@@ -81,6 +82,16 @@ main>.page{max-width:none}
 .show-city{color:var(--muted);font-size:.9em}
 .shows.static li{display:block;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.06);border-radius:0;margin-bottom:0}
 .shows.static li:hover{transform:none;background:rgba(255,255,255,.03)}
+
+/* music header with toggle */
+.music-header{position:relative;margin:0 auto 16px;max-width:900px}
+.music-header h1{margin:0}
+.music-toggle{display:flex;gap:16px;align-items:center;position:absolute;left:0;top:50%;transform:translateY(-50%)}
+.toggle-btn{background:none;border:none;padding:4px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center}
+.toggle-btn:hover .service-logo{transform:scale(1.15)}
+.toggle-btn .service-logo{width:20px;height:20px;transition:all .3s ease;color:var(--muted);opacity:.35}
+.toggle-btn:hover .service-logo{opacity:.65}
+.toggle-btn.active .service-logo{color:var(--accent);opacity:1;filter:drop-shadow(0 2px 6px rgba(176,122,63,.3))}
 
 /* releases */
 .release-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;max-width:900px;margin:0 auto}
@@ -269,6 +280,10 @@ blockquote.tiktok-embed section{margin:0!important}
   .button-row{gap:10px;padding:20px 16px}
   .btn{padding:10px 16px}
   .center-links{padding:8px 16px 24px}
+  
+  .music-toggle{gap:12px}
+  .toggle-btn{padding:3px}
+  .toggle-btn .service-logo{width:17px;height:17px}
   
   .release{width:calc(50% - 12px)}
   .release h3{font-size:1em}
