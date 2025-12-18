@@ -83,6 +83,9 @@
     <p><a class="link" href="mailto:dirtyaestheticmusic@gmail.com">dirtyaestheticmusic@gmail.com</a></p>
     <p><a class="link" href="https://linktr.ee/dirtyaesthetic" target="_blank" rel="noopener">All Links</a></p>
   </section>
+  <div class="epk-download-row">
+    <button id="download-epk-pdf" class="btn btn-sm ghost">Download Press Kit (PDF)</button>
+  </div>
 </main>
 
 <footer class="site-footer">
@@ -101,5 +104,16 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script>
+document.getElementById('download-epk-pdf').addEventListener('click', function() {
+  // Try to fetch the PDF file; if successful, trigger download
+  const link = document.createElement('a');
+  link.href = 'assets/downloads/DirtyAesthetic-EPK.pdf';
+  link.download = 'DirtyAesthetic-EPK.pdf';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+});
+</script>
 </body>
 </html>

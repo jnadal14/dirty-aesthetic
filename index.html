@@ -14,16 +14,15 @@
   gap:12px;
 }
 .ep-tracklist .track .track-play{
+  position:relative;
   margin-left:auto;
   width:34px;
   height:34px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
   border:1px solid rgba(255,255,255,0.25);
   border-radius:999px;
   cursor:pointer;
   user-select:none;
+  -webkit-tap-highlight-color: transparent;
 }
 .ep-tracklist .track.locked{
   opacity:0.35;
@@ -34,6 +33,40 @@
 }
 .ep-tracklist .track.locked .track-play{
   pointer-events:none;
+}
+
+.track-play::before,
+.track-play::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+}
+
+.ep-tracklist .track:not(.playing) .track-play::before{
+  width:0;
+  height:0;
+  border-top:7px solid transparent;
+  border-bottom:7px solid transparent;
+  border-left:11px solid rgba(255,255,255,0.85);
+  margin-left:1px;
+}
+
+.ep-tracklist .track.playing .track-play::before,
+.ep-tracklist .track.playing .track-play::after{
+  width:4px;
+  height:14px;
+  background:rgba(255,255,255,0.85);
+  border-radius:1px;
+}
+
+.ep-tracklist .track.playing .track-play::before{
+  margin-left:-4px;
+}
+
+.ep-tracklist .track.playing .track-play::after{
+  margin-left:4px;
 }
 </style>
 </head>
@@ -76,39 +109,39 @@
           <li class="track unlocked" data-track="corduroy">
             <span class="track-number">1</span>
             <span class="track-name">Corduroy</span>
-            <span class="track-play" data-action="toggle" aria-label="Play Corduroy">▶</span>
+            <span class="track-play" data-action="toggle" aria-label="Play Corduroy"></span>
             <audio data-id="corduroy" preload="none" src="https://pub-337b084e3a8d428b92035f1538143d4c.r2.dev/SOTR_TEASERS/corduroy_teaser.mp3"></audio>
           </li>
 
           <li class="track locked">
             <span class="track-number">2</span>
             <span class="track-name">Take What You Need</span>
-            <span class="track-play" aria-hidden="true">▶</span>
+            <span class="track-play" aria-hidden="true"></span>
           </li>
 
           <li class="track locked">
             <span class="track-number">3</span>
             <span class="track-name">Heart Home</span>
-            <span class="track-play" aria-hidden="true">▶</span>
+            <span class="track-play" aria-hidden="true"></span>
           </li>
 
           <li class="track unlocked" data-track="sugarbottom">
             <span class="track-number">4</span>
             <span class="track-name">Sugar Bottom</span>
-            <span class="track-play" data-action="toggle" aria-label="Play Sugar Bottom">▶</span>
+            <span class="track-play" data-action="toggle" aria-label="Play Sugar Bottom"></span>
             <audio data-id="sugarbottom" preload="none" src="https://pub-337b084e3a8d428b92035f1538143d4c.r2.dev/SOTR_TEASERS/sugarbottom_teaser.mp3"></audio>
           </li>
 
           <li class="track locked">
             <span class="track-number">5</span>
             <span class="track-name">Out of Key</span>
-            <span class="track-play" aria-hidden="true">▶</span>
+            <span class="track-play" aria-hidden="true"></span>
           </li>
 
           <li class="track locked">
             <span class="track-number">6</span>
             <span class="track-name">White Flag</span>
-            <span class="track-play" aria-hidden="true">▶</span>
+            <span class="track-play" aria-hidden="true"></span>
           </li>
         </ul>
 
@@ -162,10 +195,9 @@
 <script>
 let currentPlaying = null;
 
-function setPlayIcon(trackEl, isPlaying) {
+function setPlayLabel(trackEl, isPlaying) {
   const btn = trackEl.querySelector('.track-play');
   if (!btn) return;
-  btn.textContent = isPlaying ? '⏸' : '▶';
   btn.setAttribute('aria-label', (isPlaying ? 'Pause ' : 'Play ') + (trackEl.querySelector('.track-name')?.textContent || 'track'));
 }
 
@@ -176,7 +208,7 @@ function stopCurrent() {
   if (otherAudio) otherAudio.pause();
   if (otherTrack) {
     otherTrack.classList.remove('playing');
-    setPlayIcon(otherTrack, false);
+    setPlayLabel(otherTrack, false);
   }
   currentPlaying = null;
 }
@@ -191,12 +223,12 @@ function toggleTrack(id) {
   if (audio.paused) {
     audio.play();
     track.classList.add('playing');
-    setPlayIcon(track, true);
+    setPlayLabel(track, true);
     currentPlaying = id;
   } else {
     audio.pause();
     track.classList.remove('playing');
-    setPlayIcon(track, false);
+    setPlayLabel(track, false);
     currentPlaying = null;
   }
 }
@@ -207,16 +239,7 @@ document.querySelectorAll('.ep-tracklist .track').forEach(track => {
 
   playBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-
-    if (track.classList.contains('spotify')) {
-      stopCurrent();
-      const url = track.dataset.spotify;
-      if (url) window.open(url, '_blank', 'noopener');
-      return;
-    }
-
     if (track.classList.contains('locked')) return;
-
     const id = track.dataset.track;
     if (id) toggleTrack(id);
   });
@@ -229,7 +252,7 @@ document.querySelectorAll('audio[data-id]').forEach(audio => {
   audio.addEventListener('ended', () => {
     if (track) {
       track.classList.remove('playing');
-      setPlayIcon(track, false);
+      setPlayLabel(track, false);
     }
     if (currentPlaying === id) currentPlaying = null;
   });
@@ -237,7 +260,7 @@ document.querySelectorAll('audio[data-id]').forEach(audio => {
   audio.addEventListener('pause', () => {
     if (track && currentPlaying === id) {
       track.classList.remove('playing');
-      setPlayIcon(track, false);
+      setPlayLabel(track, false);
       currentPlaying = null;
     }
   });
