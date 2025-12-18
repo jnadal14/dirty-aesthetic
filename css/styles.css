@@ -205,7 +205,8 @@ blockquote.tiktok-embed section{margin:0!important}
 /* EP Promo Section */
 .ep-promo{padding:clamp(48px,7vw,80px) clamp(20px,5vw,48px);background:var(--card);max-width:none}
 .ep-showcase{display:grid;grid-template-columns:280px 1fr;gap:32px;max-width:750px;margin:0 auto;text-align:left;align-items:start;padding:0 20px}
-.ep-cover img{border-radius:12px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.ep-cover img{border-radius:12px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:transform .3s ease,box-shadow .3s ease;}
+.ep-cover:hover img, .ep-cover a:hover img{transform:scale(1.03);box-shadow:0 12px 32px rgba(0,0,0,.4)}
 .ep-info h3{margin:0 0 8px;font-size:1.8em;letter-spacing:1px}
 .ep-date{color:var(--accent);font-size:1.1em;margin:0 0 20px;letter-spacing:.5px}
 .ep-tracklist{list-style:none;padding:0;margin:0}
