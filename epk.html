@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <title>EPK • Dirty Aesthetic</title>
+<meta name="description" content="Electronic Press Kit for Dirty Aesthetic. Vancouver indie garage rock band. Biography, lineup, releases, venues, press photos, and contact information.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="https://www.dirtyaesthetic.com/epk.html">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
-<link rel="icon" type="image/png" href="assets/images/favicon.png">
 </head>
 <body>
 <header class="site-header">
@@ -21,7 +22,8 @@
 </header>
 
 <main class="page">
-  <h1>Electronic Press Kit</h1>
+  <h1 style="font-size:clamp(28px,5vw,36px);margin-bottom:8px;letter-spacing:2px;">Dirty Aesthetic</h1>
+  <h2 style="font-size:clamp(18px,3vw,24px);color:var(--accent);margin-bottom:16px;text-transform:none;letter-spacing:1px;">Electronic Press Kit</h2>
 
   <section class="epk-block">
     <p>Formed in Greater Vancouver in the summer of 2024, Dirty Aesthetic delivers surf garage infused indie rock layered with folk and alternative textures. Their sound moves effortlessly from high energy tracks that get crowds dancing to slow, heartfelt songs that pull at the heartstrings. Lyrically, they explore themes of heartbreak, love, mental health, and addiction.</p>
@@ -44,11 +46,11 @@
   <section class="epk-block">
     <h2>Releases</h2>
     <ul class="releases">
-      <li><a href="https://distrokid.com/hyperfollow/dirtyaesthetic/sugar-on-the-rocks" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">Sugar On The Rocks EP, January 9<sup>th</sup>, 2026</a></li>
-      <li><a href="https://open.spotify.com/track/4JQE8SO7E9kqkfikmz6Zzc?si=a8c2ee308e8f424c" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">Sugar Bottom, August 29<sup>th</sup>, 2025</a></li>
-      <li><a href="https://open.spotify.com/track/1d913Z6QvDaaYtTAcfCwWI?si=c221919a150b445b" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">Blue Roses, February 23<sup>rd</sup>, 2025</a></li>
-      <li><a href="https://open.spotify.com/track/6ostKPYA1pmcBByK0Npk1y?si=90d66523104146de" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">While I Wonder, December 5<sup>th</sup>, 2024</a></li>
-      <li><a href="https://open.spotify.com/track/13mNifmsvTg9hh5qpG8fyE?si=f34e309009f04cd1" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">Run, October 18<sup>th</sup>, 2024</a></li>
+      <li>Sugar On The Rocks EP, January 9<sup>th</sup>, 2026</li>
+      <li>Sugar Bottom, August 29<sup>th</sup>, 2025</li>
+      <li>Blue Roses, February 23<sup>rd</sup>, 2025</li>
+      <li>While I Wonder, December 5<sup>th</sup>, 2024</li>
+      <li>Run, October 18<sup>th</sup>, 2024</li>
     </ul>
   </section>
 
@@ -106,14 +108,10 @@
 
 <script src="js/main.js"></script>
 <script>
-document.getElementById('download-epk-pdf').addEventListener('click', function() {
-  // Try to fetch the PDF file; if successful, trigger download
-  const link = document.createElement('a');
-  link.href = 'assets/downloads/DirtyAesthetic-EPK.pdf';
-  link.download = 'DirtyAesthetic-EPK.pdf';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+document.getElementById('download-epk-pdf').addEventListener('click', function(e) {
+  e.preventDefault();
+  // Trigger print dialog which will create the PDF
+  window.print();
 });
 </script>
 </body>

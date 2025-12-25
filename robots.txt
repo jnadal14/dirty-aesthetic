@@ -1,3 +1,9 @@
 User-agent: *
 Allow: /
-Sitemap: https://dirtyaesthetic.com/sitemap.xml
+
+# Block backup files
+Disallow: /*.backup.html
+Disallow: /*.backup.css
+Disallow: /dirtyaesthetic_epk.txt
+
+Sitemap: https://www.dirtyaesthetic.com/sitemap.xml
