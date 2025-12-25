@@ -34,10 +34,18 @@ img{max-width:100%;display:block}
 
 /* header */
 .site-header{display:flex;justify-content:space-between;align-items:center;padding:16px clamp(16px,4vw,32px);border-bottom:1px solid rgba(255,255,255,.06);backdrop-filter:saturate(120%) blur(6px);position:sticky;top:0;z-index:1000;background:linear-gradient(180deg,rgba(32,23,15,.95),rgba(32,23,15,.6))}
+.brand-container{display:flex;flex-direction:column;align-items:center;gap:2px}
 .brand{font-size:clamp(22px,5vw,28px);letter-spacing:.5px;transition:opacity .2s ease;white-space:nowrap}
 .brand:hover{opacity:.8}
+.brand-subtitle{font-size:11px;color:var(--ink);opacity:.85;transition:all .2s ease;letter-spacing:.5px;text-decoration:none}
+.brand-subtitle:hover{opacity:1;color:var(--accent)}
 .nav{display:flex;align-items:center;gap:clamp(12px,2.5vw,20px)}
 .nav a{opacity:.9;position:relative;padding-bottom:4px;transition:opacity .2s ease;white-space:nowrap;letter-spacing:.5px}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;z-index:1001}
+.hamburger span{width:25px;height:2px;background:var(--ink);transition:all .3s ease}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(7px,7px)}
+.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(7px,-7px)}
 .nav a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--accent);transition:width .25s ease}
 .nav a:hover::after,.nav a.active::after{width:100%}
 .nav a:hover{opacity:1}
@@ -210,7 +218,7 @@ blockquote.tiktok-embed section{margin:0!important}
 .contact-form input,.contact-form textarea{background:#0f0b08;color:var(--ink);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px;font-size:1em;transition:border-color .2s ease,box-shadow .2s ease}
 .contact-form input:hover,.contact-form textarea:hover{border-color:rgba(255,255,255,.2)}
 .contact-form input:focus,.contact-form textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
-.contact-form .btn{margin-top:8px;width:100%}
+.contact-form .btn{margin-top:8px;width:100%;font-family:'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 
 /* EP Promo Section */
 .ep-promo{padding:clamp(48px,7vw,80px) clamp(20px,5vw,48px);background:var(--card);max-width:none}
@@ -270,8 +278,10 @@ blockquote.tiktok-embed section{margin:0!important}
   .site-header{padding:12px 16px}
   .nav{gap:8px}
   .nav a{font-size:.9em;padding-bottom:2px}
+  .brand{font-size:20px}
+  .brand-subtitle{font-size:10px}
   
-  .hero{height:55vh;background-position:center 45%}
+  .hero{height:55vh;background-position:center center;background-size:auto 100%}
   .hero .cta-row{gap:10px}
   .hero .cta-row .btn{padding:10px 18px}
   
@@ -309,6 +319,28 @@ blockquote.tiktok-embed section{margin:0!important}
   
   .button-row{flex-direction:column;gap:8px}
   .button-row .btn{width:100%;max-width:280px}
+  
+  .hamburger{display:flex}
+  .site-header{flex-wrap:wrap}
+  .nav{
+    display:none;
+    width:100%;
+    order:3;
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+    padding:16px 0 8px 0;
+    background:transparent;
+  }
+  .nav.active{display:flex}
+  .nav a{
+    width:100%;
+    padding:12px 16px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    font-size:1em;
+    text-align:center;
+  }
+  .nav a::after{display:none}
 }
 
 /* Landscape phones */

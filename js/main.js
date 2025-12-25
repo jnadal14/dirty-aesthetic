@@ -8,6 +8,33 @@ navLinks.forEach(link => {
   }
 })
 
+// Hamburger menu toggle
+const hamburger = document.getElementById('hamburger')
+const nav = document.getElementById('nav')
+
+if (hamburger && nav) {
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active')
+    nav.classList.toggle('active')
+  })
+
+  // Close menu when clicking a link
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('active')
+      nav.classList.remove('active')
+    })
+  })
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!hamburger.contains(e.target) && !nav.contains(e.target)) {
+      hamburger.classList.remove('active')
+      nav.classList.remove('active')
+    }
+  })
+}
+
 // Redirect to EPK page when printing (unless already on EPK page)
 document.addEventListener('keydown', (e) => {
   // Check for Cmd+P (Mac) or Ctrl+P (Windows)
@@ -75,6 +102,12 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   }
   data.upcoming.slice(0,4).forEach(s=>{
     const li=document.createElement('li')
+    if(s.link){
+      li.style.cursor='pointer'
+      li.addEventListener('click', () => {
+        window.open(s.link, '_blank', 'noopener,noreferrer')
+      })
+    }
     li.innerHTML=`
       <span class="show-date">${addOrdinal(s.date)}</span>
       <span class="show-venue">${s.venue}</span>
