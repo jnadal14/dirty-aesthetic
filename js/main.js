@@ -8,41 +8,6 @@ navLinks.forEach(link => {
   }
 })
 
-// Music service toggle
-const toggleButtons = document.querySelectorAll('.toggle-btn')
-const releaseLinks = document.querySelectorAll('.release-link')
-
-if (toggleButtons.length > 0 && releaseLinks.length > 0) {
-  toggleButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const service = btn.getAttribute('data-service')
-      
-      // Update active state
-      toggleButtons.forEach(b => b.classList.remove('active'))
-      btn.classList.add('active')
-      
-      // Update all release links
-      releaseLinks.forEach(link => {
-        const url = link.getAttribute(`data-${service}`)
-        if (url) {
-          link.setAttribute('href', url)
-        }
-      })
-    })
-  })
-}
-
-// Add ordinal suffix to dates
-function addOrdinal(dateStr) {
-  return dateStr.replace(/\b(\d+)(,)/g, (match, num, comma) => {
-    const n = parseInt(num)
-    const suffix = n % 10 === 1 && n !== 11 ? 'st' :
-                   n % 10 === 2 && n !== 12 ? 'nd' :
-                   n % 10 === 3 && n !== 13 ? 'rd' : 'th'
-    return `${num}<sup>${suffix}</sup>${comma}`
-  })
-}
-
 // Load shows
 fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const ul=document.getElementById('upcoming')
@@ -56,7 +21,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   data.upcoming.slice(0,4).forEach(s=>{
     const li=document.createElement('li')
     li.innerHTML=`
-      <span class="show-date">${addOrdinal(s.date)}</span>
+      <span class="show-date">${s.date}</span>
       <span class="show-venue">${s.venue}</span>
       <span class="show-city">${s.city}</span>
     `
