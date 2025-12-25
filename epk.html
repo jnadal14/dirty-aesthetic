@@ -11,8 +11,16 @@
 </head>
 <body>
 <header class="site-header">
-  <a class="brand" href="index.html">Dirty Aesthetic</a>
-  <nav class="nav">
+  <div class="brand-container">
+    <a class="brand" href="index.html">Dirty Aesthetic</a>
+    <a class="brand-subtitle" href="https://admitone.com/events/vancouver/community/performance/dirty-aesthetic-presents-sugar-on-the-rocks-ep-release-show/SRWWLY" target="_blank" rel="noopener">Jan 16th Tickets</a>
+  </div>
+  <div class="hamburger" id="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <nav class="nav" id="nav">
     <a href="music.html">Music</a>
     <a href="watch.html">Watch</a>
     <a href="store.html">Store</a>
@@ -87,7 +95,7 @@
     <p><a class="link" href="https://linktr.ee/dirtyaesthetic" target="_blank" rel="noopener">All Links</a></p>
   </section>
   <div class="epk-download-row">
-    <a id="download-epk-pdf" class="btn ghost" href="assets/downloads/dirtyaesthetic_epk.pdf" download style="margin-bottom:32px;">Download Press Kit (PDF)</a>
+    <a id="download-epk-pdf" class="btn ghost" href="assets/downloads/dirtyaesthetic_epk.pdf" download="DirtyAesthetic-EPK.pdf" style="margin-bottom:32px;">Download Press Kit (PDF)</a>
   </div>
 </main>
 
@@ -107,12 +115,5 @@
 </footer>
 
 <script src="js/main.js"></script>
-<script>
-document.getElementById('download-epk-pdf').addEventListener('click', function(e) {
-  e.preventDefault();
-  // Trigger print dialog which will create the PDF
-  window.print();
-});
-</script>
 </body>
 </html>
