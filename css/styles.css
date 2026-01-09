@@ -27,6 +27,10 @@ img{max-width:100%;display:block}
   from{opacity:0}
   to{opacity:1}
 }
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
 @keyframes pulse{
   0%,100%{opacity:1}
   50%{opacity:.7}
@@ -224,117 +228,200 @@ blockquote.tiktok-embed section{margin:0!important}
 .contact-form input:focus,.contact-form textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
 .contact-form .btn{margin-top:8px;width:100%;font-family:'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 
-/* Single Release Section */
-.single-release{
-  padding:clamp(48px,7vw,72px) clamp(20px,5vw,48px);
-  background:linear-gradient(135deg, rgba(176,122,63,.08) 0%, transparent 50%, rgba(122,54,0,.06) 100%);
-  border-bottom:1px solid rgba(255,255,255,.04);
-  animation:fadeIn .6s ease both;
+/* EP Release Section */
+.ep-release{
+  position:relative;
+  padding:clamp(60px,10vw,100px) clamp(20px,5vw,48px);
+  overflow:hidden;
+  background:#0a0705;
 }
-.single-release-inner{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:clamp(24px,4vw,48px);
-  max-width:700px;
+.ep-release-bg{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(176,122,63,.15) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(122,54,0,.12) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(32,23,15,.3) 0%, rgba(10,7,5,1) 100%);
+  pointer-events:none;
+}
+.ep-release-content{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(200px,320px) 1fr;
+  gap:clamp(32px,5vw,64px);
+  max-width:900px;
   margin:0 auto;
+  align-items:center;
 }
-.single-cover{
-  flex-shrink:0;
-  width:clamp(140px,25vw,200px);
+.ep-release-cover{
+  position:relative;
 }
-.single-cover img{
+.ep-cover-glow{
+  position:absolute;
+  inset:-20%;
+  background:radial-gradient(circle, rgba(176,122,63,.3) 0%, transparent 70%);
+  filter:blur(40px);
+  opacity:0;
+  transition:opacity .5s ease;
+  pointer-events:none;
+}
+.ep-release-cover:hover .ep-cover-glow{
+  opacity:1;
+}
+.ep-release-cover img{
   width:100%;
-  border-radius:12px;
-  box-shadow:0 8px 40px rgba(0,0,0,.5), 0 0 60px rgba(176,122,63,.15);
-  transition:transform .3s ease, box-shadow .3s ease;
+  border-radius:8px;
+  box-shadow:
+    0 4px 20px rgba(0,0,0,.5),
+    0 20px 60px rgba(0,0,0,.4),
+    0 0 0 1px rgba(255,255,255,.05);
+  transition:transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s ease;
 }
-.single-cover:hover img{
-  transform:scale(1.03) rotate(-1deg);
-  box-shadow:0 12px 50px rgba(0,0,0,.6), 0 0 80px rgba(176,122,63,.2);
+.ep-release-cover:hover img{
+  transform:scale(1.02) translateY(-4px);
+  box-shadow:
+    0 8px 30px rgba(0,0,0,.6),
+    0 30px 80px rgba(0,0,0,.5),
+    0 0 0 1px rgba(255,255,255,.08);
 }
-.single-info{
-  text-align:left;
+.ep-release-info{
+  animation:fadeUp .6s ease both;
 }
-.single-tag{
+.ep-release-tag{
   display:inline-block;
-  background:var(--accent);
-  color:#120c07;
-  padding:5px 14px;
-  border-radius:20px;
-  font-size:.75em;
-  font-weight:600;
-  letter-spacing:1.5px;
+  background:linear-gradient(135deg, var(--accent) 0%, #d4943f 100%);
+  color:#0a0705;
+  padding:6px 16px;
+  border-radius:4px;
+  font-size:.7em;
+  font-weight:700;
+  letter-spacing:2px;
   text-transform:uppercase;
-  margin-bottom:12px;
-  animation:pulse 2.5s ease infinite;
+  margin-bottom:16px;
 }
-.single-title{
-  font-size:clamp(2em,5vw,3em);
+.ep-release-title{
+  font-size:clamp(2.2em,6vw,3.5em);
   margin:0 0 8px;
   letter-spacing:1px;
   color:var(--ink);
-  line-height:1.1;
+  line-height:1;
+  font-weight:400;
 }
-.single-subtitle{
+.ep-release-meta{
   color:var(--muted);
-  margin:0 0 20px;
-  font-size:1em;
+  font-size:.95em;
+  margin:0 0 28px;
+  letter-spacing:.5px;
 }
-.single-subtitle em{
-  color:var(--ink);
-  font-style:normal;
+.ep-tracklist-full{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:repeat(3, auto);
+  grid-auto-flow:column;
+  gap:8px 32px;
+  margin-bottom:32px;
 }
-.stream-links{
+.ep-track{
   display:flex;
+  align-items:center;
   gap:12px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  transition:all .2s ease;
+}
+.ep-track:hover{
+  border-color:rgba(176,122,63,.2);
+}
+.ep-track:hover .track-title{
+  color:var(--ink);
+}
+.track-num{
+  font-size:.75em;
+  color:var(--accent);
+  font-weight:600;
+  min-width:20px;
+}
+.track-title{
+  color:var(--muted);
+  font-size:.9em;
+  transition:color .2s ease;
+}
+.ep-stream-buttons{
+  display:flex;
+  gap:16px;
   flex-wrap:wrap;
 }
-.stream-btn{
+.ep-stream-btn{
   display:inline-flex;
   align-items:center;
-  gap:8px;
-  padding:10px 18px;
-  border-radius:999px;
-  font-size:.9em;
-  font-weight:500;
-  transition:all .2s ease;
-  border:1px solid rgba(255,255,255,.15);
-  background:rgba(255,255,255,.03);
-  color:var(--ink);
+  gap:10px;
+  padding:14px 24px;
+  border-radius:8px;
+  font-size:.95em;
+  font-weight:600;
+  transition:all .25s cubic-bezier(.2,.8,.2,1);
+  text-decoration:none;
 }
-.stream-btn svg{
-  width:18px;
-  height:18px;
+.ep-stream-btn svg{
+  width:22px;
+  height:22px;
   flex-shrink:0;
 }
-.stream-btn.spotify:hover{
+.ep-stream-btn.spotify{
   background:#1DB954;
-  border-color:#1DB954;
   color:#000;
-  transform:translateY(-2px);
-  box-shadow:0 4px 20px rgba(29,185,84,.3);
 }
-.stream-btn.apple:hover{
-  background:#fc3c44;
-  border-color:#fc3c44;
+.ep-stream-btn.spotify:hover{
+  background:#1ed760;
+  transform:translateY(-3px);
+  box-shadow:0 8px 30px rgba(29,185,84,.4);
+}
+.ep-stream-btn.apple{
+  background:linear-gradient(135deg, #fc3c44 0%, #d93036 100%);
   color:#fff;
-  transform:translateY(-2px);
-  box-shadow:0 4px 20px rgba(252,60,68,.3);
 }
-@media (max-width:640px){
-  .single-release-inner{
-    flex-direction:column;
+.ep-stream-btn.apple:hover{
+  background:linear-gradient(135deg, #ff5058 0%, #fc3c44 100%);
+  transform:translateY(-3px);
+  box-shadow:0 8px 30px rgba(252,60,68,.4);
+}
+@media (max-width:768px){
+  .ep-release-content{
+    grid-template-columns:1fr;
     text-align:center;
+    gap:32px;
   }
-  .single-info{
-    text-align:center;
+  .ep-release-cover{
+    max-width:280px;
+    margin:0 auto;
   }
-  .stream-links{
+  .ep-tracklist-full{
+    grid-template-columns:1fr;
+    max-width:240px;
+    margin:0 auto 32px;
+    text-align:left;
+  }
+  .ep-stream-buttons{
     justify-content:center;
   }
-  .single-cover{
-    width:180px;
+}
+@media (max-width:480px){
+  .ep-release{
+    padding:clamp(40px,8vw,60px) 16px;
+  }
+  .ep-release-cover{
+    max-width:220px;
+  }
+  .ep-release-title{
+    font-size:clamp(1.8em,8vw,2.5em);
+  }
+  .ep-stream-buttons{
+    flex-direction:column;
+    gap:12px;
+  }
+  .ep-stream-btn{
+    justify-content:center;
+    width:100%;
   }
 }
 
@@ -390,8 +477,6 @@ blockquote.tiktok-embed section{margin:0!important}
   .hero-logo{width:clamp(250px,50vw,450px)}
   .page h2{margin-top:24px}
   .press-grid{grid-template-columns:repeat(2,1fr)}
-  .single-release-inner{gap:24px}
-  .single-cover{width:clamp(120px,22vw,160px)}
 }
 
 /* Mobile */
@@ -407,13 +492,6 @@ blockquote.tiktok-embed section{margin:0!important}
   .hero .cta-row{gap:10px}
   .hero .cta-row .btn{padding:10px 18px}
   .hero-logo{width:clamp(220px,70vw,400px)}
-  
-  .single-release{padding:clamp(32px,6vw,48px) clamp(16px,4vw,32px)}
-  .single-release-inner{flex-direction:column;text-align:center}
-  .single-info{text-align:center}
-  .stream-links{justify-content:center}
-  .single-cover{width:160px}
-  .single-title{font-size:clamp(1.8em,6vw,2.2em)}
   
   .page{padding:24px 16px}
   .button-row{gap:10px;padding:20px 16px}
@@ -448,10 +526,6 @@ blockquote.tiktok-embed section{margin:0!important}
   .hero-logo{width:clamp(180px,80vw,280px)}
   .hero .cta-row{flex-direction:column;gap:8px;width:100%;padding:0 20px}
   .hero .cta-row .btn{width:100%}
-  
-  .single-cover{width:140px}
-  .stream-links{flex-direction:column;gap:10px}
-  .stream-btn{justify-content:center}
   
   .release{width:100%;max-width:280px}
   .press-grid{grid-template-columns:1fr}
@@ -491,8 +565,6 @@ blockquote.tiktok-embed section{margin:0!important}
   .hero h1{font-size:clamp(28px,6vw,48px)}
   .hero-logo{width:clamp(200px,40vw,350px)}
   .hero p{margin:8px 0 16px}
-  .single-release{padding:24px 16px}
-  .single-release-inner{gap:20px}
   .site-header{padding:10px 16px}
 }
 
