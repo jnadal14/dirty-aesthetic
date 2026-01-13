@@ -22,6 +22,13 @@
 <meta name="twitter:description" content="Indie garage rock from Vancouver. Looks dirty, sounds dirtier.">
 <meta name="twitter:image" content="https://www.dirtyaesthetic.com/assets/images/press/GROUP%20.jpg">
 <link rel="icon" type="image/png" href="assets/images/favicon.png">
+
+<!-- Preload critical assets for faster loading -->
+<link rel="preload" href="assets/fonts/NaftaLight-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="assets/images/press/GROUP .jpg" as="image">
+<link rel="preload" href="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" as="image">
+<link rel="preload" href="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" as="image">
+
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -140,5 +147,14 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script>
+// Preload hero image for smoother loading
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(() => {
+    const img = new Image();
+    img.src = 'assets/images/press/GROUP .jpg';
+  });
+}
+</script>
 </body>
 </html>
