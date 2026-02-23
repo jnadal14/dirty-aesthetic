@@ -1,10 +1,19 @@
 {
   "upcoming": [
     {
-      "date": "Feb 22, 2026",
+      "date": "Mar 6, 2026",
       "city": "Vancouver",
-      "venue": "Green Auto — New and Known",
-      "link": "https://gigpit.ca/shows/event:vhIPyz2zli8"
+      "venue": "SFU Radio"
+    },
+    {
+      "date": "Mar 27, 2026",
+      "city": "Vancouver",
+      "venue": "MOM'S (Leo's Clothing Supply)"
+    },
+    {
+      "date": "Apr 4, 2026",
+      "city": "Vancouver",
+      "venue": "Green Auto"
     }
   ]
 }
