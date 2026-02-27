@@ -1,19 +1,29 @@
 {
   "upcoming": [
     {
+      "date": "Mar 1, 2026",
+      "city": "Vancouver",
+      "venue": "Red Gate",
+      "lineup": "Peanut Patrol, Drew Storey, Transient, Fridge",
+      "poster": "assets/images/posters/redgate_mar1.jpg"
+    },
+    {
       "date": "Mar 6, 2026",
       "city": "Vancouver",
-      "venue": "SFU Radio"
+      "venue": "SFU Radio Station (CJSF 90.1 FM)",
+      "link": "https://www.cjsf.ca/streaming"
     },
     {
       "date": "Mar 27, 2026",
       "city": "Vancouver",
-      "venue": "MOM'S (Leo's Clothing Supply)"
+      "venue": "MOM'S (Leo's Clothing Supply)",
+      "lineup": "Hotel Decor, Bry Luvjoy & The Fantomes, Rae & The Moonbeams, Coastal Shivers"
     },
     {
       "date": "Apr 4, 2026",
       "city": "Vancouver",
-      "venue": "Green Auto"
+      "venue": "Green Auto",
+      "lineup": "King of Foxes, Avery Sloane"
     }
   ]
 }
