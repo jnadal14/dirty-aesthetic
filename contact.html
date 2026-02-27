@@ -18,7 +18,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body class="contact-page-bg">
   <header class="site-header">
     <div class="brand-container">
       <a class="brand" href="index.html"><img src="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" alt="Dirty Aesthetic"></a>
@@ -39,6 +39,7 @@
 
 <main class="page">
   <h1 class="center">Inquiries</h1>
+  <p class="contact-subtitle">We'd love to work with you.</p>
   <form class="contact-form" action="https://formspree.io/f/xjgvzapo" method="POST">
     <label>
       <span>Name</span>
@@ -53,8 +54,16 @@
       <input type="text" name="subject">
     </label>
     <label>
+      <span>Project Start Date</span>
+      <input type="date" name="project_start_date">
+    </label>
+    <label>
+      <span>Project Details</span>
+      <textarea name="project_details" rows="4" placeholder="Venue, event type, expected capacity, other acts, etc."></textarea>
+    </label>
+    <label>
       <span>Message</span>
-      <textarea name="message" rows="6" required></textarea>
+      <textarea name="message" rows="4" required></textarea>
     </label>
     <button class="btn ghost" type="submit">Send Message</button>
   </form>
