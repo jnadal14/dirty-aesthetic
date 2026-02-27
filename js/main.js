@@ -33,6 +33,21 @@ if (hamburger && nav) {
       nav.classList.remove('active')
     }
   })
+
+  // Dynamically collapse nav when it overlaps the brand
+  const header = document.querySelector('.site-header')
+  const brand = document.querySelector('.brand-container')
+  function checkNavFit() {
+    header.classList.remove('nav-collapsed')
+    nav.style.display = ''
+    const brandRight = brand.getBoundingClientRect().right
+    const navLeft = nav.getBoundingClientRect().left
+    if (navLeft < brandRight + 12) {
+      header.classList.add('nav-collapsed')
+    }
+  }
+  checkNavFit()
+  window.addEventListener('resize', checkNavFit)
 }
 
 // Redirect to EPK page when printing (unless already on EPK page)
