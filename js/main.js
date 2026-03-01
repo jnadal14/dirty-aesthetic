@@ -134,7 +134,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     return
   }
 
-  data.upcoming.slice(0,4).forEach((s, i)=>{
+  data.upcoming.forEach((s, i)=>{
     if(editorial){
       const parts = parseDateParts(s.date)
       const row = document.createElement('a')
@@ -205,6 +205,21 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     container.appendChild(li)
   }
 })
+
+// Swing-in animation for band member cards on scroll
+;(function(){
+  const cards = document.querySelectorAll('.member-card')
+  if(!cards.length) return
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view')
+        observer.unobserve(entry.target)
+      }
+    })
+  }, { threshold: 0.02 })
+  cards.forEach(card => observer.observe(card))
+})()
 
 // Lightbox — close/nav logic (always set up if #lightbox exists)
 ;(function(){

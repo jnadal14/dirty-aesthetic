@@ -20,10 +20,22 @@
       "lineup": "Hotel Decor, Bry Luvjoy & The Fantomes, Rae & The Moonbeams, Coastal Shivers"
     },
     {
+      "date": "Apr 3, 2026",
+      "city": "Vancouver",
+      "venue": "Red Gate",
+      "lineup": "Carmine, MATH CLUB, Ynes"
+    },
+    {
       "date": "Apr 4, 2026",
       "city": "Vancouver",
       "venue": "Green Auto",
       "lineup": "King of Foxes, Avery Sloane"
+    },
+    {
+      "date": "Apr 18, 2026",
+      "city": "Vancouver",
+      "venue": "Green Auto",
+      "lineup": "The Zummers, Nick Stone & the Gems"
     }
   ]
 }

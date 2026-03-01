@@ -346,13 +346,24 @@ body.contact-page-bg{
 .member-card{
   display:flex;
   flex-direction:column;
-  animation:fadeUp .6s ease both;
+  opacity:0;
+  transform:rotate(8deg) translateY(60px) scale(.92);
+  transform-origin:bottom left;
+  transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);
 }
-.member-card:nth-child(2){animation-delay:.08s}
-.member-card:nth-child(3){animation-delay:.16s}
-.member-card:nth-child(4){animation-delay:.24s}
-.member-card:nth-child(5){animation-delay:.32s}
-.member-card:nth-child(6){animation-delay:.4s}
+.member-card:nth-child(even){
+  transform:rotate(-8deg) translateY(60px) scale(.92);
+  transform-origin:bottom right;
+}
+.member-card.in-view{
+  opacity:1;
+  transform:rotate(0) translateY(0) scale(1);
+}
+.member-card:nth-child(2){transition-delay:.05s}
+.member-card:nth-child(3){transition-delay:.1s}
+.member-card:nth-child(4){transition-delay:.15s}
+.member-card:nth-child(5){transition-delay:.2s}
+.member-card:nth-child(6){transition-delay:.25s}
 .member-card:nth-child(odd){padding-top:0}
 .member-card:nth-child(2){padding-top:clamp(100px,18vw,220px)}
 .member-card:nth-child(4){padding-top:clamp(80px,14vw,180px)}
@@ -1040,7 +1051,6 @@ a.show-row[href]{cursor:pointer}
   display:grid;
   grid-template-columns:1fr 1fr;
   grid-template-rows:repeat(3, auto);
-  grid-auto-flow:column;
   background:rgba(10,7,5,.5);
   border-radius:8px;
   padding:8px 16px;
@@ -1324,6 +1334,7 @@ a.show-row[href]{cursor:pointer}
   .epk-section-title{font-size:12pt;margin-bottom:10pt;padding-bottom:8pt}
   .epk-list li{padding:6pt 0;font-size:10pt}
   .members-grid{grid-template-columns:1fr 1fr 1fr;gap:12pt}
+  .member-card{opacity:1!important;transform:none!important}
   .member-right{padding-top:0}
   .member-name{font-size:10pt}
   .member-role{font-size:8pt}
