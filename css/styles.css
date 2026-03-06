@@ -816,32 +816,16 @@ a.show-row[href]{cursor:pointer}
 }
 
 .show-row-arrow{
-  display:flex;
-  align-items:center;
-  gap:6px;
   color:var(--accent);
   font-size:.7em;
   letter-spacing:1.5px;
   text-transform:uppercase;
-  opacity:1;
-  transform:translateX(0);
-  transition:all .4s cubic-bezier(.2,.8,.2,1);
+  transition:color .3s ease;
   white-space:nowrap;
-  padding:6px 12px;
-  border:1px solid rgba(176,122,63,.25);
-  border-radius:999px;
+  margin-left:12px;
 }
-.show-row-arrow svg{transition:transform .3s ease}
-.show-row:hover .show-row-arrow{
-  opacity:1;
-  transform:translateX(0);
-  border-color:rgba(176,122,63,.3);
-}
-.show-row:hover .show-row-arrow:hover{
-  background:rgba(176,122,63,.12);
-  border-color:rgba(176,122,63,.5);
-}
-.show-row:hover .show-row-arrow svg{transform:translateX(3px)}
+.show-row-arrow svg{display:none}
+.show-row:hover .show-row-arrow{color:var(--ink)}
 
 .show-row-poster{
   width:clamp(60px,10vw,90px);
@@ -894,7 +878,6 @@ a.show-row[href]{cursor:pointer}
     width:clamp(50px,14vw,75px);
   }
   .show-row-arrow{
-    padding:6px 10px;
     font-size:.65em;
     letter-spacing:1px;
   }

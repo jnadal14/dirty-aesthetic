@@ -157,12 +157,11 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
           <span class="show-row-day">${parts ? parts.dayOrd : ''}</span>
         </div>
         <div class="show-row-info">
-          <span class="show-row-venue">${s.venue}</span>
+          <span class="show-row-venue">${s.venue} ${arrowHtml}</span>
           ${lineupHtml}
           <span class="show-row-city">${s.city}</span>
         </div>
-        ${posterHtml}
-        ${arrowHtml}`
+        ${posterHtml}`
       container.appendChild(row)
 
       const posterEl = row.querySelector('.show-row-poster')
