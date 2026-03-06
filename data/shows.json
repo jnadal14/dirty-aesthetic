@@ -9,14 +9,15 @@
     {
       "date": "Mar 27, 2026",
       "city": "Vancouver",
-      "venue": "MOM'S (Leo's Clothing Supply)",
+      "venue": "Leo's Clothing Supply",
       "lineup": "Hotel Decor, Bry Luvjoy & The Fantomes, Rae & The Moonbeams, Coastal Shivers"
     },
     {
       "date": "Apr 3, 2026",
       "city": "Vancouver",
       "venue": "Red Gate",
-      "lineup": "Carmine, MATH CLUB, Ynes"
+      "lineup": "MATH CLUB, Carmine, Ynes",
+      "poster": "assets/images/posters/REDGATE_04:03:26.JPG"
     },
     {
       "date": "Apr 4, 2026",
