@@ -1264,11 +1264,8 @@ a.show-row[href]{cursor:pointer}
   .brand-subtitle{font-size:11px}
   
   .hero-logo{width:clamp(180px,80vw,280px)}
-  .hero .cta-row{flex-direction:column;gap:8px;width:100%;padding:0 20px}
-  .hero .cta-row .btn{width:100%}
-  
-  .button-row{flex-direction:column;gap:8px}
-  .button-row .btn{width:100%;max-width:280px}
+  .hero .cta-row{gap:8px}
+  .hero .cta-row .btn{padding:9px 16px;font-size:.95em}
   
   .footer-logo img{height:18px;top:-3px}
   .legal{flex-direction:column;gap:8px}
