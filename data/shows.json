@@ -1,13 +1,15 @@
 {
   "upcoming": [
     {
-      "date": "Apr 3, 2026",
+      "date": "Apr 18, 2026",
       "city": "Vancouver",
-      "venue": "Red Gate",
-      "lineup": "MATH CLUB, Carmine, Ynes",
-      "poster": "assets/images/posters/REDGATE_04:03:26.JPG",
-      "link": "https://redgate.tv/tickets/"
-    },
+      "venue": "Green Auto",
+      "lineup": "The Zummers, Nick Stone & the Gems",
+      "poster": "assets/images/posters/04:18:26_GREEN AUTO_THE ZUMMERS.JPG",
+      "link": "https://gigpit.ca/shows/event:bhs8mrkzaQo?region=1"
+    }
+  ],
+  "past": [
     {
       "date": "Apr 4, 2026",
       "city": "Vancouver",
@@ -17,12 +19,59 @@
       "link": "https://gigpit.ca/shows/event:MFXLx2rdrj4?region=1"
     },
     {
-      "date": "Apr 18, 2026",
+      "date": "Apr 3, 2026",
       "city": "Vancouver",
-      "venue": "Green Auto",
-      "poster": "assets/images/posters/04:18:26_GREEN AUTO_THE ZUMMERS.JPG",
-      "lineup": "The Zummers, Nick Stone & the Gems",
-      "link": "https://gigpit.ca/shows/event:bhs8mrkzaQo?region=1"
+      "venue": "Red Gate",
+      "lineup": "MATH CLUB, Carmine, Ynes",
+      "poster": "assets/images/posters/REDGATE_04:03:26.JPG",
+      "link": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5X7CPA269WSGW"
+    },
+    {
+      "date": "Mar 27, 2026",
+      "city": "Vancouver",
+      "venue": "Leo's Clothing Supply",
+      "lineup": "Hotel Decor, Bry Luvjoy & The Fantomes, Rae & The Moonbeams, Coastal Shivers",
+      "poster": "assets/images/posters/03:27:26_MOMS.JPG",
+      "link": "https://www.currentevents.online/products/live-music-at-leos-clothing-supply-upstairs-hotel-decor-the-fantones-rae-the-moonbeams-coastal-shivers-dirty-aesthetic",
+      "notes": "Cancelled"
+    },
+    {
+      "date": "Mar 6, 2026",
+      "city": "Vancouver",
+      "venue": "SFU Radio Station (CJSF 90.1 FM)",
+      "link": "https://www.cjsf.ca/streaming",
+      "notes": "Live radio performance"
+    },
+    {
+      "date": "Mar 1, 2026",
+      "city": "Vancouver",
+      "venue": "Red Gate",
+      "lineup": "Peanut Patrol, Drew Storey, Transient, Fridge",
+      "poster": "assets/images/posters/redgate_mar1.jpg"
+    },
+    {
+      "date": "Feb 23, 2026",
+      "city": "Vancouver",
+      "venue": "Green Auto — New and Known",
+      "poster": "assets/images/posters/GREEN AUTO_NEW AND KNOWN_POSTER.jpeg",
+      "link": "https://gigpit.ca/shows/event:vhIPyz2zli8"
+    },
+    {
+      "date": "Jan 25, 2026",
+      "city": "Vancouver",
+      "venue": "Green Auto"
+    },
+    {
+      "date": "Jan 16, 2026",
+      "city": "Vancouver",
+      "venue": "The Biltmore Cabaret — Sugar on the Rocks EP Release",
+      "poster": "assets/images/posters/SOTR_SHOW_POSTER.JPG",
+      "link": "https://admitone.com/events/vancouver/community/performance/dirty-aesthetic-presents-sugar-on-the-rocks-ep-release-show/SRWWLY"
+    },
+    {
+      "date": "Nov 21, 2025",
+      "city": "Vancouver",
+      "venue": "The Roxy Cabaret"
     }
   ]
 }
