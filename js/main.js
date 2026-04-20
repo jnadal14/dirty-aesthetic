@@ -118,7 +118,7 @@ function parseDateParts(dateStr) {
 }
 
 // Load shows
-const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><div class="show-row-empty-inner"><span class="show-row-venue">TBA</span><p class="show-row-empty-note">Nothing booked right now — check back soon for new dates.</p></div></div>`
+const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><span class="show-row-venue">TBA</span></div>`
 
 fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const container=document.getElementById('upcoming')
@@ -131,7 +131,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     } else {
       const li=document.createElement('li')
       li.className='show-list-tba'
-      li.textContent='TBA — check back soon.'
+      li.textContent='TBA'
       container.appendChild(li)
     }
     return
@@ -204,7 +204,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   } else {
     const li=document.createElement('li')
     li.className='show-list-tba'
-    li.textContent='TBA — check back soon.'
+    li.textContent='TBA'
     container.appendChild(li)
   }
 })
