@@ -1,5 +1,6 @@
 {
-  "upcoming": [
+  "upcoming": [],
+  "past": [
     {
       "date": "Apr 18, 2026",
       "city": "Vancouver",
@@ -7,9 +8,7 @@
       "lineup": "The Zummers, Nick Stone & the Gems",
       "poster": "assets/images/posters/04:18:26_GREEN AUTO_THE ZUMMERS.JPG",
       "link": "https://gigpit.ca/shows/event:bhs8mrkzaQo?region=1"
-    }
-  ],
-  "past": [
+    },
     {
       "date": "Apr 4, 2026",
       "city": "Vancouver",

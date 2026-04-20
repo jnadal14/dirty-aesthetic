@@ -118,6 +118,8 @@ function parseDateParts(dateStr) {
 }
 
 // Load shows
+const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><div class="show-row-empty-inner"><span class="show-row-venue">TBA</span><p class="show-row-empty-note">Nothing booked right now — check back soon for new dates.</p></div></div>`
+
 fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const container=document.getElementById('upcoming')
   if(!container)return
@@ -125,10 +127,11 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
 
   if(!data.upcoming || data.upcoming.length===0){
     if(editorial){
-      container.innerHTML='<div class="show-row"><span class="show-row-venue" style="width:100%;text-align:center">TBA</span></div>'
+      container.innerHTML = emptyShowsEditorialHtml
     } else {
       const li=document.createElement('li')
-      li.textContent='TBA'
+      li.className='show-list-tba'
+      li.textContent='TBA — check back soon.'
       container.appendChild(li)
     }
     return
@@ -197,10 +200,11 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const container=document.getElementById('upcoming')
   if(!container)return
   if(container.classList.contains('shows-editorial')){
-    container.innerHTML='<div class="show-row"><span class="show-row-venue" style="width:100%;text-align:center">TBA</span></div>'
+    container.innerHTML = emptyShowsEditorialHtml
   } else {
     const li=document.createElement('li')
-    li.textContent='TBA'
+    li.className='show-list-tba'
+    li.textContent='TBA — check back soon.'
     container.appendChild(li)
   }
 })
