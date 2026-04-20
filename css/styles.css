@@ -761,6 +761,27 @@ a.show-row[href]{cursor:pointer}
   border-bottom-color:rgba(176,122,63,.15);
   background:rgba(176,122,63,.03);
 }
+.show-row-empty{
+  grid-template-columns:1fr;
+  justify-items:center;
+  text-align:center;
+  cursor:default;
+  padding:clamp(24px,5vw,40px) 16px;
+}
+.show-row-empty::before{display:none}
+.show-row-empty:hover{
+  background:transparent;
+  border-bottom-color:rgba(255,255,255,.05);
+}
+.show-row-empty-inner{max-width:28em}
+.show-row-empty-note{
+  margin:12px 0 0;
+  color:var(--muted);
+  font-size:clamp(.85em,2.8vw,.98em);
+  line-height:1.5;
+  font-weight:400;
+  letter-spacing:.3px;
+}
 
 .show-row-date{
   display:flex;
