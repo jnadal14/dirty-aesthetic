@@ -41,7 +41,7 @@ img{max-width:100%;display:block}
 .brand-subtitle{font-size:14px;color:var(--ink);opacity:.85;transition:all .2s ease;letter-spacing:.5px;text-decoration:none}
 .brand-subtitle:hover{opacity:1;color:var(--accent)}
 .nav{display:flex;align-items:center;gap:clamp(12px,2.5vw,20px)}
-.nav a{opacity:.9;position:relative;padding-bottom:4px;transition:opacity .2s ease;white-space:nowrap;letter-spacing:.5px}
+.nav a{opacity:.9;position:relative;padding-bottom:4px;transition:opacity .2s ease;white-space:nowrap;letter-spacing:.5px;font-size:clamp(1.05rem,1.2vw,1.2rem)}
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;z-index:1001}
 .nav-collapsed .hamburger{display:flex}
 .nav-collapsed .brand-subtitle{display:none}
@@ -260,7 +260,7 @@ body.contact-page-bg{
   display:grid;
   grid-template-columns:auto 1fr;
   gap:clamp(28px,4vw,48px);
-  align-items:center;
+  align-items:stretch;
   min-height:auto;
   padding:clamp(100px,12vw,140px) clamp(40px,6vw,80px) 0;
   animation:fadeUp .7s ease both;
@@ -274,11 +274,19 @@ body.contact-page-bg{
   overflow:hidden;
   box-shadow:0 8px 32px rgba(0,0,0,.4);
   width:clamp(200px,22vw,320px);
+  height:100%;
+  max-height:100%;
 }
 .epk-intro-photo img{
   width:100%;
+  height:100%;
   display:block;
   border-radius:6px;
+  object-fit:cover;
+}
+.epk-intro-photo-alt-logo,
+.epk-intro-photo-mobile-bottom{
+  display:none;
 }
 .epk-intro-content{
   display:flex;
@@ -319,6 +327,15 @@ body.contact-page-bg{
 }
 .epk-intro-content p + p{
   margin-top:1em;
+}
+@media (min-width:801px){
+  .epk-intro{
+    grid-template-columns:clamp(220px,24vw,340px) minmax(0,1fr);
+    align-items:stretch;
+  }
+  .epk-intro-photo{
+    display:block;
+  }
 }
 
 /* — Spotify embed — */
@@ -521,6 +538,7 @@ body.contact-page-bg{
 @media (max-width:800px){
   .epk-intro{
     grid-template-columns:auto 1fr;
+    align-items:start;
     min-height:auto;
     padding:clamp(90px,14vw,110px) clamp(20px,4vw,32px) 0;
     gap:clamp(20px,4vw,36px);
@@ -530,6 +548,21 @@ body.contact-page-bg{
   }
   .epk-intro-photo{
     width:clamp(110px,22vw,180px);
+    position:relative;
+    height:auto;
+    align-self:start;
+    display:block;
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,.4);
+  }
+  .epk-intro-photo img{
+    height:auto;
+    object-fit:initial;
+  }
+  .epk-intro-photo-alt-logo,
+  .epk-intro-photo-mobile-bottom{
+    display:none;
   }
   .epk-intro-content{
     padding:0;
@@ -591,6 +624,23 @@ body.contact-page-bg{
   .epk-contact-section .btn{
     padding:10px 20px;
     font-size:.95em;
+  }
+}
+@media (max-width:640px){
+  .epk-intro{
+    grid-template-columns:1fr;
+    align-items:start;
+  }
+  .epk-intro-photo{
+    display:none;
+  }
+  .epk-logo{
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .epk-subtitle{
+    display:block;
+    text-align:center;
   }
 }
 @media (max-width:480px){
@@ -1236,7 +1286,13 @@ a.show-row[href]{cursor:pointer}
   .nav{gap:6px}
   .nav a{font-size:.8em;letter-spacing:0}
   
-  .hero{height:55vh;min-height:360px;background-position:center center;background-size:cover}
+  .hero{
+    height:100vh;
+    min-height:100vh;
+    background-image:url('../assets/images/HEADER_MOBILE.jpg');
+    background-position:center top;
+    background-size:cover;
+  }
   .hero .cta-row{gap:10px}
   .hero .cta-row .btn{padding:10px 18px}
   .hero-logo{width:clamp(220px,70vw,400px)}
