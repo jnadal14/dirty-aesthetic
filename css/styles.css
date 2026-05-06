@@ -1448,7 +1448,6 @@ a.show-row[href]{cursor:pointer}
   *{
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
   *{animation:none!important;transition:none!important}
   html,body{
@@ -1465,9 +1464,39 @@ a.show-row[href]{cursor:pointer}
   .page h1{font-size:22pt;margin-bottom:6pt;text-align:center;color:var(--ink);letter-spacing:2pt}
 
   .epk-page{padding:0}
-  .epk-intro{grid-template-columns:1fr 1fr;min-height:auto}
-  .epk-intro-photo{height:auto;max-height:250pt}
-  .epk-section{padding:20pt 0;page-break-inside:avoid}
+  .epk-intro{
+    grid-template-columns:1fr 1fr;
+    min-height:auto;
+    padding:0;
+    gap:14pt;
+    align-items:start;
+    break-after:page;
+    page-break-after:always;
+  }
+  .epk-intro-photo{height:auto;max-height:220pt}
+  .epk-intro-content p{font-size:10pt;line-height:1.45}
+  .epk-spotify-embed{display:none!important}
+
+  .epk-divider-photo{display:none!important}
+
+  .epk-members{
+    break-before:page;
+    page-break-before:always;
+    break-after:page;
+    page-break-after:always;
+  }
+
+  .epk-gallery{
+    break-before:page;
+    page-break-before:always;
+  }
+
+  /* Keep the PDF to 3 pages by limiting gallery */
+  .epk-gallery .gallery-item:nth-child(n+10){display:none!important}
+
+  .epk-contact-section{display:none!important}
+
+  .epk-section{padding:20pt 0;page-break-inside:avoid;break-inside:avoid}
   .epk-section-title{font-size:12pt;margin-bottom:10pt;padding-bottom:8pt}
   .epk-list li{padding:6pt 0;font-size:10pt}
   .members-grid{grid-template-columns:1fr 1fr 1fr;gap:12pt}
@@ -1480,7 +1509,6 @@ a.show-row[href]{cursor:pointer}
   .gallery-masonry{columns:3;column-gap:8pt}
   .gallery-masonry .gallery-item{border-radius:4pt;margin-bottom:8pt}
   .lightbox-overlay{display:none!important}
-  .epk-divider-photo{max-height:200pt;page-break-inside:avoid}
 
   a::after{content:none!important}
   h1{page-break-after:avoid}
