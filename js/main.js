@@ -70,6 +70,223 @@ window.addEventListener('beforeprint', () => {
   }
 })
 
+// Site-wide parallax scrolling (desktop, reduced-motion aware)
+;(function(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+  const contentConfig = [
+    { selector: '.hero-inner', speed: 0.08 },
+    { selector: '.shows-feature-inner', speed: 0.06 },
+    { selector: '.ep-release-content', speed: 0.05 },
+    { selector: '.home-contact-inner', speed: 0.04 },
+    { selector: '.watch-hero', speed: 0.05 },
+    { selector: '.music-header', speed: 0.04 },
+    { selector: '.page', speed: 0.03 },
+    { selector: '.epk-intro-content', speed: 0.06 },
+    { selector: '.epk-intro-photo', speed: 0.09 }
+  ]
+
+  const backgroundConfig = [
+    { selector: '.hero', cssVar: '--hero-bg-parallax', speed: 0.045 },
+    { selector: '.shows-feature', cssVar: '--shows-bg-parallax', speed: 0.05 },
+    { selector: '.ep-release', cssVar: '--ep-bg-parallax', speed: 0.04 }
+  ]
+
+  let enabled = false
+  let ticking = false
+  let contentTargets = []
+  let backgroundTargets = []
+
+  function mapTargets(config) {
+    const targets = []
+    for (let i = 0; i < config.length; i++) {
+      const def = config[i]
+      const nodes = document.querySelectorAll(def.selector)
+      nodes.forEach(node => targets.push({ node, ...def }))
+    }
+    return targets
+  }
+
+  function resetParallax() {
+    contentTargets.forEach(({ node }) => node.style.setProperty('--parallax-y', '0px'))
+    backgroundTargets.forEach(({ node, cssVar }) => node.style.setProperty(cssVar, '0px'))
+  }
+
+  function updateParallax() {
+    if (!enabled) {
+      resetParallax()
+      ticking = false
+      return
+    }
+
+    const vh = window.innerHeight || document.documentElement.clientHeight
+    const activeZone = 180
+
+    contentTargets.forEach(({ node, speed }) => {
+      const rect = node.getBoundingClientRect()
+      if (rect.bottom < -activeZone || rect.top > vh + activeZone) {
+        node.style.setProperty('--parallax-y', '0px')
+        return
+      }
+      const center = rect.top + rect.height / 2
+      const offset = (vh / 2 - center) * speed
+      node.style.setProperty('--parallax-y', `${offset.toFixed(2)}px`)
+    })
+
+    backgroundTargets.forEach(({ node, speed, cssVar }) => {
+      const rect = node.getBoundingClientRect()
+      if (rect.bottom < -activeZone || rect.top > vh + activeZone) {
+        node.style.setProperty(cssVar, '0px')
+        return
+      }
+      const center = rect.top + rect.height / 2
+      const offset = (vh / 2 - center) * speed
+      node.style.setProperty(cssVar, `${offset.toFixed(2)}px`)
+    })
+
+    ticking = false
+  }
+
+  function scheduleUpdate() {
+    if (ticking) return
+    ticking = true
+    requestAnimationFrame(updateParallax)
+  }
+
+  function refreshState() {
+    enabled = !reduceMotion.matches
+    contentTargets = mapTargets(contentConfig)
+    backgroundTargets = mapTargets(backgroundConfig)
+    scheduleUpdate()
+  }
+
+  window.addEventListener('scroll', scheduleUpdate, { passive: true })
+  window.addEventListener('resize', refreshState, { passive: true })
+  if (reduceMotion.addEventListener) {
+    reduceMotion.addEventListener('change', refreshState)
+  }
+
+  refreshState()
+})()
+
+// ===== Lenis smooth-scroll =====
+// Loads Lenis from CDN and turns it on for the whole document.
+// Hooks all in-page anchor links to use lenis.scrollTo for buttery jumps.
+// Disabled when prefers-reduced-motion is set.
+;(function loadLenis(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+  const script = document.createElement('script')
+  script.src = 'https://unpkg.com/lenis@1.1.20/dist/lenis.min.js'
+  script.async = true
+  script.onload = () => {
+    if (typeof window.Lenis !== 'function') return
+
+    const lenis = new window.Lenis({
+      duration: 1.05,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      syncTouch: false
+    })
+
+    function raf(time){
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+    requestAnimationFrame(raf)
+
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      const href = link.getAttribute('href')
+      if (!href || href.length <= 1) return
+      link.addEventListener('click', (e) => {
+        const target = document.querySelector(href)
+        if (!target) return
+        e.preventDefault()
+        lenis.scrollTo(target, { offset: 0, duration: 1.45 })
+      })
+    })
+
+    window.__lenis = lenis
+  }
+  document.head.appendChild(script)
+})()
+
+// ===== Custom cursor follower =====
+// A single dot lerp-tracks the pointer. It inverts under any background
+// via mix-blend-mode and grows + flips color when hovering interactive
+// elements. Skipped on touch devices.
+;(function customCursor(){
+  if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return
+
+  const dot = document.createElement('div')
+  dot.className = 'custom-cursor'
+  document.body.appendChild(dot)
+  document.body.classList.add('custom-cursor-active')
+
+  let dx = -100, dy = -100, tx = -100, ty = -100
+  let raf = null
+
+  function tick(){
+    dx += (tx - dx) * 0.45
+    dy += (ty - dy) * 0.45
+    dot.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0) translate(-50%, -50%)`
+    raf = requestAnimationFrame(tick)
+  }
+
+  document.addEventListener('mousemove', (e) => {
+    tx = e.clientX
+    ty = e.clientY
+    dot.classList.add('visible')
+    if (!raf) raf = requestAnimationFrame(tick)
+  }, { passive: true })
+
+  document.addEventListener('mouseleave', () => {
+    dot.classList.remove('visible')
+  })
+
+  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
+
+  document.addEventListener('mouseover', (e) => {
+    const isHover = !!e.target.closest(hoverSelector)
+    dot.classList.toggle('hover', isHover)
+  })
+})()
+
+// Scroll-triggered reveal animations.
+// Any element marked .reveal / .reveal-fade / .reveal-scale will animate
+// into place as it enters the viewport. Exposed globally so dynamically
+// inserted elements (e.g. show rows from JSON) can be observed too.
+;(function(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    document.querySelectorAll('.reveal,.reveal-fade,.reveal-scale')
+      .forEach(el => el.classList.add('in-view'))
+    window.__observeReveal = () => {}
+    return
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.classList.add('in-view')
+        observer.unobserve(entry.target)
+      }
+    })
+  }, {
+    threshold: 0.18,
+    rootMargin: '0px 0px -8% 0px'
+  })
+
+  function observeReveal(scope){
+    const root = scope || document
+    root.querySelectorAll('.reveal,.reveal-fade,.reveal-scale').forEach(el => {
+      if (!el.classList.contains('in-view')) observer.observe(el)
+    })
+  }
+
+  observeReveal()
+  window.__observeReveal = observeReveal
+})()
+
 // Music service toggle
 const toggleButtons = document.querySelectorAll('.toggle-btn')
 const releaseLinks = document.querySelectorAll('.release-link')
@@ -141,8 +358,8 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     if(editorial){
       const parts = parseDateParts(s.date)
       const row = document.createElement('a')
-      row.className = 'show-row'
-      row.style.animationDelay = `${i * .12}s`
+      row.className = 'show-row reveal'
+      row.style.setProperty('--reveal-delay', `${(i * 0.08).toFixed(2)}s`)
       if(s.link){
         row.href = s.link
         row.target = '_blank'
@@ -196,6 +413,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       container.appendChild(li)
     }
   })
+  if (typeof window.__observeReveal === 'function') window.__observeReveal(container)
 }).catch(()=>{
   const container=document.getElementById('upcoming')
   if(!container)return
