@@ -74,16 +74,17 @@ window.addEventListener('beforeprint', () => {
 ;(function(){
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
+  // Only elements that live inside an overflow:hidden hero-style container
+  // (or have generous padding around them) get content-layer parallax. We
+  // deliberately exclude .ep-release-content, .watch-hero, .epk-intro-*
+  // because those sit next to non-parallaxed content and overlap onto it
+  // when they drift.
   const contentConfig = [
     { selector: '.hero-inner', speed: 0.08 },
     { selector: '.shows-feature-inner', speed: 0.06 },
-    { selector: '.ep-release-content', speed: 0.05 },
     { selector: '.home-contact-inner', speed: 0.04 },
-    { selector: '.watch-hero', speed: 0.05 },
     { selector: '.music-header', speed: 0.04 },
-    { selector: '.page', speed: 0.03 },
-    { selector: '.epk-intro-content', speed: 0.06 },
-    { selector: '.epk-intro-photo', speed: 0.09 }
+    { selector: '.page', speed: 0.03 }
   ]
 
   const backgroundConfig = [
@@ -120,14 +121,13 @@ window.addEventListener('beforeprint', () => {
     }
 
     const vh = window.innerHeight || document.documentElement.clientHeight
-    const activeZone = 180
 
+    // Always compute against actual position. The previous activeZone
+    // shortcut snapped --parallax-y to 0 for off-screen elements and then
+    // jumped to the full calculated offset (often ±20-50px) the instant
+    // they re-entered the buffer, which read as a visible jolt.
     contentTargets.forEach(({ node, speed }) => {
       const rect = node.getBoundingClientRect()
-      if (rect.bottom < -activeZone || rect.top > vh + activeZone) {
-        node.style.setProperty('--parallax-y', '0px')
-        return
-      }
       const center = rect.top + rect.height / 2
       const offset = (vh / 2 - center) * speed
       node.style.setProperty('--parallax-y', `${offset.toFixed(2)}px`)
@@ -135,10 +135,6 @@ window.addEventListener('beforeprint', () => {
 
     backgroundTargets.forEach(({ node, speed, cssVar }) => {
       const rect = node.getBoundingClientRect()
-      if (rect.bottom < -activeZone || rect.top > vh + activeZone) {
-        node.style.setProperty(cssVar, '0px')
-        return
-      }
       const center = rect.top + rect.height / 2
       const offset = (vh / 2 - center) * speed
       node.style.setProperty(cssVar, `${offset.toFixed(2)}px`)

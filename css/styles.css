@@ -80,7 +80,7 @@ img{max-width:100%;display:block}
 .nav a.active{opacity:1}
 
 /* hero */
-.hero{position:relative;height:100vh;background:url('../assets/images/HEADER.jpg?v=20260508') center calc(55% + var(--hero-bg-parallax, 0px))/cover no-repeat}
+.hero{position:relative;height:100vh;overflow:hidden;background:url('../assets/images/HEADER.jpg?v=20260508') center calc(55% + var(--hero-bg-parallax, 0px))/cover no-repeat}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(32,23,15,.4) 0%,rgba(32,23,15,.65) 50%,rgba(32,23,15,.9) 100%);filter:sepia(50%)}
 .hero-inner{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 clamp(16px,5vw,40px)}
 .hero h1{font-size:clamp(36px,8vw,72px);letter-spacing:2px;margin:0;animation:fadeUp .8s ease both;text-shadow:0 4px 30px rgba(0,0,0,.5);max-width:900px}
@@ -88,16 +88,14 @@ img{max-width:100%;display:block}
 .hero p{margin:12px 0 28px;color:var(--muted);animation:fadeUp .8s ease .15s both;font-size:clamp(1em,2.5vw,1.2em)}
 .hero .cta-row{animation:fadeUp .8s ease .3s both;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 
-/* Site-wide parallax layers (content + section backgrounds) */
+/* Site-wide parallax layers (content). Keep this list in sync with the
+   contentConfig array in js/main.js — adding a selector here without the
+   matching entry there will leave the element static (and vice versa). */
 .hero-inner,
 .shows-feature-inner,
-.ep-release-content,
 .home-contact-inner,
-.watch-hero,
 .music-header,
-.page,
-.epk-intro-content,
-.epk-intro-photo{
+.page{
   transform:translate3d(0, var(--parallax-y, 0px), 0);
   will-change:transform;
 }
@@ -130,7 +128,10 @@ img{max-width:100%;display:block}
 .in-view.reveal-fade,
 .in-view.reveal-scale{
   opacity:1;
-  transform:translate3d(0,0,0) scale(1);
+  /* Preserve --parallax-y so elements that are both revealed AND parallax
+     targets (e.g. .music-header) keep drifting after their reveal
+     animation completes. */
+  transform:translate3d(0, var(--parallax-y, 0px), 0) scale(1);
   filter:blur(0);
 }
 
@@ -226,7 +227,7 @@ main>.page{max-width:none}
 .shows.static li:hover{transform:none;background:rgba(255,255,255,.03)}
 
 /* music header with toggle */
-.music-header{position:relative;margin:0 auto 16px;max-width:900px}
+.music-header{position:relative;margin:0 auto clamp(36px,5vw,64px);max-width:900px;padding-top:clamp(8px,2vw,20px)}
 .music-header h1{margin:0}
 .music-toggle{display:flex;gap:16px;align-items:center;position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:10}
 .toggle-btn{background:none;border:none;padding:4px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;pointer-events:auto}
@@ -878,7 +879,7 @@ body.privacy-page .privacy-page-main p{
 .lightbox-prev{left:20px}
 .lightbox-next{right:20px}
 @media (max-width:640px){.lightbox-nav{padding:8px 12px;font-size:18px}.lightbox-close{top:12px;right:16px;font-size:24px}}
-.embed{margin:16px auto;max-width:100%}
+.embed{margin:clamp(48px,6vw,80px) auto clamp(24px,4vw,48px);max-width:100%}
 .embed iframe,.embed blockquote{margin:0 auto}
 
 /* social embed grid */
