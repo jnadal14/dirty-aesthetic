@@ -92,8 +92,6 @@ img{max-width:100%;display:block}
    contentConfig array in js/main.js — adding a selector here without the
    matching entry there will leave the element static (and vice versa). */
 .hero-inner,
-.shows-feature-inner,
-.home-contact-inner,
 .music-header,
 .page{
   transform:translate3d(0, var(--parallax-y, 0px), 0);
@@ -103,10 +101,18 @@ img{max-width:100%;display:block}
 /* ===== Scroll-triggered reveals =====
    Elements with .reveal / .reveal-fade / .reveal-scale start hidden
    and animate into place when the IntersectionObserver adds .in-view.
-   Use --reveal-delay (inline style) for staggered child animations. */
+   Use --reveal-delay (inline style) for staggered child animations.
+
+   The explicit --parallax-y:0 below is critical: CSS custom properties
+   inherit by default, so a .reveal child of a parallax target (e.g. an
+   <h2> inside .home-contact-inner) would otherwise pick up the parent's
+   parallax offset and double-apply it via its own in-view transform,
+   producing visible stutter and overshoot. The parallax script writes
+   to .style (inline) on actual targets, which still wins via specificity. */
 .reveal,
 .reveal-fade,
 .reveal-scale{
+  --parallax-y:0px;
   opacity:0;
   transition:
     opacity 1s cubic-bezier(.2,.7,.2,1) var(--reveal-delay,0s),

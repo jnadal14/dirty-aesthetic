@@ -74,15 +74,14 @@ window.addEventListener('beforeprint', () => {
 ;(function(){
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
-  // Only elements that live inside an overflow:hidden hero-style container
-  // (or have generous padding around them) get content-layer parallax. We
-  // deliberately exclude .ep-release-content, .watch-hero, .epk-intro-*
-  // because those sit next to non-parallaxed content and overlap onto it
-  // when they drift.
+  // Keep this list small and conservative. Section "inner" containers were
+  // removed because their content drifts faster than the page scroll and
+  // either escapes overflow:hidden boundaries (heading slipping under the
+  // hero) or exposes the CSS-var inheritance bug to revealed children
+  // (form/heading stutter). What's left is just the hero text and the
+  // gentle whole-page drift on inner pages.
   const contentConfig = [
     { selector: '.hero-inner', speed: 0.08 },
-    { selector: '.shows-feature-inner', speed: 0.06 },
-    { selector: '.home-contact-inner', speed: 0.04 },
     { selector: '.music-header', speed: 0.04 },
     { selector: '.page', speed: 0.03 }
   ]
