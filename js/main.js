@@ -339,6 +339,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
 
   if(!data.upcoming || data.upcoming.length===0){
     if(editorial){
+      container.classList.remove('shows-editorial--solo')
       container.innerHTML = emptyShowsEditorialHtml
     } else {
       const li=document.createElement('li')
@@ -349,11 +350,16 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     return
   }
 
+  if (editorial) {
+    container.classList.toggle('shows-editorial--solo', data.upcoming.length === 1)
+  }
+
   data.upcoming.forEach((s, i)=>{
     if(editorial){
       const parts = parseDateParts(s.date)
       const row = document.createElement('a')
-      row.className = 'show-row reveal'
+      const solo = data.upcoming.length === 1 ? ' show-row--solo' : ''
+      row.className = 'show-row reveal' + solo
       row.style.setProperty('--reveal-delay', `${(i * 0.08).toFixed(2)}s`)
       if(s.link){
         row.href = s.link
@@ -413,6 +419,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const container=document.getElementById('upcoming')
   if(!container)return
   if(container.classList.contains('shows-editorial')){
+    container.classList.remove('shows-editorial--solo')
     container.innerHTML = emptyShowsEditorialHtml
   } else {
     const li=document.createElement('li')
