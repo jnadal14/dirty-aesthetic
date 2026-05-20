@@ -23,20 +23,22 @@
 <meta name="twitter:image" content="https://www.dirtyaesthetic.com/assets/images/press/GROUP%20.jpg">
 <link rel="icon" type="image/png" href="assets/images/favicon.png">
 
-<!-- Preload critical assets for faster loading -->
+<!-- Preload critical (above-the-fold) assets only -->
 <link rel="preload" href="assets/fonts/NaftaLight-Regular.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="preload" href="assets/images/HEADER.jpg?v=20260508" as="image">
+<link rel="preload" as="image" type="image/webp" href="assets/images/optimized/header-desktop.webp" media="(min-width: 769px)" fetchpriority="high">
+<link rel="preload" as="image" type="image/webp" href="assets/images/optimized/header-mobile.webp" media="(max-width: 768px)" fetchpriority="high">
 <link rel="preload" href="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" as="image">
 <link rel="preload" href="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" as="image">
-<link rel="preload" href="assets/images/covers/cover_irrational.jpg" as="image">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <header class="site-header">
   <div class="brand-container">
-    <a class="brand" href="index.html"><img src="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" alt="Dirty Aesthetic"></a>
+    <a class="brand" href="index.html"><img src="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" alt="Dirty Aesthetic" decoding="async" width="120" height="120"></a>
   </div>
   <div class="hamburger" id="hamburger">
     <span></span>
@@ -56,7 +58,7 @@
   <section class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-inner">
-      <h1><img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic" class="hero-logo"></h1>
+      <h1><img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic" class="hero-logo" decoding="async" fetchpriority="high"></h1>
       <p>Vancouver, BC</p>
       <div class="cta-row">
         <a class="btn ghost" href="#upcoming-section">Shows</a>
@@ -79,7 +81,10 @@
       <div class="ep-release-cover reveal-scale">
         <div class="ep-cover-glow"></div>
         <div class="single-cover-badge" aria-hidden="true">Coming Soon</div>
-        <img src="assets/images/covers/cover_irrational.jpg" alt="Irrational single cover">
+        <picture>
+          <source type="image/webp" srcset="assets/images/optimized/covers/cover_irrational.webp">
+          <img src="assets/images/optimized/covers/cover_irrational.jpg" alt="Irrational single cover" loading="lazy" decoding="async" width="1200" height="1200">
+        </picture>
       </div>
       <div class="ep-release-info">
         <span class="ep-release-tag reveal">New Single</span>
@@ -91,7 +96,6 @@
         <p class="single-release-blurb reveal" style="--reveal-delay:.34s">The first taste of our upcoming debut album. Pre-save now and hear it the moment it drops.</p>
         <div class="single-release-actions reveal" style="--reveal-delay:.42s">
           <a href="https://distrokid.com/hyperfollow/dirtyaesthetic/irrational?ref=release" target="_blank" rel="noopener" class="presave-btn">
-            <svg class="presave-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.95 6.39 7.05.62-5.33 4.62 1.6 6.87L12 17.77l-6.27 3.23 1.6-6.87L2 9.51l7.05-.62L12 2.5z"/></svg>
             <span>Pre-Save Irrational</span>
           </a>
           <p class="presave-help">Spotify, Apple Music, Deezer &amp; more</p>
@@ -105,7 +109,10 @@
     <div class="ep-release-content">
       <div class="ep-release-cover reveal-scale">
         <div class="ep-cover-glow"></div>
-        <img src="assets/images/covers/cover_sugar_on_the_rocks.jpg" alt="Sugar on the Rocks EP">
+        <picture>
+          <source type="image/webp" srcset="assets/images/optimized/covers/cover_sugar_on_the_rocks.webp">
+          <img src="assets/images/optimized/covers/cover_sugar_on_the_rocks.jpg" alt="Sugar on the Rocks EP" loading="lazy" decoding="async" width="800" height="800">
+        </picture>
       </div>
       <div class="ep-release-info">
         <div class="ep-release-header reveal" style="--reveal-delay:.15s">
@@ -185,19 +192,10 @@
   </div>
   <div class="legal">
     <a href="privacy.html">Privacy</a>
-    <span class="footer-logo">© <img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic"></span>
+    <span class="footer-logo">© <img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic" loading="lazy" decoding="async"></span>
   </div>
 </footer>
 
-<script src="js/main.js"></script>
-<script>
-// Preload hero image for smoother loading
-if ('requestIdleCallback' in window) {
-  requestIdleCallback(() => {
-    const img = new Image();
-    img.src = 'assets/images/HEADER.jpg?v=20260508';
-  });
-}
-</script>
+<script src="js/main.js" defer></script>
 </body>
 </html>

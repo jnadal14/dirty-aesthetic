@@ -15,18 +15,16 @@
 <meta property="og:image" content="https://www.dirtyaesthetic.com/assets/images/press/GROUP%20.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.dirtyaesthetic.com/assets/images/press/GROUP%20.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
-<link rel="preload" as="image" href="assets/images/LINEUP/JOSH C.jpg">
-<link rel="preload" as="image" href="assets/images/LINEUP/DYLAN.jpg">
-<link rel="preload" as="image" href="assets/images/LINEUP/JACOB.jpg">
-<link rel="preload" as="image" href="assets/images/LINEUP/JOSH S.jpg">
-<link rel="preload" as="image" href="assets/images/LINEUP/BARDIA.jpg">
+<link rel="preload" as="image" type="image/webp" href="assets/images/optimized/full-profile.webp" fetchpriority="high">
 </head>
 <body>
 <header class="site-header">
   <div class="brand-container">
-    <a class="brand" href="index.html"><img src="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" alt="Dirty Aesthetic"></a>
+    <a class="brand" href="index.html"><img src="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" alt="Dirty Aesthetic" decoding="async" width="120" height="120"></a>
   </div>
   <div class="hamburger" id="hamburger">
     <span></span>
@@ -46,10 +44,13 @@
 
   <section class="epk-intro">
     <div class="epk-intro-photo reveal-scale">
-      <img src="assets/images/FULL_PROFILE.jpg" alt="Dirty Aesthetic">
+      <picture>
+        <source type="image/webp" srcset="assets/images/optimized/full-profile.webp">
+        <img src="assets/images/optimized/full-profile.jpg" alt="Dirty Aesthetic" decoding="async" fetchpriority="high">
+      </picture>
     </div>
     <div class="epk-intro-content">
-      <img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic" class="epk-logo reveal">
+      <img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic" class="epk-logo reveal" decoding="async">
       <span class="epk-subtitle reveal" style="--reveal-delay:.1s">Electronic Press Kit</span>
       <p class="reveal" style="--reveal-delay:.18s">Dirty Aesthetic was formed in the greater Vancouver area in the summer of 2024. The band consists of five members: Bardia Tarjoman, Dylan Iwaschuk, Jacob Nadal, Joshua Chapman, and Joshua Seaman. In just over a year, Dirty Aesthetic has navigated their way into the Vancouver music scene seamlessly, playing multiple shows at many of Vancouver's most well known underground venues, such as Green Auto, The Roxy, and the Biltmore Cabaret. Due to their energy on stage and fun loving attitude, you can be sure to catch them playing at these venues again and again.</p>
       <p class="reveal" style="--reveal-delay:.24s">Very quickly, they have created a unique sound, delivering garage surf infused indie rock layered with folk and alternative textures. They move effortlessly from high energy tracks like "Corduroy" and "White Flag" to smooth and soulful songs that pull at the heartstrings, like "Blue Roses" and "Heart Home." Lyrically, they explore themes of heartbreak, love, mental health, and addiction.</p>
@@ -63,7 +64,10 @@
   </section>
 
   <div class="epk-divider-photo reveal-scale">
-    <img src="assets/images/HEADER.jpg?v=20260508" alt="Dirty Aesthetic">
+    <picture>
+      <source type="image/webp" srcset="assets/images/optimized/header-desktop.webp">
+      <img src="assets/images/optimized/header-desktop.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async">
+    </picture>
   </div>
 
   <section class="epk-members">
@@ -72,35 +76,60 @@
     </div>
     <div class="members-grid">
       <div class="member-card">
-        <div class="member-photo"><img src="assets/images/LINEUP/JOSH C.jpg" alt="Josh Chapman"></div>
+        <div class="member-photo">
+          <picture>
+            <source type="image/webp" srcset="assets/images/optimized/lineup/josh-c.webp">
+            <img src="assets/images/optimized/lineup/josh-c.jpg" alt="Josh Chapman" loading="lazy" decoding="async">
+          </picture>
+        </div>
         <div class="member-info">
           <h3 class="member-name">Josh C.</h3>
           <p class="member-role">Drums</p>
         </div>
       </div>
       <div class="member-card">
-        <div class="member-photo"><img src="assets/images/LINEUP/DYLAN.jpg" alt="Dylan Iwaschuk"></div>
+        <div class="member-photo">
+          <picture>
+            <source type="image/webp" srcset="assets/images/optimized/lineup/dylan.webp">
+            <img src="assets/images/optimized/lineup/dylan.jpg" alt="Dylan Iwaschuk" loading="lazy" decoding="async">
+          </picture>
+        </div>
         <div class="member-info">
           <h3 class="member-name">Dylan</h3>
           <p class="member-role">Lead Vocals</p>
         </div>
       </div>
       <div class="member-card">
-        <div class="member-photo"><img src="assets/images/LINEUP/JACOB.jpg" alt="Jacob Nadal"></div>
+        <div class="member-photo">
+          <picture>
+            <source type="image/webp" srcset="assets/images/optimized/lineup/jacob.webp">
+            <img src="assets/images/optimized/lineup/jacob.jpg" alt="Jacob Nadal" loading="lazy" decoding="async">
+          </picture>
+        </div>
         <div class="member-info">
           <h3 class="member-name">Jacob</h3>
           <p class="member-role">Rhythm Guitar, Backing Vocals</p>
         </div>
       </div>
       <div class="member-card">
-        <div class="member-photo"><img src="assets/images/LINEUP/JOSH S.jpg" alt="Josh Seaman"></div>
+        <div class="member-photo">
+          <picture>
+            <source type="image/webp" srcset="assets/images/optimized/lineup/josh-s.webp">
+            <img src="assets/images/optimized/lineup/josh-s.jpg" alt="Josh Seaman" loading="lazy" decoding="async">
+          </picture>
+        </div>
         <div class="member-info">
           <h3 class="member-name">Josh S.</h3>
           <p class="member-role">Bass</p>
         </div>
       </div>
       <div class="member-card">
-        <div class="member-photo"><img src="assets/images/LINEUP/BARDIA.jpg" alt="Bardia Tarjoman"></div>
+        <div class="member-photo">
+          <picture>
+            <source type="image/webp" srcset="assets/images/optimized/lineup/bardia.webp">
+            <img src="assets/images/optimized/lineup/bardia.jpg" alt="Bardia Tarjoman" loading="lazy" decoding="async">
+          </picture>
+        </div>
         <div class="member-info">
           <h3 class="member-name">Bardia</h3>
           <p class="member-role">Lead Guitar</p>
@@ -151,22 +180,22 @@
     </div>
     <div class="epk-gallery-wrap">
       <div class="gallery-masonry reveal-stagger">
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/1.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/2.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/3.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/4.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/5.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/6.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/7.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/8.png" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/9.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/10.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/11.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/12.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/13.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/14.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/15.jpg" alt="Dirty Aesthetic" loading="lazy"></div>
-        <div class="gallery-item reveal-scale"><img src="assets/images/GALLERY/16.png" alt="Dirty Aesthetic" loading="lazy"></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/1.webp"><img src="assets/images/optimized/gallery/1.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/2.webp"><img src="assets/images/optimized/gallery/2.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/3.webp"><img src="assets/images/optimized/gallery/3.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/4.webp"><img src="assets/images/optimized/gallery/4.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/5.webp"><img src="assets/images/optimized/gallery/5.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/6.webp"><img src="assets/images/optimized/gallery/6.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/7.webp"><img src="assets/images/optimized/gallery/7.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/8.webp"><img src="assets/images/optimized/gallery/8.png" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/9.webp"><img src="assets/images/optimized/gallery/9.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/10.webp"><img src="assets/images/optimized/gallery/10.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/11.webp"><img src="assets/images/optimized/gallery/11.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/12.webp"><img src="assets/images/optimized/gallery/12.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/13.webp"><img src="assets/images/optimized/gallery/13.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/14.webp"><img src="assets/images/optimized/gallery/14.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/15.webp"><img src="assets/images/optimized/gallery/15.jpg" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
+        <div class="gallery-item reveal-scale"><picture><source type="image/webp" srcset="assets/images/optimized/gallery/16.webp"><img src="assets/images/optimized/gallery/16.png" alt="Dirty Aesthetic" loading="lazy" decoding="async"></picture></div>
       </div>
       <p class="epk-photo-credit reveal">Photo credit available on request</p>
     </div>
@@ -203,10 +232,10 @@
   </div>
   <div class="legal">
     <a href="privacy.html">Privacy</a>
-    <span class="footer-logo">© <img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic"></span>
+    <span class="footer-logo">© <img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic" loading="lazy" decoding="async"></span>
   </div>
 </footer>
 
-<script src="js/main.js"></script>
+<script src="js/main.js" defer></script>
 </body>
 </html>
