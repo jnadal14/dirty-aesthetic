@@ -239,7 +239,7 @@ window.addEventListener('beforeprint', () => {
     dot.classList.remove('visible')
   })
 
-  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
+  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .ep-release-cover, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
 
   document.addEventListener('mouseover', (e) => {
     const isHover = !!e.target.closest(hoverSelector)
@@ -491,4 +491,26 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       })
     })
   }
+
+  // Release cover art (homepage single + EP sections)
+  document.querySelectorAll('.ep-release-cover[data-lightbox-src]').forEach(cover => {
+    const img = cover.querySelector('img')
+    const fullSrc = cover.dataset.lightboxSrc
+    if (!fullSrc || !img) return
+
+    function openCover() {
+      lbImg.src = fullSrc
+      lbImg.alt = img.alt
+      overlay.classList.add('active')
+      document.body.style.overflow = 'hidden'
+    }
+
+    cover.addEventListener('click', openCover)
+    cover.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        openCover()
+      }
+    })
+  })
 })()
