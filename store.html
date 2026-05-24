@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Store • Dirty Aesthetic</title>
-<meta name="description" content="Dirty Aesthetic merchandise and music store. Vancouver indie garage rock band merch coming soon.">
+<meta name="description" content="Dirty Aesthetic merchandise — first drop coming soon. A sneak peek at the design.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="canonical" href="https://www.dirtyaesthetic.com/store.html">
 
@@ -11,17 +11,22 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.dirtyaesthetic.com/store.html">
 <meta property="og:title" content="Store • Dirty Aesthetic">
-<meta property="og:description" content="Dirty Aesthetic merchandise and music store. Merch coming soon.">
-<meta property="og:image" content="https://www.dirtyaesthetic.com/assets/images/press/GROUP%20.jpg">
+<meta property="og:description" content="Dirty Aesthetic merchandise — first drop coming soon. A sneak peek at the design.">
+<meta property="og:image" content="https://www.dirtyaesthetic.com/assets/images/optimized/merch/merch-1.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://www.dirtyaesthetic.com/assets/images/press/GROUP%20.jpg">
+<meta name="twitter:image" content="https://www.dirtyaesthetic.com/assets/images/optimized/merch/merch-1.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<link rel="preload" as="image" type="image/webp" href="assets/images/optimized/merch/merch-1.webp" fetchpriority="high">
+<link rel="icon" type="image/png" href="assets/images/favicon.png">
 </head>
 <body class="store-page-bg">
   <header class="site-header">
     <div class="brand-container">
-      <a class="brand" href="index.html"><img src="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" alt="Dirty Aesthetic"></a>
+      <a class="brand" href="index.html"><img src="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" alt="Dirty Aesthetic" decoding="async" width="120" height="120"></a>
     </div>
     <div class="hamburger" id="hamburger">
       <span></span>
@@ -37,28 +42,29 @@
     </nav>
   </header>
 
-<main class="page center-page">
-  <div class="center-box">
-    <h1 class="reveal">Store</h1>
-    <p class="coming reveal" style="--reveal-delay:.12s">Merch coming soon.</p>
-
-    <div class="reveal" style="--reveal-delay:.22s; margin-top:20px">
-      <a
-        class="btn ghost"
-        href="https://dirtyaesthetic.bandcamp.com/"
-        target="_blank"
-        rel="noopener"
-      >
-        Visit Bandcamp
-      </a>
+<main class="merch-teaser-page">
+  <section class="merch-teaser">
+    <div class="merch-teaser-art reveal-scale" role="button" tabindex="0" aria-label="View full merch design" data-lightbox-src="assets/images/MERCH/MERCH_1.JPG">
+      <picture>
+        <source type="image/webp" srcset="assets/images/optimized/merch/merch-1.webp">
+        <img src="assets/images/optimized/merch/merch-1.jpg" alt="Dirty Aesthetic first merch drop design" decoding="async" fetchpriority="high" width="1400" height="1414">
+      </picture>
     </div>
+    <p class="merch-coming-soon reveal" style="--reveal-delay:.18s">Coming Soon</p>
+  </section>
+
+  <div class="lightbox-overlay" id="lightbox">
+    <button class="lightbox-close" aria-label="Close">&times;</button>
+    <button class="lightbox-nav lightbox-prev" aria-label="Previous" style="display:none">&#8249;</button>
+    <img src="" alt="Merch design">
+    <button class="lightbox-nav lightbox-next" aria-label="Next" style="display:none">&#8250;</button>
   </div>
 </main>
 
 <footer class="site-footer">
   <div class="social">
     <a href="https://instagram.com/dirtyaestheticband" target="_blank" rel="noopener">Instagram</a>
-    <a href="https://tiktok.com/@dirtyaestheticband" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://tiktok.com/@dirty_aesthetic" target="_blank" rel="noopener">TikTok</a>
     <a href="https://open.spotify.com/artist/6LJB3zSDmtQ3NxA6GjUwlt" target="_blank" rel="noopener">Spotify</a>
     <a href="https://music.apple.com/ca/artist/dirty-aesthetic/1773260865" target="_blank" rel="noopener">Apple Music</a>
     <a href="https://dirtyaesthetic.bandcamp.com/" target="_blank" rel="noopener">Bandcamp</a>
@@ -66,12 +72,10 @@
   </div>
   <div class="legal">
     <a href="privacy.html">Privacy</a>
-    <span class="footer-logo">© <img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic"></span>
+    <span class="footer-logo">© <img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic" loading="lazy" decoding="async"></span>
   </div>
 </footer>
 
-<script src="js/main.js"></script>
+<script src="js/main.js" defer></script>
 </body>
 </html>
-
-

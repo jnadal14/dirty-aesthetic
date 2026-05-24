@@ -18,7 +18,8 @@ OUT = SRC / "optimized"
 OUT_COVERS = OUT / "covers"
 OUT_LINEUP = OUT / "lineup"
 OUT_GALLERY = OUT / "gallery"
-for d in (OUT, OUT_COVERS, OUT_LINEUP, OUT_GALLERY):
+OUT_MERCH = OUT / "merch"
+for d in (OUT, OUT_COVERS, OUT_LINEUP, OUT_GALLERY, OUT_MERCH):
     d.mkdir(parents=True, exist_ok=True)
 
 CWEBP = (
@@ -169,5 +170,9 @@ gallery_map = {f"{i}.jpg": str(i) for i in range(1, 17) if i not in (8, 16)}
 gallery_map["8.png"] = "8"
 gallery_map["16.png"] = "16"
 process_subdir("GALLERY", OUT_GALLERY, gallery_map, target=1400, jpeg_q=82, webp_q=78)
+
+print("Merch")
+merch_map = {"MERCH_1.JPG": "merch-1"}
+process_subdir("MERCH", OUT_MERCH, merch_map, target=1400, jpeg_q=85, webp_q=82)
 
 print("\nDone.")

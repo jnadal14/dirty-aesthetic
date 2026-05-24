@@ -1702,6 +1702,59 @@ a.show-row[href]{cursor:pointer}
   }
 }
 
+/* ===== Merch Teaser (store.html) ===== */
+.merch-teaser-page{
+  min-height:calc(100vh - 80px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(80px,10vw,140px) clamp(20px,5vw,48px) clamp(56px,7vw,96px);
+}
+.merch-teaser{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:clamp(28px,4vw,48px);
+  width:100%;
+  max-width:560px;
+}
+.merch-teaser-art{
+  width:100%;
+  cursor:zoom-in;
+  transition:transform .4s cubic-bezier(.2,.8,.2,1);
+}
+.merch-teaser-art:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:6px;
+  border-radius:10px;
+}
+.merch-teaser-art:hover{
+  transform:translateY(-3px);
+}
+.merch-teaser-art img{
+  width:100%;
+  height:auto;
+  border-radius:10px;
+  box-shadow:
+    0 6px 24px rgba(0,0,0,.55),
+    0 24px 70px rgba(0,0,0,.5);
+  transition:box-shadow .4s ease;
+}
+.merch-teaser-art:hover img{
+  box-shadow:
+    0 10px 32px rgba(0,0,0,.65),
+    0 32px 90px rgba(0,0,0,.55);
+}
+.merch-coming-soon{
+  margin:0;
+  color:var(--muted);
+  font-family:'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  font-size:clamp(1.2em,3vw,1.6em);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  text-align:center;
+}
+
 /* EP Promo Section */
 .ep-promo{padding:clamp(48px,7vw,80px) clamp(20px,5vw,48px);background:var(--card);max-width:none}
 .ep-showcase{display:grid;grid-template-columns:280px 1fr;gap:32px;max-width:750px;margin:0 auto;text-align:left;align-items:start;padding:0 20px}

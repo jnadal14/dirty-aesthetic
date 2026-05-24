@@ -239,7 +239,7 @@ window.addEventListener('beforeprint', () => {
     dot.classList.remove('visible')
   })
 
-  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .ep-release-cover, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
+  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .ep-release-cover, .merch-teaser-art, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
 
   document.addEventListener('mouseover', (e) => {
     const isHover = !!e.target.closest(hoverSelector)
@@ -492,24 +492,24 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     })
   }
 
-  // Release cover art (homepage single + EP sections)
-  document.querySelectorAll('.ep-release-cover[data-lightbox-src]').forEach(cover => {
-    const img = cover.querySelector('img')
-    const fullSrc = cover.dataset.lightboxSrc
-    if (!fullSrc || !img) return
+  // Release cover art & merch teaser (data-lightbox-src on any element)
+  document.querySelectorAll('[data-lightbox-src]').forEach(el => {
+    const img = el.querySelector('img')
+    const fullSrc = el.dataset.lightboxSrc
+    if (!fullSrc) return
 
-    function openCover() {
+    function openLightbox() {
       lbImg.src = fullSrc
-      lbImg.alt = img.alt
+      lbImg.alt = (img && img.alt) || 'Preview'
       overlay.classList.add('active')
       document.body.style.overflow = 'hidden'
     }
 
-    cover.addEventListener('click', openCover)
-    cover.addEventListener('keydown', (e) => {
+    el.addEventListener('click', openLightbox)
+    el.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault()
-        openCover()
+        openLightbox()
       }
     })
   })
