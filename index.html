@@ -32,6 +32,8 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.youtube.com">
+<link rel="preconnect" href="https://i.ytimg.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -60,14 +62,17 @@
     <div class="hero-inner">
       <h1><img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic" class="hero-logo" decoding="async" fetchpriority="high"></h1>
       <p>Vancouver, BC</p>
-      <div class="cta-row">
-        <a class="btn ghost" href="#upcoming-section">Shows</a>
-        <a class="btn ghost" href="music.html">Listen</a>
+      <div class="hero-ctas">
+        <div class="cta-row">
+          <a class="btn ghost" href="#upcoming-section">Shows</a>
+          <a class="btn ghost" href="music.html">Listen</a>
+        </div>
+        <a class="btn ghost" href="#irrational-section">Watch Irrational Video</a>
       </div>
     </div>
   </section>
 
-  <section class="ep-release single-release">
+  <section class="ep-release single-release" id="irrational-section">
     <div class="ep-release-bg"></div>
     <div class="ep-release-content">
       <div class="ep-release-cover reveal-scale" role="button" tabindex="0" aria-label="View full Irrational artwork" data-lightbox-src="assets/images/covers/cover_irrational.jpg">
@@ -94,7 +99,14 @@
           <span class="single-date-label">Out</span>
           <span class="single-date-value">Now</span>
         </p>
-        <p class="single-release-blurb reveal" style="--reveal-delay:.38s">The first single from our upcoming debut album. Streaming everywhere now.</p>
+        <p class="single-release-blurb reveal" style="--reveal-delay:.38s">The first single from our upcoming debut album. Streaming everywhere now — watch the official video below.</p>
+      </div>
+    </div>
+
+    <div class="single-release-video reveal" id="irrational-video" style="--reveal-delay:.12s">
+      <p class="single-video-label">Official Music Video</p>
+      <div class="video-embed-large">
+        <iframe src="https://www.youtube-nocookie.com/embed/wYlm0XSz5B4?rel=0&modestbranding=1" title="Dirty Aesthetic — Irrational (Official Music Video)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
     </div>
   </section>

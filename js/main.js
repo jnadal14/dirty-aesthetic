@@ -164,6 +164,38 @@ window.addEventListener('beforeprint', () => {
   refreshState()
 })()
 
+// Scroll "Watch Irrational Video" to the right part of the section.
+// Desktop: center the whole section. Mobile: land on the video at the bottom.
+function scrollToIrrationalSection(){
+  const section = document.getElementById('irrational-section')
+  if(!section) return
+
+  const mobile = window.matchMedia('(max-width: 768px)').matches
+  const y = Math.max(0, mobile
+    ? section.offsetTop + section.offsetHeight - window.innerHeight + 32
+    : section.offsetTop + section.offsetHeight / 2 - window.innerHeight / 2
+  )
+
+  if(window.__lenis){
+    window.__lenis.scrollTo(y, { duration: 1.45 })
+  } else {
+    window.scrollTo({ top: y, behavior: 'smooth' })
+  }
+}
+
+function bindIrrationalScrollLinks(){
+  document.querySelectorAll('a[href="#irrational-section"]').forEach(link => {
+    if(link.dataset.irrationalScrollBound) return
+    link.dataset.irrationalScrollBound = 'true'
+    link.addEventListener('click', (e) => {
+      e.preventDefault()
+      scrollToIrrationalSection()
+    })
+  })
+}
+
+bindIrrationalScrollLinks()
+
 // ===== Lenis smooth-scroll =====
 // Loads Lenis from CDN and turns it on for the whole document.
 // Hooks all in-page anchor links to use lenis.scrollTo for buttery jumps.
@@ -192,7 +224,7 @@ window.addEventListener('beforeprint', () => {
 
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       const href = link.getAttribute('href')
-      if (!href || href.length <= 1) return
+      if (!href || href.length <= 1 || href === '#irrational-section') return
       link.addEventListener('click', (e) => {
         const target = document.querySelector(href)
         if (!target) return
@@ -201,6 +233,7 @@ window.addEventListener('beforeprint', () => {
       })
     })
 
+    bindIrrationalScrollLinks()
     window.__lenis = lenis
   }
   document.head.appendChild(script)
