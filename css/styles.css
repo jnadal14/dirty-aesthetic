@@ -266,14 +266,9 @@ body.music-page-bg{
 
 .release-grid{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:clamp(16px,3vw,28px);
-  max-width:900px;
-  margin:0 auto;
-}
-.release-grid .release:last-child:nth-child(odd){
-  grid-column:1/-1;
-  max-width:calc(50% - clamp(8px,1.5vw,14px));
+  grid-template-columns:repeat(3,1fr);
+  gap:clamp(14px,2vw,24px);
+  max-width:1120px;
   margin:0 auto;
 }
 .release{transition:transform .3s cubic-bezier(.2,.8,.2,1);text-align:center}
@@ -314,6 +309,15 @@ body.music-page-bg{
   box-shadow:0 4px 14px rgba(176,122,63,.35);
   pointer-events:none;
 }
+@media (max-width:820px){
+  .release-grid{grid-template-columns:repeat(2,1fr)}
+  /* Center a lone trailing cover when in 2-column mode */
+  .release-grid .release:last-child:nth-child(odd){
+    grid-column:1/-1;
+    max-width:calc(50% - clamp(8px,1.5vw,14px));
+    margin:0 auto;
+  }
+}
 @media (max-width:500px){
   .release-grid{grid-template-columns:repeat(2,1fr);gap:12px}
 }
@@ -343,6 +347,21 @@ body.contact-page-bg{
 .video-embed-large{aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--card);box-shadow:0 8px 40px rgba(0,0,0,.4);transition:transform .3s ease,box-shadow .3s ease}
 .video-embed-large:hover{transform:translateY(-4px);box-shadow:0 16px 56px rgba(0,0,0,.5)}
 .video-embed-large iframe{width:100%;height:100%;border:none}
+
+/* Watch — featured music video */
+.watch-feature{max-width:1000px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+.watch-feature-caption{text-align:center;color:var(--ink);font-size:clamp(1.05em,2vw,1.3em);letter-spacing:1px;margin:clamp(16px,2.5vw,24px) 0 0}
+
+/* Watch — secondary clips */
+.watch-clips{max-width:880px;margin:0 auto;padding:clamp(40px,6vw,72px) clamp(16px,4vw,48px) clamp(32px,5vw,56px)}
+.watch-clips-heading{text-align:center;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-size:clamp(.95em,1.8vw,1.15em);margin:0 0 clamp(20px,3vw,32px)}
+.watch-clips-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(16px,3vw,28px)}
+.watch-clip{animation:fadeUp .6s ease both}
+.watch-clip .video-embed{box-shadow:0 6px 24px rgba(0,0,0,.35);transition:transform .3s ease,box-shadow .3s ease}
+.watch-clip:hover .video-embed{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.45)}
+@media (max-width:640px){
+  .watch-clips-grid{grid-template-columns:1fr;gap:16px}
+}
 
 .clips-section{padding:clamp(32px,5vw,56px) clamp(16px,4vw,32px);background:rgba(0,0,0,.15);margin-top:24px}
 .clips-section h2{text-align:center;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin:0 0 24px}
@@ -1702,36 +1721,36 @@ a.show-row[href]{cursor:pointer}
   }
 }
 
-/* ===== Merch Teaser (store.html) ===== */
-.merch-teaser-page{
+/* ===== Merch Store (store.html) ===== */
+.merch-shop-page{
   min-height:calc(100vh - 80px);
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:clamp(80px,10vw,140px) clamp(20px,5vw,48px) clamp(56px,7vw,96px);
+  padding:clamp(80px,10vw,130px) clamp(20px,5vw,48px) clamp(56px,7vw,96px);
 }
-.merch-teaser{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:clamp(28px,4vw,48px);
+.merch-shop{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:clamp(32px,5vw,64px);
+  align-items:start;
   width:100%;
-  max-width:560px;
+  max-width:1040px;
 }
-.merch-teaser-art{
+.merch-shop-art{
+  position:sticky;
+  top:100px;
   width:100%;
   cursor:zoom-in;
   transition:transform .4s cubic-bezier(.2,.8,.2,1);
 }
-.merch-teaser-art:focus-visible{
+.merch-shop-art:focus-visible{
   outline:2px solid var(--accent);
   outline-offset:6px;
   border-radius:10px;
 }
-.merch-teaser-art:hover{
-  transform:translateY(-3px);
-}
-.merch-teaser-art img{
+.merch-shop-art:hover{transform:translateY(-3px)}
+.merch-shop-art img{
   width:100%;
   height:auto;
   border-radius:10px;
@@ -1740,19 +1759,60 @@ a.show-row[href]{cursor:pointer}
     0 24px 70px rgba(0,0,0,.5);
   transition:box-shadow .4s ease;
 }
-.merch-teaser-art:hover img{
+.merch-shop-art:hover img{
   box-shadow:
     0 10px 32px rgba(0,0,0,.65),
     0 32px 90px rgba(0,0,0,.55);
 }
-.merch-coming-soon{
-  margin:0;
-  color:var(--muted);
-  font-family:'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  font-size:clamp(1.2em,3vw,1.6em);
-  letter-spacing:2px;
+
+.merch-shop-panel{display:flex;flex-direction:column}
+.merch-shop-eyebrow{
+  margin:0 0 6px;
+  color:var(--accent);
+  font-size:.8em;
+  letter-spacing:3px;
   text-transform:uppercase;
+}
+.merch-shop-title{
+  margin:0 0 14px;
+  font-size:clamp(1.8em,4vw,2.6em);
+  letter-spacing:1px;
+  line-height:1.05;
+}
+.merch-shop-note{
+  margin:0 0 clamp(20px,3vw,28px);
+  color:var(--muted);
+  font-size:clamp(.95em,1.8vw,1.05em);
+  line-height:1.55;
+  letter-spacing:.3px;
+}
+.merch-field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.merch-fieldset{border:none;margin:0;padding:0;display:grid;gap:10px}
+.merch-fieldset legend{padding:0;margin:0 0 2px}
+.merch-fieldset legend span{color:var(--muted);font-size:.85em;text-transform:uppercase;letter-spacing:1px}
+.merch-radio{display:flex;align-items:center;gap:10px;cursor:pointer}
+.merch-radio input{width:auto;accent-color:var(--accent)}
+.merch-radio span{color:var(--ink);font-size:.95em;text-transform:none;letter-spacing:.3px}
+.merch-order-status{
+  margin:clamp(16px,3vw,24px) 0 0;
+  padding:18px 20px;
+  background:rgba(176,122,63,.08);
+  border:1px solid rgba(176,122,63,.3);
+  border-radius:12px;
+  color:var(--ink);
+  font-size:1.05em;
+  line-height:1.5;
+  letter-spacing:.3px;
   text-align:center;
+}
+.merch-order-status.form-status--error{
+  background:rgba(201,138,138,.08);
+  border-color:rgba(201,138,138,.35);
+}
+
+@media (max-width:760px){
+  .merch-shop{grid-template-columns:1fr;max-width:520px;gap:clamp(24px,5vw,36px)}
+  .merch-shop-art{position:static;max-width:420px;margin:0 auto}
 }
 
 /* EP Promo Section */

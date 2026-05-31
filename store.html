@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Store • Dirty Aesthetic</title>
-<meta name="description" content="Dirty Aesthetic merchandise — first drop coming soon. A sneak peek at the design.">
+<meta name="description" content="Dirty Aesthetic merchandise — first drop now available to order.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="canonical" href="https://www.dirtyaesthetic.com/store.html">
 
@@ -11,7 +11,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.dirtyaesthetic.com/store.html">
 <meta property="og:title" content="Store • Dirty Aesthetic">
-<meta property="og:description" content="Dirty Aesthetic merchandise — first drop coming soon. A sneak peek at the design.">
+<meta property="og:description" content="Dirty Aesthetic merchandise — first drop now available to order.">
 <meta property="og:image" content="https://www.dirtyaesthetic.com/assets/images/optimized/merch/merch-1.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.dirtyaesthetic.com/assets/images/optimized/merch/merch-1.jpg">
@@ -42,15 +42,94 @@
     </nav>
   </header>
 
-<main class="merch-teaser-page">
-  <section class="merch-teaser">
-    <div class="merch-teaser-art reveal-scale" role="button" tabindex="0" aria-label="View full merch design" data-lightbox-src="assets/images/MERCH/MERCH_1.JPG">
+<main class="merch-shop-page">
+  <section class="merch-shop">
+    <div class="merch-shop-art reveal-scale" role="button" tabindex="0" aria-label="View full merch design" data-lightbox-src="assets/images/MERCH/MERCH_1.JPG">
       <picture>
         <source type="image/webp" srcset="assets/images/optimized/merch/merch-1.webp">
         <img src="assets/images/optimized/merch/merch-1.jpg" alt="Dirty Aesthetic first merch drop design" decoding="async" fetchpriority="high" width="1400" height="1414">
       </picture>
     </div>
-    <p class="merch-coming-soon reveal" style="--reveal-delay:.18s">Coming Soon</p>
+
+    <div class="merch-shop-panel reveal" style="--reveal-delay:.12s">
+      <p class="merch-shop-eyebrow">First Drop</p>
+      <h1 class="merch-shop-title">Dirty Aesthetic Merch</h1>
+      <p class="merch-shop-note">Now available to order. Fill out the form below and we'll email you to confirm sizing, your total, and payment.</p>
+
+      <!-- Orders POST to Formspree, which emails each order to the band and stores every
+           submission for one-click CSV export. The hidden order_csv field below is filled
+           on submit so each email also contains a ready-to-paste CSV row. -->
+      <form id="merch-order-form" class="contact-form merch-order-form" action="https://formspree.io/f/xjgvzapo" method="POST">
+        <input type="hidden" name="_subject" value="New Merch Order — Dirty Aesthetic">
+        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none">
+
+        <label>
+          <span>Name</span>
+          <input type="text" name="name" required>
+        </label>
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" required>
+        </label>
+        <label>
+          <span>Phone (optional)</span>
+          <input type="tel" name="phone" autocomplete="tel">
+        </label>
+
+        <label>
+          <span>Item</span>
+          <select name="item" required>
+            <option value="First Drop — Design 1">First Drop — Design 1</option>
+          </select>
+        </label>
+
+        <div class="merch-field-row">
+          <label>
+            <span>Size</span>
+            <select name="size" required>
+              <option value="" disabled selected>Select size</option>
+              <option>XS</option>
+              <option>S</option>
+              <option>M</option>
+              <option>L</option>
+              <option>XL</option>
+              <option>XXL</option>
+            </select>
+          </label>
+          <label>
+            <span>Quantity</span>
+            <input type="number" name="quantity" min="1" max="20" value="1" required>
+          </label>
+        </div>
+
+        <fieldset class="merch-fieldset">
+          <legend><span>Delivery</span></legend>
+          <label class="merch-radio">
+            <input type="radio" name="delivery" value="Local pickup (Vancouver)" checked>
+            <span>Local pickup (Vancouver)</span>
+          </label>
+          <label class="merch-radio">
+            <input type="radio" name="delivery" value="Ship to me">
+            <span>Ship to me</span>
+          </label>
+        </fieldset>
+
+        <label>
+          <span>Shipping address (if shipping)</span>
+          <textarea name="address" rows="3" placeholder="Street, city, province/state, postal code, country"></textarea>
+        </label>
+
+        <label>
+          <span>Notes (optional)</span>
+          <textarea name="notes" rows="3" placeholder="Anything we should know?"></textarea>
+        </label>
+
+        <input type="hidden" name="order_csv" value="">
+        <button class="btn ghost" type="submit">Place Order</button>
+      </form>
+
+      <p id="merch-order-status" class="merch-order-status" role="status" hidden></p>
+    </div>
   </section>
 
   <div class="lightbox-overlay" id="lightbox">

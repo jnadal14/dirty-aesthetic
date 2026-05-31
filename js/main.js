@@ -239,7 +239,7 @@ window.addEventListener('beforeprint', () => {
     dot.classList.remove('visible')
   })
 
-  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .ep-release-cover, .merch-teaser-art, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
+  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .ep-release-cover, .merch-shop-art, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
 
   document.addEventListener('mouseover', (e) => {
     const isHover = !!e.target.closest(hoverSelector)
@@ -512,5 +512,58 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
         openLightbox()
       }
     })
+  })
+})()
+
+// Merch order form (store.html): emails the band via Formspree and packs
+// each order into a single CSV row so it's easy to track in a spreadsheet.
+;(function(){
+  const form = document.getElementById('merch-order-form')
+  if(!form) return
+  const status = document.getElementById('merch-order-status')
+
+  function csvCell(v){
+    const s = (v == null ? '' : String(v)).trim()
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const data = new FormData(form)
+
+    const cols = ['Timestamp','Name','Email','Phone','Item','Size','Quantity','Delivery','Address','Notes']
+    const vals = [
+      new Date().toISOString(),
+      data.get('name'), data.get('email'), data.get('phone'),
+      data.get('item'), data.get('size'), data.get('quantity'),
+      data.get('delivery'), data.get('address'), data.get('notes')
+    ]
+    data.set('order_csv', cols.map(csvCell).join(',') + '\n' + vals.map(csvCell).join(','))
+
+    const btn = form.querySelector('button[type="submit"]')
+    const originalText = btn ? btn.textContent : ''
+    if(btn){ btn.disabled = true; btn.textContent = 'Sending…' }
+    if(status){ status.hidden = true; status.classList.remove('form-status--error') }
+
+    try{
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      })
+      if(!res.ok) throw new Error('Bad response')
+      form.hidden = true
+      if(status){
+        status.hidden = false
+        status.textContent = "Order received — we'll email you to confirm sizing, your total, and payment. Thank you!"
+      }
+    } catch(err){
+      if(btn){ btn.disabled = false; btn.textContent = originalText }
+      if(status){
+        status.hidden = false
+        status.classList.add('form-status--error')
+        status.innerHTML = 'Something went wrong. Please try again or email us at <a href="mailto:dirtyaestheticmusic@gmail.com">dirtyaestheticmusic@gmail.com</a>.'
+      }
+    }
   })
 })()
