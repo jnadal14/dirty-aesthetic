@@ -1,0 +1,254 @@
+{
+  "lineup": {
+    "bardia": {
+      "webp": "assets/images/optimized/lineup/bardia.webp",
+      "src": "assets/images/optimized/lineup/bardia.jpg",
+      "full": "assets/images/LINEUP/BARDIA.jpg",
+      "type": "jpeg",
+      "width": 900,
+      "height": 1350
+    },
+    "dylan": {
+      "webp": "assets/images/optimized/lineup/dylan.webp",
+      "src": "assets/images/optimized/lineup/dylan.jpg",
+      "full": "assets/images/LINEUP/DYLAN.jpg",
+      "type": "jpeg",
+      "width": 800,
+      "height": 1200
+    },
+    "jacob": {
+      "webp": "assets/images/optimized/lineup/jacob.webp",
+      "src": "assets/images/optimized/lineup/jacob.png",
+      "full": "assets/images/LINEUP/JACOB.png",
+      "type": "png",
+      "width": 900,
+      "height": 1125
+    },
+    "josh-c": {
+      "webp": "assets/images/optimized/lineup/josh-c.webp",
+      "src": "assets/images/optimized/lineup/josh-c.jpg",
+      "full": "assets/images/LINEUP/JOSH C.jpg",
+      "type": "jpeg",
+      "width": 900,
+      "height": 1350
+    },
+    "josh-s": {
+      "webp": "assets/images/optimized/lineup/josh-s.webp",
+      "src": "assets/images/optimized/lineup/josh-s.jpg",
+      "full": "assets/images/LINEUP/JOSH S.jpg",
+      "type": "jpeg",
+      "width": 900,
+      "height": 1125
+    }
+  },
+  "gallery": [
+    {
+      "webp": "assets/images/optimized/gallery/1.webp",
+      "src": "assets/images/optimized/gallery/1.png",
+      "full": "assets/images/GALLERY/1.png",
+      "type": "png",
+      "width": 1400,
+      "height": 1750
+    },
+    {
+      "webp": "assets/images/optimized/gallery/2.webp",
+      "src": "assets/images/optimized/gallery/2.png",
+      "full": "assets/images/GALLERY/2.png",
+      "type": "png",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "webp": "assets/images/optimized/gallery/3.webp",
+      "src": "assets/images/optimized/gallery/3.png",
+      "full": "assets/images/GALLERY/3.png",
+      "type": "png",
+      "width": 1400,
+      "height": 1750
+    },
+    {
+      "webp": "assets/images/optimized/gallery/4.webp",
+      "src": "assets/images/optimized/gallery/4.jpg",
+      "full": "assets/images/GALLERY/4.jpg",
+      "type": "jpeg",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "webp": "assets/images/optimized/gallery/5.webp",
+      "src": "assets/images/optimized/gallery/5.png",
+      "full": "assets/images/GALLERY/5.png",
+      "type": "png",
+      "width": 1400,
+      "height": 1750
+    },
+    {
+      "webp": "assets/images/optimized/gallery/6.webp",
+      "src": "assets/images/optimized/gallery/6.jpg",
+      "full": "assets/images/GALLERY/6.jpg",
+      "type": "jpeg",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "webp": "assets/images/optimized/gallery/7.webp",
+      "src": "assets/images/optimized/gallery/7.jpg",
+      "full": "assets/images/GALLERY/7.jpg",
+      "type": "jpeg",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "webp": "assets/images/optimized/gallery/8.webp",
+      "src": "assets/images/optimized/gallery/8.png",
+      "full": "assets/images/GALLERY/8.png",
+      "type": "png",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "webp": "assets/images/optimized/gallery/9.webp",
+      "src": "assets/images/optimized/gallery/9.jpg",
+      "full": "assets/images/GALLERY/9.jpg",
+      "type": "jpeg",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "webp": "assets/images/optimized/gallery/10.webp",
+      "src": "assets/images/optimized/gallery/10.jpg",
+      "full": "assets/images/GALLERY/10.jpg",
+      "type": "jpeg",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "webp": "assets/images/optimized/gallery/11.webp",
+      "src": "assets/images/optimized/gallery/11.jpg",
+      "full": "assets/images/GALLERY/11.jpg",
+      "type": "jpeg",
+      "width": 1400,
+      "height": 1750
+    },
+    {
+      "webp": "assets/images/optimized/gallery/12.webp",
+      "src": "assets/images/optimized/gallery/12.png",
+      "full": "assets/images/GALLERY/12.png",
+      "type": "png",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "webp": "assets/images/optimized/gallery/13.webp",
+      "src": "assets/images/optimized/gallery/13.jpg",
+      "full": "assets/images/GALLERY/13.jpg",
+      "type": "jpeg",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "webp": "assets/images/optimized/gallery/14.webp",
+      "src": "assets/images/optimized/gallery/14.jpg",
+      "full": "assets/images/GALLERY/14.jpg",
+      "type": "jpeg",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "webp": "assets/images/optimized/gallery/15.webp",
+      "src": "assets/images/optimized/gallery/15.jpg",
+      "full": "assets/images/GALLERY/15.jpg",
+      "type": "jpeg",
+      "width": 1400,
+      "height": 1750
+    },
+    {
+      "webp": "assets/images/optimized/gallery/16.webp",
+      "src": "assets/images/optimized/gallery/16.jpg",
+      "full": "assets/images/GALLERY/16.jpg",
+      "type": "jpeg",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "webp": "assets/images/optimized/gallery/17.webp",
+      "src": "assets/images/optimized/gallery/17.png",
+      "full": "assets/images/GALLERY/17.png",
+      "type": "png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "webp": "assets/images/optimized/gallery/18.webp",
+      "src": "assets/images/optimized/gallery/18.jpg",
+      "full": "assets/images/GALLERY/18.jpg",
+      "type": "jpeg",
+      "width": 1179,
+      "height": 879
+    },
+    {
+      "webp": "assets/images/optimized/gallery/19.webp",
+      "src": "assets/images/optimized/gallery/19.jpg",
+      "full": "assets/images/GALLERY/19.jpg",
+      "type": "jpeg",
+      "width": 1179,
+      "height": 1535
+    },
+    {
+      "webp": "assets/images/optimized/gallery/20.webp",
+      "src": "assets/images/optimized/gallery/20.jpg",
+      "full": "assets/images/GALLERY/20.jpg",
+      "type": "jpeg",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "webp": "assets/images/optimized/gallery/21.webp",
+      "src": "assets/images/optimized/gallery/21.png",
+      "full": "assets/images/GALLERY/21.png",
+      "type": "png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "webp": "assets/images/optimized/gallery/22.webp",
+      "src": "assets/images/optimized/gallery/22.jpg",
+      "full": "assets/images/GALLERY/22.jpg",
+      "type": "jpeg",
+      "width": 800,
+      "height": 1200
+    },
+    {
+      "webp": "assets/images/optimized/gallery/23.webp",
+      "src": "assets/images/optimized/gallery/23.jpg",
+      "full": "assets/images/GALLERY/23.jpg",
+      "type": "jpeg",
+      "width": 848,
+      "height": 1200
+    },
+    {
+      "webp": "assets/images/optimized/gallery/24.webp",
+      "src": "assets/images/optimized/gallery/24.jpg",
+      "full": "assets/images/GALLERY/24.jpg",
+      "type": "jpeg",
+      "width": 905,
+      "height": 1200
+    },
+    {
+      "webp": "assets/images/optimized/gallery/25.webp",
+      "src": "assets/images/optimized/gallery/25.jpg",
+      "full": "assets/images/GALLERY/25.jpg",
+      "type": "jpeg",
+      "width": 800,
+      "height": 1200
+    },
+    {
+      "webp": "assets/images/optimized/gallery/26.webp",
+      "src": "assets/images/optimized/gallery/26.jpg",
+      "full": "assets/images/GALLERY/26.jpg",
+      "type": "jpeg",
+      "width": 1200,
+      "height": 800
+    }
+  ]
+}

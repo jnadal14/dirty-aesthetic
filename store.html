@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Store • Dirty Aesthetic</title>
-<meta name="description" content="Dirty Aesthetic merchandise — first drop now available to order.">
+<meta name="description" content="Dirty Aesthetic merch preorder. First drop tee, $35.">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="canonical" href="https://www.dirtyaesthetic.com/store.html">
 
@@ -11,7 +11,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.dirtyaesthetic.com/store.html">
 <meta property="og:title" content="Store • Dirty Aesthetic">
-<meta property="og:description" content="Dirty Aesthetic merchandise — first drop now available to order.">
+<meta property="og:description" content="Dirty Aesthetic merch preorder. First drop tee, $35.">
 <meta property="og:image" content="https://www.dirtyaesthetic.com/assets/images/optimized/merch/merch-1.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.dirtyaesthetic.com/assets/images/optimized/merch/merch-1.jpg">
@@ -42,52 +42,42 @@
     </nav>
   </header>
 
-<main class="merch-shop-page">
-  <section class="merch-shop">
-    <div class="merch-shop-art reveal-scale" role="button" tabindex="0" aria-label="View full merch design" data-lightbox-src="assets/images/MERCH/MERCH_1.JPG">
-      <picture>
-        <source type="image/webp" srcset="assets/images/optimized/merch/merch-1.webp">
-        <img src="assets/images/optimized/merch/merch-1.jpg" alt="Dirty Aesthetic first merch drop design" decoding="async" fetchpriority="high" width="1400" height="1414">
-      </picture>
-    </div>
+<main class="store-page">
+  <section class="store-product">
+    <div class="store-product-grid">
 
-    <div class="merch-shop-panel reveal" style="--reveal-delay:.12s">
-      <p class="merch-shop-eyebrow">First Drop</p>
-      <h1 class="merch-shop-title">Dirty Aesthetic Merch</h1>
-      <p class="merch-shop-note">Now available to order. Fill out the form below and we'll email you to confirm sizing, your total, and payment.</p>
+      <div class="store-product-visual reveal-scale">
+        <div class="store-product-image" role="button" tabindex="0" aria-label="View full merch design" data-lightbox-src="assets/images/MERCH/MERCH_1.JPG">
+          <div class="store-cover-glow"></div>
+          <picture>
+            <source type="image/webp" srcset="assets/images/optimized/merch/merch-1.webp">
+            <img src="assets/images/optimized/merch/merch-1.jpg" alt="Dirty Aesthetic first merch drop" decoding="async" fetchpriority="high" width="1400" height="1414">
+          </picture>
+        </div>
+      </div>
 
-      <!-- Orders POST to Formspree, which emails each order to the band and stores every
-           submission for one-click CSV export. The hidden order_csv field below is filled
-           on submit so each email also contains a ready-to-paste CSV row. -->
-      <form id="merch-order-form" class="contact-form merch-order-form" action="https://formspree.io/f/xjgvzapo" method="POST">
-        <input type="hidden" name="_subject" value="New Merch Order — Dirty Aesthetic">
-        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none">
+      <div class="store-product-panel reveal" style="--reveal-delay:.1s">
+        <header class="store-product-header">
+          <span class="ep-release-tag store-product-tag">Preorder</span>
+          <h1 class="store-product-title">Dirty Aesthetic Tee <span class="store-price-amount">$35</span></h1>
+        </header>
 
-        <label>
-          <span>Name</span>
-          <input type="text" name="name" required>
-        </label>
-        <label>
-          <span>Email</span>
-          <input type="email" name="email" required>
-        </label>
-        <label>
-          <span>Phone (optional)</span>
-          <input type="tel" name="phone" autocomplete="tel">
-        </label>
+        <form id="merch-order-form" class="store-form contact-form" action="https://formspree.io/f/xjgvzapo" method="POST">
+          <input type="hidden" name="_subject" value="New Merch Preorder Dirty Aesthetic">
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" class="store-honeypot">
+          <input type="hidden" name="item" value="First Drop Tee $35">
+          <input type="hidden" name="price" value="$35">
 
-        <label>
-          <span>Item</span>
-          <select name="item" required>
-            <option value="First Drop — Design 1">First Drop — Design 1</option>
-          </select>
-        </label>
+          <label class="store-sr-only" for="merch-name">Name</label>
+          <input type="text" name="name" id="merch-name" placeholder="Name" required autocomplete="name">
 
-        <div class="merch-field-row">
-          <label>
-            <span>Size</span>
-            <select name="size" required>
-              <option value="" disabled selected>Select size</option>
+          <label class="store-sr-only" for="merch-email">Email</label>
+          <input type="email" name="email" id="merch-email" placeholder="Email" required autocomplete="email">
+
+          <div class="store-field-row">
+            <label class="store-sr-only" for="merch-size">Size</label>
+            <select name="size" id="merch-size" required>
+              <option value="" disabled selected>Size</option>
               <option>XS</option>
               <option>S</option>
               <option>M</option>
@@ -95,40 +85,35 @@
               <option>XL</option>
               <option>XXL</option>
             </select>
+            <label class="store-sr-only" for="merch-qty">Quantity</label>
+            <input type="number" name="quantity" id="merch-qty" min="1" max="20" value="1" required aria-label="Quantity">
+          </div>
+
+          <div class="store-delivery">
+            <div class="store-delivery-options">
+              <label class="store-delivery-option">
+                <input type="radio" name="delivery" value="Local pickup (Vancouver)" checked>
+                <span>Pickup <small>Vancouver</small></span>
+              </label>
+              <label class="store-delivery-option">
+                <input type="radio" name="delivery" value="Ship to me">
+                <span>Ship</span>
+              </label>
+            </div>
+          </div>
+
+          <label class="store-shipping-field" id="merch-shipping-field" for="merch-address" hidden>
+            <span class="store-sr-only">Shipping address</span>
+            <textarea name="address" id="merch-address" rows="2" placeholder="Shipping address"></textarea>
           </label>
-          <label>
-            <span>Quantity</span>
-            <input type="number" name="quantity" min="1" max="20" value="1" required>
-          </label>
-        </div>
 
-        <fieldset class="merch-fieldset">
-          <legend><span>Delivery</span></legend>
-          <label class="merch-radio">
-            <input type="radio" name="delivery" value="Local pickup (Vancouver)" checked>
-            <span>Local pickup (Vancouver)</span>
-          </label>
-          <label class="merch-radio">
-            <input type="radio" name="delivery" value="Ship to me">
-            <span>Ship to me</span>
-          </label>
-        </fieldset>
+          <input type="hidden" name="order_csv" value="">
+          <button class="btn ghost store-submit" type="submit">Preorder</button>
+        </form>
 
-        <label>
-          <span>Shipping address (if shipping)</span>
-          <textarea name="address" rows="3" placeholder="Street, city, province/state, postal code, country"></textarea>
-        </label>
+        <p id="merch-order-status" class="store-order-status" role="status" hidden></p>
+      </div>
 
-        <label>
-          <span>Notes (optional)</span>
-          <textarea name="notes" rows="3" placeholder="Anything we should know?"></textarea>
-        </label>
-
-        <input type="hidden" name="order_csv" value="">
-        <button class="btn ghost" type="submit">Place Order</button>
-      </form>
-
-      <p id="merch-order-status" class="merch-order-status" role="status" hidden></p>
     </div>
   </section>
 

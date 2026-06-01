@@ -272,7 +272,7 @@ bindIrrationalScrollLinks()
     dot.classList.remove('visible')
   })
 
-  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .ep-release-cover, .merch-shop-art, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
+  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .ep-release-cover, .store-product-image, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
 
   document.addEventListener('mouseover', (e) => {
     const isHover = !!e.target.closest(hoverSelector)
@@ -513,10 +513,13 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   })
 
   // Gallery items (EPK page)
-  const items = document.querySelectorAll('.gallery-item')
-  if(items.length){
-    srcs = Array.from(items).map(el => el.querySelector('img').src)
+  function bindGalleryLightbox(){
+    const items = document.querySelectorAll('.gallery-item')
+    if(!items.length) return
+    srcs = Array.from(items).map(el => el.dataset.fullSrc || el.querySelector('img').src)
     items.forEach((item, i) => {
+      if(item.dataset.lightboxBound) return
+      item.dataset.lightboxBound = 'true'
       item.addEventListener('click', () => {
         show(i)
         overlay.classList.add('active')
@@ -524,6 +527,8 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       })
     })
   }
+  bindGalleryLightbox()
+  window.__bindGalleryLightbox = bindGalleryLightbox
 
   // Release cover art & merch teaser (data-lightbox-src on any element)
   document.querySelectorAll('[data-lightbox-src]').forEach(el => {
@@ -548,12 +553,23 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   })
 })()
 
-// Merch order form (store.html): emails the band via Formspree and packs
-// each order into a single CSV row so it's easy to track in a spreadsheet.
+// Merch preorder form (store.html): emails the band via Formspree and packs
+// each preorder into a single CSV row so it's easy to track in a spreadsheet.
 ;(function(){
   const form = document.getElementById('merch-order-form')
   if(!form) return
   const status = document.getElementById('merch-order-status')
+  const shippingField = document.getElementById('merch-shipping-field')
+  const addressInput = document.getElementById('merch-address')
+  const deliveryRadios = form.querySelectorAll('input[name="delivery"]')
+
+  function syncShippingField(){
+    const ship = [...deliveryRadios].some(r => r.checked && r.value === 'Ship to me')
+    if(shippingField) shippingField.hidden = !ship
+    if(addressInput) addressInput.required = ship
+  }
+  deliveryRadios.forEach(r => r.addEventListener('change', syncShippingField))
+  syncShippingField()
 
   function csvCell(v){
     const s = (v == null ? '' : String(v)).trim()
@@ -564,12 +580,12 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     e.preventDefault()
     const data = new FormData(form)
 
-    const cols = ['Timestamp','Name','Email','Phone','Item','Size','Quantity','Delivery','Address','Notes']
+    const cols = ['Timestamp','Name','Email','Item','Price','Size','Quantity','Delivery','Address']
     const vals = [
       new Date().toISOString(),
-      data.get('name'), data.get('email'), data.get('phone'),
-      data.get('item'), data.get('size'), data.get('quantity'),
-      data.get('delivery'), data.get('address'), data.get('notes')
+      data.get('name'), data.get('email'),
+      data.get('item'), data.get('price'), data.get('size'), data.get('quantity'),
+      data.get('delivery'), data.get('address')
     ]
     data.set('order_csv', cols.map(csvCell).join(',') + '\n' + vals.map(csvCell).join(','))
 
@@ -588,7 +604,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       form.hidden = true
       if(status){
         status.hidden = false
-        status.textContent = "Order received — we'll email you to confirm sizing, your total, and payment. Thank you!"
+        status.textContent = "Preorder received. We'll email you soon. Thank you!"
       }
     } catch(err){
       if(btn){ btn.disabled = false; btn.textContent = originalText }
@@ -598,5 +614,93 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
         status.innerHTML = 'Something went wrong. Please try again or email us at <a href="mailto:dirtyaestheticmusic@gmail.com">dirtyaestheticmusic@gmail.com</a>.'
       }
     }
+  })
+})()
+
+// EPK — lineup + gallery from data/epk-images.json (supports jpg/png sources)
+;(function(){
+  const galleryRoot = document.getElementById('epk-gallery')
+  const lineupPhotos = document.querySelectorAll('[data-lineup]')
+  if(!galleryRoot && !lineupPhotos.length) return
+
+  function applyPicture(picture, image){
+    if(!picture || !image) return
+    const source = picture.querySelector('source[type="image/webp"]')
+    const img = picture.querySelector('img')
+    if(source) source.srcset = image.webp
+    if(img) img.src = image.src
+  }
+
+  function buildGalleryItem(image, eager, index){
+    const item = document.createElement('div')
+    item.className = 'gallery-item reveal-scale'
+    item.style.setProperty('--reveal-delay', `${Math.min(index * 0.04, 0.48).toFixed(2)}s`)
+    if(image.width && image.height){
+      item.style.aspectRatio = `${image.width} / ${image.height}`
+    }
+    item.dataset.fullSrc = image.full
+    item.innerHTML = `
+      <picture>
+        <source type="image/webp" srcset="${image.webp}">
+        <img src="${image.src}" alt="Dirty Aesthetic" width="${image.width || ''}" height="${image.height || ''}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
+      </picture>`
+    return item
+  }
+
+  function revealGallery(root){
+    root.querySelectorAll('.gallery-item').forEach(el => el.classList.add('in-view'))
+  }
+
+  function watchGalleryReveal(root){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      revealGallery(root)
+      return
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(!entry.isIntersecting) return
+        revealGallery(root)
+        observer.disconnect()
+      })
+    }, { threshold: 0.1, rootMargin: '0px 0px -4% 0px' })
+    observer.observe(root)
+  }
+
+  function markGalleryReady(root){
+    const imgs = root.querySelectorAll('img')
+    Promise.all([...imgs].map(img => img.complete
+      ? Promise.resolve()
+      : new Promise(resolve => {
+          img.addEventListener('load', resolve, { once: true })
+          img.addEventListener('error', resolve, { once: true })
+        })
+    )).then(() => {
+      root.classList.add('is-ready')
+      watchGalleryReveal(root)
+    })
+  }
+
+  fetch('data/epk-images.json', { cache: 'no-store' }).then(r => {
+    if(!r.ok) throw new Error('manifest missing')
+    return r.json()
+  }).then(data => {
+    if(data.lineup){
+      lineupPhotos.forEach(photo => {
+        const image = data.lineup[photo.dataset.lineup]
+        if(!image) return
+        applyPicture(photo.querySelector('picture'), image)
+      })
+    }
+
+    if(galleryRoot && Array.isArray(data.gallery)){
+      const eager = window.matchMedia('(min-width: 769px)').matches
+      galleryRoot.innerHTML = ''
+      galleryRoot.classList.remove('is-ready')
+      data.gallery.forEach((image, i) => galleryRoot.appendChild(buildGalleryItem(image, eager, i)))
+      markGalleryReady(galleryRoot)
+      if(typeof window.__bindGalleryLightbox === 'function') window.__bindGalleryLightbox()
+    }
+  }).catch(() => {
+    if(galleryRoot) galleryRoot.innerHTML = '<p class="epk-gallery-fallback">Gallery photos loading soon.</p>'
   })
 })()
