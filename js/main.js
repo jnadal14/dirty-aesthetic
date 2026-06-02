@@ -516,7 +516,9 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   function bindGalleryLightbox(){
     const items = document.querySelectorAll('.gallery-item')
     if(!items.length) return
-    srcs = Array.from(items).map(el => el.dataset.fullSrc || el.querySelector('img').src)
+    srcs = Array.from(items).map(el =>
+      el.dataset.fullWebp || el.dataset.fullSrc || el.querySelector('img')?.src || ''
+    )
     items.forEach((item, i) => {
       if(item.dataset.lightboxBound) return
       item.dataset.lightboxBound = 'true'
@@ -623,6 +625,10 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const lineupPhotos = document.querySelectorAll('[data-lineup]')
   if(!galleryRoot && !lineupPhotos.length) return
 
+  const GALLERY_EAGER = 6
+  const LAZY_ROOT_MARGIN = '500px 0px'
+  const IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+
   function applyPicture(picture, image){
     if(!picture || !image) return
     const source = picture.querySelector('source[type="image/webp"]')
@@ -631,20 +637,66 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     if(img) img.src = image.src
   }
 
-  function buildGalleryItem(image, eager, index){
+  function markImageLoaded(item, img){
+    item.classList.add('is-loaded')
+    if(img && img.decode){
+      img.decode().catch(() => {}).finally(() => item.classList.add('is-decoded'))
+    } else {
+      item.classList.add('is-decoded')
+    }
+  }
+
+  function bindImageLoaded(item, img){
+    if(img.complete && img.naturalWidth){
+      markImageLoaded(item, img)
+      return
+    }
+    img.addEventListener('load', () => markImageLoaded(item, img), { once: true })
+    img.addEventListener('error', () => item.classList.add('is-loaded'), { once: true })
+  }
+
+  function buildGalleryItem(image, index){
+    const eager = index < GALLERY_EAGER
     const item = document.createElement('div')
-    item.className = 'gallery-item reveal-scale'
+    item.className = 'gallery-item reveal-scale' + (eager ? '' : ' gallery-item--lazy')
     item.style.setProperty('--reveal-delay', `${Math.min(index * 0.04, 0.48).toFixed(2)}s`)
     if(image.width && image.height){
       item.style.aspectRatio = `${image.width} / ${image.height}`
     }
     item.dataset.fullSrc = image.full
-    item.innerHTML = `
-      <picture>
-        <source type="image/webp" srcset="${image.webp}">
-        <img src="${image.src}" alt="Dirty Aesthetic" width="${image.width || ''}" height="${image.height || ''}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
-      </picture>`
+    if(image.fullWebp) item.dataset.fullWebp = image.fullWebp
+
+    if(eager){
+      item.innerHTML = `
+        <picture>
+          <source type="image/webp" srcset="${image.webp}">
+          <img src="${image.src}" alt="Dirty Aesthetic" width="${image.width || ''}" height="${image.height || ''}" loading="eager" decoding="async"${index < 3 ? ' fetchpriority="high"' : ''}>
+        </picture>`
+    } else {
+      item.innerHTML = `
+        <picture>
+          <source type="image/webp" data-srcset="${image.webp}">
+          <img src="${IMG_PLACEHOLDER}" data-src="${image.src}" data-webp="${image.webp}" alt="Dirty Aesthetic" width="${image.width || ''}" height="${image.height || ''}" loading="lazy" decoding="async">
+        </picture>`
+    }
     return item
+  }
+
+  function hydrateGalleryItem(item){
+    if(!item.classList.contains('gallery-item--lazy')) return
+    const picture = item.querySelector('picture')
+    const source = picture?.querySelector('source[type="image/webp"]')
+    const img = picture?.querySelector('img')
+    if(!img || !img.dataset.src) return
+
+    if(source?.dataset.srcset){
+      source.srcset = source.dataset.srcset
+      source.removeAttribute('data-srcset')
+    }
+    img.src = img.dataset.src
+    img.removeAttribute('data-src')
+    item.classList.remove('gallery-item--lazy')
+    bindImageLoaded(item, img)
   }
 
   function revealGallery(root){
@@ -662,25 +714,40 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
         revealGallery(root)
         observer.disconnect()
       })
-    }, { threshold: 0.1, rootMargin: '0px 0px -4% 0px' })
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' })
     observer.observe(root)
   }
 
-  function markGalleryReady(root){
-    const imgs = root.querySelectorAll('img')
-    Promise.all([...imgs].map(img => img.complete
-      ? Promise.resolve()
-      : new Promise(resolve => {
-          img.addEventListener('load', resolve, { once: true })
-          img.addEventListener('error', resolve, { once: true })
-        })
-    )).then(() => {
-      root.classList.add('is-ready')
-      watchGalleryReveal(root)
-    })
+  function observeLazyGalleryItems(root){
+    const lazyItems = root.querySelectorAll('.gallery-item--lazy')
+    if(!lazyItems.length) return
+
+    if(!('IntersectionObserver' in window)){
+      lazyItems.forEach(hydrateGalleryItem)
+      return
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(!entry.isIntersecting) return
+        hydrateGalleryItem(entry.target)
+        observer.unobserve(entry.target)
+      })
+    }, { rootMargin: LAZY_ROOT_MARGIN })
+
+    lazyItems.forEach(item => observer.observe(item))
   }
 
-  fetch('data/epk-images.json', { cache: 'no-store' }).then(r => {
+  function initGallery(root){
+    root.classList.add('is-ready')
+    root.querySelectorAll('.gallery-item:not(.gallery-item--lazy) img').forEach(img => {
+      bindImageLoaded(img.closest('.gallery-item'), img)
+    })
+    observeLazyGalleryItems(root)
+    watchGalleryReveal(root)
+  }
+
+  fetch('data/epk-images.json').then(r => {
     if(!r.ok) throw new Error('manifest missing')
     return r.json()
   }).then(data => {
@@ -693,11 +760,10 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     }
 
     if(galleryRoot && Array.isArray(data.gallery)){
-      const eager = window.matchMedia('(min-width: 769px)').matches
       galleryRoot.innerHTML = ''
       galleryRoot.classList.remove('is-ready')
-      data.gallery.forEach((image, i) => galleryRoot.appendChild(buildGalleryItem(image, eager, i)))
-      markGalleryReady(galleryRoot)
+      data.gallery.forEach((image, i) => galleryRoot.appendChild(buildGalleryItem(image, i)))
+      initGallery(galleryRoot)
       if(typeof window.__bindGalleryLightbox === 'function') window.__bindGalleryLightbox()
     }
   }).catch(() => {

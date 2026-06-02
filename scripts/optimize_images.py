@@ -23,9 +23,10 @@ OUT = SRC / "optimized"
 OUT_COVERS = OUT / "covers"
 OUT_LINEUP = OUT / "lineup"
 OUT_GALLERY = OUT / "gallery"
+OUT_GALLERY_FULL = OUT / "gallery" / "full"
 OUT_MERCH = OUT / "merch"
 DATA = ROOT / "data"
-for d in (OUT, OUT_COVERS, OUT_LINEUP, OUT_GALLERY, OUT_MERCH, DATA):
+for d in (OUT, OUT_COVERS, OUT_LINEUP, OUT_GALLERY, OUT_GALLERY_FULL, OUT_MERCH, DATA):
     d.mkdir(parents=True, exist_ok=True)
 
 CWEBP = (
@@ -88,6 +89,46 @@ def report(path):
         return
     size_kb = path.stat().st_size / 1024
     print(f"  {path.relative_to(ROOT)}  {size_kb:.0f} KB")
+
+
+def flatten_alpha(img, bg=(0, 0, 0)):
+    if img.mode == "P":
+        img = img.convert("RGBA")
+    if img.mode in ("RGBA", "LA"):
+        base = Image.new("RGB", img.size, bg)
+        base.paste(img, mask=img.split()[-1])
+        return base
+    if img.mode != "RGB":
+        return img.convert("RGB")
+    return img
+
+
+def process_gallery_item(src_path, out_dir, out_base, grid_w=800, lightbox_w=1600):
+    """Grid-sized JPEG/WebP for masonry + separate lightbox variants."""
+    img = Image.open(src_path)
+    img = ImageOps.exif_transpose(img)
+
+    grid = flatten_alpha(resize_to_width(img, grid_w))
+    out_jpg = out_dir / f"{out_base}.jpg"
+    save_jpeg(grid, out_jpg, quality=80)
+    out_webp = out_dir / f"{out_base}.webp"
+    save_webp(out_jpg, out_webp, 76)
+
+    lb = flatten_alpha(resize_to_width(img, lightbox_w))
+    lb_jpg = OUT_GALLERY_FULL / f"{out_base}.jpg"
+    save_jpeg(lb, lb_jpg, quality=84)
+    lb_webp = OUT_GALLERY_FULL / f"{out_base}.webp"
+    save_webp(lb_jpg, lb_webp, 80)
+
+    return {
+        "webp": rel(out_webp),
+        "src": rel(out_jpg),
+        "full": rel(lb_jpg),
+        "fullWebp": rel(lb_webp),
+        "type": "jpeg",
+        "width": grid.width,
+        "height": grid.height,
+    }
 
 
 def process_raster(src_path, out_dir, out_base, target_width, jpeg_q=82, webp_q=80):
@@ -205,10 +246,11 @@ gallery_manifest = []
 for src in discover_gallery_sources():
     out_base = src.stem
     print(f"  {out_base} <= GALLERY/{src.name}")
-    meta = process_raster(src, OUT_GALLERY, out_base, 1400, jpeg_q=82, webp_q=78)
+    meta = process_gallery_item(src, OUT_GALLERY, out_base)
     gallery_manifest.append(meta)
     report(OUT_GALLERY / Path(meta["src"]).name)
     report(OUT_GALLERY / Path(meta["webp"]).name)
+    report(OUT_GALLERY_FULL / Path(meta["fullWebp"]).name)
 
 print("Merch")
 merch_src = find_source("MERCH", ["MERCH_1", "merch-1", "MERCH_1.JPG"])
