@@ -1713,14 +1713,23 @@ a.show-row[href]{cursor:pointer}
 /* Single Release — reuses .ep-release scaffolding, swaps background + adds date/blurb styles */
 .single-release{
   background-color:#0a0705;
+  background-position:center calc(50% + var(--ep-bg-parallax, 0px));
+  background-size:cover;
+  background-repeat:no-repeat;
+}
+.single-release--back-to-me{
+  background-image:url('../assets/images/optimized/covers/cover_back_to_me.jpg');
+  background-image:image-set(
+    url('../assets/images/optimized/covers/cover_back_to_me.webp') type('image/webp'),
+    url('../assets/images/optimized/covers/cover_back_to_me.jpg') type('image/jpeg')
+  );
+}
+.single-release--irrational{
   background-image:url('../assets/images/optimized/covers/cover_irrational.jpg');
   background-image:image-set(
     url('../assets/images/optimized/covers/cover_irrational.webp') type('image/webp'),
     url('../assets/images/optimized/covers/cover_irrational.jpg') type('image/jpeg')
   );
-  background-position:center calc(50% + var(--ep-bg-parallax, 0px));
-  background-size:cover;
-  background-repeat:no-repeat;
 }
 .single-release .ep-release-bg{
   background:
@@ -1758,6 +1767,21 @@ a.show-row[href]{cursor:pointer}
   line-height:1.55;
   max-width:46ch;
   margin:0;
+}
+.single-release-actions{
+  margin-top:clamp(20px,3vw,28px);
+}
+.single-presave-btn{
+  min-width:min(100%,220px);
+}
+#back-to-me-section{
+  scroll-margin-top:24px;
+}
+@media (min-width:769px){
+  #back-to-me-section{
+    padding-top:clamp(96px,11vh,144px);
+    padding-bottom:clamp(96px,11vh,144px);
+  }
 }
 .single-release-video{
   position:relative;
@@ -1798,6 +1822,10 @@ a.show-row[href]{cursor:pointer}
   .single-release-blurb{
     margin-left:auto;
     margin-right:auto;
+  }
+  .single-release-actions{
+    display:flex;
+    justify-content:center;
   }
   .single-release-video{
     margin-top:clamp(32px,6vw,48px);

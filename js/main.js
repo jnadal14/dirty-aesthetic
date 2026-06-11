@@ -164,8 +164,23 @@ window.addEventListener('beforeprint', () => {
   refreshState()
 })()
 
-// Scroll "Watch Irrational Video" to the right part of the section.
-// Desktop: center the whole section. Mobile: land on the video at the bottom.
+// Scroll in-page single sections so they land centered in the viewport.
+function scrollToCenteredSection(section){
+  if(!section) return
+  const y = Math.max(0, section.offsetTop + section.offsetHeight / 2 - window.innerHeight / 2)
+
+  if(window.__lenis){
+    window.__lenis.scrollTo(y, { duration: 1.45 })
+  } else {
+    window.scrollTo({ top: y, behavior: 'smooth' })
+  }
+}
+
+function scrollToBackToMeSection(){
+  scrollToCenteredSection(document.getElementById('back-to-me-section'))
+}
+
+// Irrational: desktop centers the section; mobile lands on the video at the bottom.
 function scrollToIrrationalSection(){
   const section = document.getElementById('irrational-section')
   if(!section) return
@@ -183,6 +198,17 @@ function scrollToIrrationalSection(){
   }
 }
 
+function bindCenteredSectionScrollLinks(){
+  document.querySelectorAll('a[href="#back-to-me-section"]').forEach(link => {
+    if(link.dataset.centeredScrollBound) return
+    link.dataset.centeredScrollBound = 'true'
+    link.addEventListener('click', (e) => {
+      e.preventDefault()
+      scrollToBackToMeSection()
+    })
+  })
+}
+
 function bindIrrationalScrollLinks(){
   document.querySelectorAll('a[href="#irrational-section"]').forEach(link => {
     if(link.dataset.irrationalScrollBound) return
@@ -194,6 +220,7 @@ function bindIrrationalScrollLinks(){
   })
 }
 
+bindCenteredSectionScrollLinks()
 bindIrrationalScrollLinks()
 
 // ===== Lenis smooth-scroll =====
@@ -224,7 +251,7 @@ bindIrrationalScrollLinks()
 
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       const href = link.getAttribute('href')
-      if (!href || href.length <= 1 || href === '#irrational-section') return
+      if (!href || href.length <= 1 || href === '#irrational-section' || href === '#back-to-me-section') return
       link.addEventListener('click', (e) => {
         const target = document.querySelector(href)
         if (!target) return
@@ -233,6 +260,7 @@ bindIrrationalScrollLinks()
       })
     })
 
+    bindCenteredSectionScrollLinks()
     bindIrrationalScrollLinks()
     window.__lenis = lenis
   }
