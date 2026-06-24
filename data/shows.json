@@ -1,15 +1,22 @@
 {
   "upcoming": [
     {
+      "date": "Jun 27, 2026",
+      "city": "Vancouver",
+      "venue": "Pangea",
+      "lineup": "Arthur Valley",
+      "poster": "assets/images/posters/PANGEA_06:27:26.PNG"
+    }
+  ],
+  "past": [
+    {
       "date": "May 29, 2026",
       "city": "Vancouver",
       "venue": "The Biltmore Cabaret",
       "lineup": "Matty Miller & The Barge Boys, Jez Dylan Bonham",
       "poster": "assets/images/posters/05:29:26_BILTMORE_BARGE BOYS.jpg",
       "link": "https://admitone.com/events/vancouver/community/music/matty-miller-the-barge-boys-what-a-loser-single-release-party/R3GANQ"
-    }
-  ],
-  "past": [
+    },
     {
       "date": "Apr 18, 2026",
       "city": "Vancouver",

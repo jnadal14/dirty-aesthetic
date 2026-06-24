@@ -632,6 +632,7 @@ body.privacy-page .privacy-page-main p{
   padding:0 clamp(20px,5vw,64px);
   display:grid;
   grid-template-columns:repeat(2,1fr);
+  justify-items:center;
   gap:clamp(12px,2vw,20px) clamp(32px,5vw,72px);
 }
 .member-card{
