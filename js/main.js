@@ -687,7 +687,8 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     const eager = index < GALLERY_EAGER
     const item = document.createElement('div')
     item.className = 'gallery-item reveal-scale' + (eager ? '' : ' gallery-item--lazy')
-    item.style.setProperty('--reveal-delay', `${Math.min(index * 0.04, 0.48).toFixed(2)}s`)
+    item.dataset.galleryIndex = String(index)
+    item.style.setProperty('--reveal-delay', '0s')
     if(image.width && image.height){
       item.style.aspectRatio = `${image.width} / ${image.height}`
     }
@@ -746,12 +747,33 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     observer.observe(root)
   }
 
+  // Stagger the parallax reveal by visual ROW (vertical position), not DOM
+  // order. With CSS multicol the DOM fills column 1 top-to-bottom first, so an
+  // index-based delay animates the whole first column in before the rest.
+  // Bucketing by offsetTop waves it in top-to-bottom across all columns.
+  function assignRowRevealOrder(root){
+    const items = [...root.querySelectorAll('.gallery-item')]
+    if(!items.length) return
+    const positioned = items.map(el => ({ el, top: el.offsetTop, left: el.offsetLeft }))
+    positioned.sort((a, b) => a.top - b.top || a.left - b.left)
+
+    let rowIndex = -1
+    let lastTop = -Infinity
+    positioned.forEach(({ el, top }) => {
+      if(top - lastTop > 40){
+        rowIndex++
+        lastTop = top
+      }
+      el.style.setProperty('--reveal-delay', `${Math.min(rowIndex * 0.08, 0.6).toFixed(2)}s`)
+    })
+  }
+
   function observeLazyGalleryItems(root){
     const lazyItems = root.querySelectorAll('.gallery-item--lazy')
     if(!lazyItems.length) return
 
     if(!('IntersectionObserver' in window)){
-      lazyItems.forEach(hydrateGalleryItem)
+      lazyItems.forEach(item => hydrateGalleryItem(item))
       return
     }
 
@@ -768,6 +790,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
 
   function initGallery(root){
     root.classList.add('is-ready')
+    assignRowRevealOrder(root)
     root.querySelectorAll('.gallery-item:not(.gallery-item--lazy) img').forEach(img => {
       bindImageLoaded(img.closest('.gallery-item'), img)
     })
