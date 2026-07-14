@@ -176,9 +176,8 @@ function scrollToCenteredSection(section){
   }
 }
 
-function scrollToBackToMeSection(){
-  scrollToCenteredSection(document.getElementById('back-to-me-section'))
-}
+// Sections that should center in the viewport when linked to in-page.
+const CENTERED_SECTION_IDS = ['back-to-me-section', 'modern-nostalgia-section']
 
 // Irrational: desktop centers the section; mobile lands on the video at the bottom.
 function scrollToIrrationalSection(){
@@ -199,12 +198,13 @@ function scrollToIrrationalSection(){
 }
 
 function bindCenteredSectionScrollLinks(){
-  document.querySelectorAll('a[href="#back-to-me-section"]').forEach(link => {
+  const selector = CENTERED_SECTION_IDS.map(id => `a[href="#${id}"]`).join(', ')
+  document.querySelectorAll(selector).forEach(link => {
     if(link.dataset.centeredScrollBound) return
     link.dataset.centeredScrollBound = 'true'
     link.addEventListener('click', (e) => {
       e.preventDefault()
-      scrollToBackToMeSection()
+      scrollToCenteredSection(document.querySelector(link.getAttribute('href')))
     })
   })
 }
@@ -251,7 +251,7 @@ bindIrrationalScrollLinks()
 
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       const href = link.getAttribute('href')
-      if (!href || href.length <= 1 || href === '#irrational-section' || href === '#back-to-me-section') return
+      if (!href || href.length <= 1 || href === '#irrational-section' || href === '#back-to-me-section' || href === '#modern-nostalgia-section') return
       link.addEventListener('click', (e) => {
         const target = document.querySelector(href)
         if (!target) return
@@ -394,6 +394,14 @@ function parseDateParts(dateStr) {
 const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><span class="show-row-venue">TBA</span></div>`
 
 fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
+  const nextShowBtn = document.getElementById('hero-next-show')
+  if(nextShowBtn && data.upcoming && data.upcoming.length){
+    const next = data.upcoming[0]
+    const parts = parseDateParts(next.date)
+    const dateLabel = parts ? `${parts.month} ${parts.day}` : next.date
+    nextShowBtn.textContent = `${next.venue} ${dateLabel}`
+  }
+
   const container=document.getElementById('upcoming')
   if(!container)return
   const editorial = container.classList.contains('shows-editorial')

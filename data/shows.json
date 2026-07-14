@@ -1,14 +1,28 @@
 {
   "upcoming": [
     {
+      "date": "Jul 30, 2026",
+      "city": "Vancouver",
+      "venue": "Red Gate",
+      "lineup": "Rhyan Reign & The Miss Behavors, Cris Cirin, Prah7ad",
+      "poster": "assets/images/posters/REDGATE_07:30:26.JPG",
+      "link": "https://redgate.tv/tickets/#Rhyan%20Reign%20&%20The%20Miss%20Behavors"
+    },
+    {
+      "date": "Aug 1, 2026",
+      "city": "Vancouver",
+      "venue": "The Roxy Cabaret",
+      "poster": "assets/images/posters/ROXY_08:01:26.jpeg"
+    }
+  ],
+  "past": [
+    {
       "date": "Jun 27, 2026",
       "city": "Vancouver",
       "venue": "Pangea",
       "lineup": "Arthur Valley",
       "poster": "assets/images/posters/PANGEA_06:27:26.PNG"
-    }
-  ],
-  "past": [
+    },
     {
       "date": "May 29, 2026",
       "city": "Vancouver",

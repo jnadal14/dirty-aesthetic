@@ -219,6 +219,7 @@ if r:
 
 print("Album / single covers")
 for src_name in [
+    "cover_modern_nostalgia.jpg",
     "cover_back_to_me.jpg",
     "cover_irrational.jpg",
     "cover_sugar_on_the_rocks.jpg",

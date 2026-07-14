@@ -1731,6 +1731,13 @@ a.show-row[href]{cursor:pointer}
   background-size:cover;
   background-repeat:no-repeat;
 }
+.single-release--modern-nostalgia{
+  background-image:url('../assets/images/optimized/covers/cover_modern_nostalgia.jpg');
+  background-image:image-set(
+    url('../assets/images/optimized/covers/cover_modern_nostalgia.webp') type('image/webp'),
+    url('../assets/images/optimized/covers/cover_modern_nostalgia.jpg') type('image/jpeg')
+  );
+}
 .single-release--back-to-me{
   background-image:url('../assets/images/optimized/covers/cover_back_to_me.jpg');
   background-image:image-set(
@@ -1769,8 +1776,8 @@ a.show-row[href]{cursor:pointer}
   font-weight:600;
 }
 .single-date-value{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(1.5em,2.6vw,2.05em);
+  font-family:'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  font-size:clamp(1.35em,2.4vw,1.9em);
   letter-spacing:2px;
   color:var(--accent);
   text-transform:uppercase;
@@ -1788,11 +1795,13 @@ a.show-row[href]{cursor:pointer}
 .single-presave-btn{
   min-width:min(100%,220px);
 }
-#back-to-me-section{
+#back-to-me-section,
+#modern-nostalgia-section{
   scroll-margin-top:24px;
 }
 @media (min-width:769px){
-  #back-to-me-section{
+  #back-to-me-section,
+  #modern-nostalgia-section{
     padding-top:clamp(96px,11vh,144px);
     padding-bottom:clamp(96px,11vh,144px);
   }
