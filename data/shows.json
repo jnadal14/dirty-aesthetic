@@ -12,7 +12,9 @@
       "date": "Aug 1, 2026",
       "city": "Vancouver",
       "venue": "The Roxy Cabaret",
-      "poster": "assets/images/posters/ROXY_08:01:26.jpeg"
+      "lineup": "Jesse and the Black Sheep",
+      "poster": "assets/images/posters/ROXY_08:01:26.jpeg",
+      "link": "https://www.showpass.com/sataug1/"
     }
   ],
   "past": [

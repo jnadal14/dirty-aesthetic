@@ -394,12 +394,15 @@ function parseDateParts(dateStr) {
 const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><span class="show-row-venue">TBA</span></div>`
 
 fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
-  const nextShowBtn = document.getElementById('hero-next-show')
-  if(nextShowBtn && data.upcoming && data.upcoming.length){
-    const next = data.upcoming[0]
-    const parts = parseDateParts(next.date)
-    const dateLabel = parts ? `${parts.month} ${parts.day}` : next.date
-    nextShowBtn.textContent = `${next.venue} ${dateLabel}`
+  const heroShows = document.getElementById('hero-shows')
+  if(heroShows && data.upcoming && data.upcoming.length){
+    heroShows.innerHTML = data.upcoming.map(s => {
+      const parts = parseDateParts(s.date)
+      const dateLabel = parts ? `${parts.month} ${parts.day}` : s.date
+      const href = s.link || '#upcoming-section'
+      const attrs = s.link ? ' target="_blank" rel="noopener"' : ''
+      return `<a class="btn ghost" href="${href}"${attrs}>${s.venue} ${dateLabel}</a>`
+    }).join('')
   }
 
   const container=document.getElementById('upcoming')
