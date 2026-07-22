@@ -164,6 +164,157 @@ window.addEventListener('beforeprint', () => {
   refreshState()
 })()
 
+// Homepage chapter navigation and section-to-section motion. This keeps the
+// existing layouts intact, adding only focus, depth and a persistent index.
+;(function homeScrollExperience(){
+  const chapters = Array.from(document.querySelectorAll('[data-scroll-chapter]'))
+  if (!chapters.length) return
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+  const spatialMotion = window.matchMedia('(min-width: 1081px) and (min-height: 680px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)')
+  const cameraPaths = [
+    { x:0, y:0, scale:1, rotate:0, origin:'center center' },
+    { x:14, y:11, scale:.78, rotate:2.4, origin:'left bottom' },
+    { x:-14, y:8, scale:.82, rotate:-2.2, origin:'right bottom' },
+    { x:0, y:12, scale:.68, rotate:.4, origin:'center bottom' },
+    { x:16, y:-2, scale:.84, rotate:1.8, origin:'left center' },
+    { x:-15, y:10, scale:.76, rotate:-1.7, origin:'right bottom' },
+    { x:0, y:14, scale:.7, rotate:.7, origin:'center bottom' }
+  ]
+  const nav = document.createElement('nav')
+  nav.className = 'chapter-nav'
+  nav.setAttribute('aria-label', 'Homepage sections')
+
+  const links = chapters.map((section, index) => {
+    if (!section.id) section.id = `chapter-${index + 1}`
+    if (index > 0) {
+      const wipe = document.createElement('span')
+      wipe.className = 'chapter-wipe'
+      wipe.setAttribute('aria-hidden', 'true')
+      section.appendChild(wipe)
+    }
+
+    const link = document.createElement('a')
+    link.className = 'chapter-nav-link'
+    link.href = `#${section.id}`
+    link.setAttribute('aria-label', `Go to ${section.dataset.chapterLabel}`)
+    link.innerHTML = `<span class="chapter-nav-number">${String(index + 1).padStart(2, '0')}</span><span class="chapter-nav-label">${section.dataset.chapterLabel}</span>`
+    nav.appendChild(link)
+
+    link.addEventListener('click', (event) => {
+      event.preventDefault()
+      const top = index === 0 ? 0 : section.getBoundingClientRect().top + window.scrollY
+      if (window.__lenis) {
+        window.__lenis.scrollTo(top, { duration: 1.35 })
+      } else {
+        window.scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' })
+      }
+      window.history.replaceState(null, '', link.hash)
+    })
+
+    return link
+  })
+
+  document.body.appendChild(nav)
+  document.body.classList.add('home-experience')
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
+  const ease = value => value * value * (3 - 2 * value)
+  let ticking = false
+  let spatialEnabled = false
+
+  function refreshSpatialState(){
+    spatialEnabled = spatialMotion.matches
+    document.body.classList.toggle('spatial-scroll-active', spatialEnabled)
+    chapters.forEach((section, index) => {
+      section.style.zIndex = spatialEnabled ? String(index + 1) : ''
+    })
+    scheduleChapterUpdate()
+  }
+
+  function updateChapters(){
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+    const scrollable = Math.max(1, document.documentElement.scrollHeight - viewportHeight)
+    const pageProgress = clamp(window.scrollY / scrollable, 0, 1)
+    nav.style.setProperty('--page-progress', pageProgress.toFixed(4))
+
+    let activeIndex = 0
+    const chapterAnchor = window.scrollY + viewportHeight * .45
+
+    chapters.forEach((section, index) => {
+      const rect = section.getBoundingClientRect()
+      const viewportCenter = viewportHeight / 2
+      const sectionCenter = rect.top + rect.height / 2
+      const centerDistance = sectionCenter - viewportCenter
+      const normalized = clamp(centerDistance / (viewportHeight * .9), -1, 1)
+      if (section.offsetTop <= chapterAnchor) activeIndex = index
+
+      if (!reduceMotion.matches) {
+        if (spatialEnabled) {
+          const path = cameraPaths[index] || cameraPaths[cameraPaths.length - 1]
+          const flowTop = section.offsetTop - window.scrollY
+          const nextSection = chapters[index + 1]
+          const nextFlowTop = nextSection ? nextSection.offsetTop - window.scrollY : viewportHeight
+          const entry = ease(clamp(1 - flowTop / viewportHeight, 0, 1))
+          const exit = nextSection ? ease(clamp(1 - nextFlowTop / viewportHeight, 0, 1)) : 0
+          const entryRemaining = 1 - entry
+          const exitDirection = index % 2 === 0 ? -1 : 1
+          const x = path.x * entryRemaining + exitDirection * 8 * exit
+          const y = path.y * entryRemaining - 4.5 * exit
+          const scale = 1 - (1 - path.scale) * entryRemaining - .13 * exit
+          const rotate = path.rotate * entryRemaining + exitDirection * 1.35 * exit
+          const blur = 4.5 * entryRemaining + 2.8 * exit
+          const brightness = 1 - .22 * entryRemaining - .24 * exit
+          const opacity = 1 - .34 * entryRemaining - .26 * exit
+          const radius = 44 * entryRemaining + 34 * exit
+
+          section.style.setProperty('--scene-x', `${x.toFixed(3)}vw`)
+          section.style.setProperty('--scene-y', `${y.toFixed(3)}vh`)
+          section.style.setProperty('--scene-scale', scale.toFixed(4))
+          section.style.setProperty('--scene-rotate', `${rotate.toFixed(3)}deg`)
+          section.style.setProperty('--scene-blur', `${blur.toFixed(2)}px`)
+          section.style.setProperty('--scene-brightness', brightness.toFixed(3))
+          section.style.setProperty('--scene-opacity', opacity.toFixed(3))
+          section.style.setProperty('--scene-radius', `${radius.toFixed(2)}px`)
+          section.style.setProperty('--scene-origin', path.origin)
+        } else {
+          const distance = Math.abs(normalized)
+          const entryProgress = clamp(1 - ((rect.top - viewportHeight * .12) / (viewportHeight * .76)), 0, 1)
+          section.style.setProperty('--chapter-drift', `${(normalized * 14).toFixed(2)}px`)
+          section.style.setProperty('--chapter-cover-x', `${(normalized * -16).toFixed(2)}px`)
+          section.style.setProperty('--chapter-info-x', `${(normalized * 16).toFixed(2)}px`)
+          section.style.setProperty('--chapter-cover-rotate', `${(normalized * -.75).toFixed(3)}deg`)
+          section.style.setProperty('--chapter-blur', `${(distance * 1.1).toFixed(2)}px`)
+          section.style.setProperty('--chapter-opacity', `${(1 - distance * .12).toFixed(3)}`)
+          section.style.setProperty('--chapter-wipe-y', `${(-72 * entryProgress).toFixed(2)}%`)
+          section.style.setProperty('--chapter-wipe-opacity', `${(.72 * (1 - entryProgress)).toFixed(3)}`)
+        }
+      }
+    })
+
+    links.forEach((link, index) => {
+      const active = index === activeIndex
+      link.classList.toggle('is-active', active)
+      if (active) link.setAttribute('aria-current', 'step')
+      else link.removeAttribute('aria-current')
+    })
+
+    ticking = false
+  }
+
+  function scheduleChapterUpdate(){
+    if (ticking) return
+    ticking = true
+    requestAnimationFrame(updateChapters)
+  }
+
+  window.addEventListener('scroll', scheduleChapterUpdate, { passive: true })
+  window.addEventListener('resize', refreshSpatialState, { passive: true })
+  if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', refreshSpatialState)
+  if (spatialMotion.addEventListener) spatialMotion.addEventListener('change', refreshSpatialState)
+  refreshSpatialState()
+})()
+
 // Scroll in-page single sections so they land centered in the viewport.
 function scrollToCenteredSection(section){
   if(!section) return
@@ -200,6 +351,7 @@ function scrollToIrrationalSection(){
 function bindCenteredSectionScrollLinks(){
   const selector = CENTERED_SECTION_IDS.map(id => `a[href="#${id}"]`).join(', ')
   document.querySelectorAll(selector).forEach(link => {
+    if(link.classList.contains('chapter-nav-link')) return
     if(link.dataset.centeredScrollBound) return
     link.dataset.centeredScrollBound = 'true'
     link.addEventListener('click', (e) => {
@@ -211,6 +363,7 @@ function bindCenteredSectionScrollLinks(){
 
 function bindIrrationalScrollLinks(){
   document.querySelectorAll('a[href="#irrational-section"]').forEach(link => {
+    if(link.classList.contains('chapter-nav-link')) return
     if(link.dataset.irrationalScrollBound) return
     link.dataset.irrationalScrollBound = 'true'
     link.addEventListener('click', (e) => {
@@ -251,7 +404,7 @@ bindIrrationalScrollLinks()
 
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       const href = link.getAttribute('href')
-      if (!href || href.length <= 1 || href === '#irrational-section' || href === '#back-to-me-section' || href === '#modern-nostalgia-section') return
+      if (!href || href.length <= 1 || link.classList.contains('chapter-nav-link') || href === '#irrational-section' || href === '#back-to-me-section' || href === '#modern-nostalgia-section') return
       link.addEventListener('click', (e) => {
         const target = document.querySelector(href)
         if (!target) return
@@ -306,6 +459,37 @@ bindIrrationalScrollLinks()
     const isHover = !!e.target.closest(hoverSelector)
     dot.classList.toggle('hover', isHover)
   })
+})()
+
+// Small magnetic response for primary controls on precise pointers.
+;(function magneticButtons(){
+  if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return
+
+  let activeButton = null
+
+  document.addEventListener('pointermove', (event) => {
+    const button = event.target.closest('.btn')
+    if (activeButton && activeButton !== button) {
+      activeButton.style.setProperty('--btn-x', '0px')
+      activeButton.style.setProperty('--btn-y', '0px')
+    }
+    activeButton = button
+    if (!button) return
+
+    const rect = button.getBoundingClientRect()
+    const x = ((event.clientX - rect.left) / rect.width - .5) * 6
+    const y = ((event.clientY - rect.top) / rect.height - .5) * 5 - 2
+    button.style.setProperty('--btn-x', `${x.toFixed(2)}px`)
+    button.style.setProperty('--btn-y', `${y.toFixed(2)}px`)
+  }, { passive: true })
+
+  document.addEventListener('pointerout', (event) => {
+    const button = event.target.closest('.btn')
+    if (!button || (event.relatedTarget && button.contains(event.relatedTarget))) return
+    button.style.setProperty('--btn-x', '0px')
+    button.style.setProperty('--btn-y', '0px')
+    if (activeButton === button) activeButton = null
+  }, { passive: true })
 })()
 
 // Scroll-triggered reveal animations.

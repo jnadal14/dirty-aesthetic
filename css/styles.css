@@ -222,11 +222,65 @@ picture{display:contents}
 }
 
 
-/* buttons */
-.btn{display:inline-block;padding:12px 22px;background:var(--accent);color:#120c07;border-radius:999px;font-weight:600;transition:all .2s ease;cursor:pointer;border:none;letter-spacing:.5px;font-size:1.05em;text-align:center}
-.btn.ghost{background:transparent;border:1px solid var(--ink);color:var(--ink)}
-.btn:hover{background:var(--highlight);color:var(--ink);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
-.btn.ghost:hover{border-color:var(--highlight);background:var(--highlight)}
+/* Buttons — compact, cut-corner controls instead of generic pills. */
+.btn{
+  --btn-x:0px;
+  --btn-y:0px;
+  position:relative;
+  isolation:isolate;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.7em;
+  overflow:hidden;
+  padding:12px 22px 11px;
+  background:var(--accent);
+  color:#120c07;
+  border:1px solid rgba(240,230,216,.28);
+  border-radius:2px;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  font:600 1.05em/1.2 'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  letter-spacing:.65px;
+  text-align:center;
+  cursor:pointer;
+  transform:translate3d(var(--btn-x),var(--btn-y),0);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 8px 26px rgba(0,0,0,.18);
+  transition:color .32s ease,border-color .32s ease,box-shadow .32s ease,transform .18s cubic-bezier(.2,.8,.2,1);
+}
+.btn::before{
+  content:'';
+  position:absolute;
+  z-index:-1;
+  inset:-2px;
+  background:var(--highlight);
+  transform:translate3d(-108%,0,0) skewX(-12deg);
+  transform-origin:left center;
+  transition:transform .42s cubic-bezier(.2,.8,.2,1);
+}
+.btn::after{
+  content:'';
+  width:16px;
+  height:1px;
+  flex:0 0 auto;
+  background:currentColor;
+  box-shadow:6px -3px 0 -0.25px currentColor;
+  transform:translateX(0);
+  transition:width .3s cubic-bezier(.2,.8,.2,1),transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.btn.ghost{
+  background:rgba(10,7,5,.24);
+  border-color:rgba(240,230,216,.62);
+  color:var(--ink);
+  backdrop-filter:blur(4px);
+}
+.btn:hover{
+  color:var(--ink);
+  border-color:rgba(240,230,216,.88);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 12px 34px rgba(0,0,0,.34);
+}
+.btn:hover::before{transform:translate3d(0,0,0) skewX(0)}
+.btn:hover::after{width:24px;transform:translateX(2px)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
 
 /* layouts */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:40px 20px}
@@ -966,6 +1020,273 @@ body.privacy-page .privacy-page-main p{
   .epk-spotify-embed iframe{
     height:260px;
   }
+}
+
+/* ===== Homepage scroll chapters =====
+   The base experience adds gentle depth and a persistent section index.
+   Large screens upgrade to the spatial reveal sequence farther below. */
+.home-experience main{position:relative}
+.home-experience main > [data-scroll-chapter]{
+  --chapter-drift:0px;
+  --chapter-cover-x:0px;
+  --chapter-info-x:0px;
+  --chapter-cover-rotate:0deg;
+  --chapter-blur:0px;
+  --chapter-opacity:1;
+  --chapter-wipe-y:-70%;
+  --chapter-wipe-opacity:0;
+  --scene-x:0vw;
+  --scene-y:0vh;
+  --scene-scale:1;
+  --scene-rotate:0deg;
+  --scene-blur:0px;
+  --scene-brightness:1;
+  --scene-opacity:1;
+  --scene-radius:0px;
+  --scene-origin:center center;
+  position:relative;
+  isolation:isolate;
+}
+.home-experience main > [data-scroll-chapter]:not(.hero){
+  box-shadow:0 -28px 72px rgba(0,0,0,.48);
+}
+.chapter-wipe{
+  position:absolute;
+  z-index:20;
+  top:-1px;
+  left:-5%;
+  width:110%;
+  height:clamp(96px,18vw,230px);
+  pointer-events:none;
+  opacity:var(--chapter-wipe-opacity);
+  transform:translate3d(0,var(--chapter-wipe-y),0) rotate(-1.2deg);
+  transform-origin:top center;
+  clip-path:polygon(0 0,100% 0,100% 55%,0 88%);
+  background:linear-gradient(180deg,rgba(0,0,0,.76),rgba(10,7,5,.32) 62%,transparent);
+  backdrop-filter:blur(7px) saturate(.75);
+  will-change:transform,opacity;
+}
+.home-experience main > [data-scroll-chapter]:nth-of-type(even) > .chapter-wipe{
+  transform:translate3d(0,var(--chapter-wipe-y),0) rotate(1.2deg);
+  clip-path:polygon(0 0,100% 0,100% 88%,0 55%);
+}
+
+.chapter-nav{
+  position:fixed;
+  z-index:900;
+  top:50%;
+  right:clamp(12px,2.25vw,32px);
+  display:grid;
+  gap:1px;
+  padding:10px 0;
+  transform:translateY(-50%);
+  --page-progress:0;
+}
+.chapter-nav::before,
+.chapter-nav::after{
+  content:'';
+  position:absolute;
+  z-index:-1;
+  top:12px;
+  right:13px;
+  width:1px;
+  height:calc(100% - 24px);
+  background:rgba(240,230,216,.16);
+  transform-origin:top;
+}
+.chapter-nav::after{
+  background:var(--accent);
+  box-shadow:0 0 14px rgba(176,122,63,.45);
+  transform:scaleY(var(--page-progress));
+}
+.chapter-nav-link{
+  position:relative;
+  display:flex;
+  width:28px;
+  height:30px;
+  align-items:center;
+  justify-content:center;
+  color:rgba(240,230,216,.35);
+  font-size:10px;
+  letter-spacing:.08em;
+  transition:color .25s ease,transform .25s cubic-bezier(.2,.8,.2,1);
+}
+.chapter-nav-link::before{
+  content:'';
+  position:absolute;
+  right:10px;
+  width:7px;
+  height:7px;
+  border:1px solid currentColor;
+  background:#0a0705;
+  transform:rotate(45deg) scale(.45);
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),background .3s ease;
+}
+.chapter-nav-number{opacity:0;transform:translateX(-8px);transition:opacity .25s ease,transform .25s ease}
+.chapter-nav-label{
+  position:absolute;
+  right:calc(100% + 12px);
+  top:50%;
+  padding:4px 8px;
+  color:var(--ink);
+  background:rgba(10,7,5,.78);
+  border-left:1px solid var(--accent);
+  font-size:11px;
+  letter-spacing:.09em;
+  line-height:1.25;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transform:translate3d(8px,-50%,0);
+  transition:opacity .22s ease,transform .22s ease;
+  backdrop-filter:blur(6px);
+}
+.chapter-nav-link:hover,
+.chapter-nav-link.is-active{color:var(--ink);transform:translateX(-2px)}
+.chapter-nav-link:hover::before,
+.chapter-nav-link.is-active::before{background:var(--accent);transform:rotate(45deg) scale(1)}
+.chapter-nav-link:hover .chapter-nav-label,
+.chapter-nav-link:focus-visible .chapter-nav-label{opacity:1;transform:translate3d(0,-50%,0)}
+.chapter-nav-link.is-active .chapter-nav-number{opacity:1;transform:translateX(-10px)}
+.chapter-nav-link:focus-visible{outline:1px solid var(--ink);outline-offset:2px}
+
+@media (min-width:769px) and (prefers-reduced-motion:no-preference){
+  .home-experience .ep-release:not(#irrational-section){
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .home-experience .shows-feature{min-height:72svh;display:flex;align-items:center}
+  .home-experience .ep-release-content,
+  .home-experience .shows-feature-inner,
+  .home-experience .home-contact-inner{
+    opacity:var(--chapter-opacity);
+    filter:blur(var(--chapter-blur));
+    transform:translate3d(0,var(--chapter-drift),0);
+    will-change:transform,filter,opacity;
+  }
+  .home-experience .ep-release-info{
+    animation:none;
+    transform:translate3d(var(--chapter-info-x),0,0);
+    will-change:transform;
+  }
+  .home-experience .ep-release-cover.reveal-scale{
+    transform:translate3d(var(--chapter-cover-x),24px,0) rotate(var(--chapter-cover-rotate)) scale(.94);
+  }
+  .home-experience .ep-release-cover.in-view.reveal-scale{
+    transform:translate3d(var(--chapter-cover-x),0,0) rotate(var(--chapter-cover-rotate)) scale(1);
+  }
+}
+
+/* Spatial reveal mode: normal document scrolling drives a stack of sticky,
+   full-screen scenes. Each scene follows a different camera path while the
+   next one takes over, creating product-launch pacing without scroll-jacking. */
+@media (min-width:1081px) and (min-height:680px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  .spatial-scroll-active main{
+    position:relative;
+    background:#000;
+  }
+  .spatial-scroll-active main > [data-scroll-chapter]{
+    position:sticky;
+    top:0;
+    width:100%;
+    height:100svh;
+    min-height:100svh;
+    max-height:100svh;
+    overflow:hidden;
+    transform-origin:var(--scene-origin);
+    transform:translate3d(var(--scene-x),var(--scene-y),0) rotate(var(--scene-rotate)) scale(var(--scene-scale));
+    filter:blur(var(--scene-blur)) brightness(var(--scene-brightness));
+    opacity:var(--scene-opacity);
+    border-radius:var(--scene-radius);
+    box-shadow:0 -30px 90px rgba(0,0,0,.62),0 30px 90px rgba(0,0,0,.5);
+    backface-visibility:hidden;
+    will-change:transform,filter,opacity,border-radius;
+    contain:paint;
+  }
+  .spatial-scroll-active main > .hero{height:100svh}
+  .spatial-scroll-active .chapter-wipe{display:none}
+  .spatial-scroll-active .ep-release,
+  .spatial-scroll-active .shows-feature,
+  .spatial-scroll-active .home-contact{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* The camera now moves the whole scene, so the smaller content drift from
+     the fallback experience is neutralized. Element reveals still run. */
+  .spatial-scroll-active .ep-release-content,
+  .spatial-scroll-active .shows-feature-inner,
+  .spatial-scroll-active .home-contact-inner{
+    opacity:1;
+    filter:none;
+    transform:none;
+  }
+  .spatial-scroll-active .ep-release-info{transform:none}
+  .spatial-scroll-active .ep-release-cover.reveal-scale{
+    transform:translate3d(0,24px,0) scale(.94);
+  }
+  .spatial-scroll-active .ep-release-cover.in-view.reveal-scale{
+    transform:translate3d(0,0,0) scale(1);
+  }
+
+  /* Irrational becomes a cinematic split scene so its artwork and video can
+     occupy one viewport instead of interrupting the camera sequence. */
+  .spatial-scroll-active #irrational-section{
+    display:grid;
+    grid-template-columns:minmax(560px,1.18fr) minmax(360px,.82fr);
+    gap:clamp(30px,3.5vw,56px);
+    align-items:center;
+    padding:clamp(70px,8vh,92px) clamp(40px,5vw,72px);
+  }
+  .spatial-scroll-active #irrational-section .ep-release-content{
+    grid-template-columns:clamp(190px,20vw,250px) minmax(250px,1fr);
+    gap:clamp(24px,3vw,40px);
+    width:100%;
+    max-width:680px;
+    margin:0;
+  }
+  .spatial-scroll-active #irrational-section .single-release-video{
+    width:100%;
+    max-width:none;
+    margin:0;
+  }
+  .spatial-scroll-active #irrational-section .single-video-label{
+    margin-bottom:12px;
+    font-size:.78em;
+  }
+
+  /* The final form condenses into two columns so Contact remains a reveal
+     scene, while the regular one-column form is preserved everywhere else. */
+  .spatial-scroll-active .home-contact{
+    padding:clamp(68px,8vh,92px) clamp(48px,7vw,96px);
+  }
+  .spatial-scroll-active .home-contact-inner{
+    width:min(100%,1040px);
+    max-width:1040px;
+  }
+  .spatial-scroll-active .home-contact h2{margin-bottom:6px}
+  .spatial-scroll-active .home-contact p{margin-bottom:18px}
+  .spatial-scroll-active .home-contact .contact-form{
+    grid-template-columns:1fr 1fr;
+    gap:11px 20px;
+  }
+  .spatial-scroll-active .home-contact .contact-form label{gap:5px}
+  .spatial-scroll-active .home-contact .contact-form input,
+  .spatial-scroll-active .home-contact .contact-form textarea{
+    padding:10px 12px;
+  }
+  .spatial-scroll-active .home-contact .contact-form textarea{min-height:96px;resize:none}
+  .spatial-scroll-active .home-contact .contact-form .btn{grid-column:1/-1;margin-top:3px}
+  .spatial-scroll-active .site-footer{position:relative;z-index:30;background:#000}
+}
+
+@media (max-width:1080px){.chapter-nav{display:none}}
+@media (prefers-reduced-motion:reduce){
+  .chapter-wipe{display:none}
+  .btn,.btn::before,.btn::after{transition:none}
 }
 
 /* Gallery masonry */

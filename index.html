@@ -38,7 +38,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body class="home-page">
 <header class="site-header">
   <div class="brand-container">
     <a class="brand" href="index.html"><img src="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" alt="Dirty Aesthetic" decoding="async" width="120" height="120"></a>
@@ -58,7 +58,7 @@
 </header>
 
 <main>
-  <section class="hero">
+  <section class="hero" id="top" data-scroll-chapter data-chapter-label="Intro">
     <div class="hero-overlay"></div>
     <div class="hero-inner">
       <h1><img src="assets/logos/FULL_NAME/FULL-OFF_WHITE.png" alt="Dirty Aesthetic" class="hero-logo" decoding="async" fetchpriority="high"></h1>
@@ -75,7 +75,7 @@
     </div>
   </section>
 
-  <section class="ep-release single-release single-release--modern-nostalgia" id="modern-nostalgia-section">
+  <section class="ep-release single-release single-release--modern-nostalgia" id="modern-nostalgia-section" data-scroll-chapter data-chapter-label="Modern Nostalgia">
     <div class="ep-release-bg"></div>
     <div class="ep-release-content">
       <div class="ep-release-cover reveal-scale" role="button" tabindex="0" aria-label="View full Modern Nostalgia artwork" data-lightbox-src="assets/images/covers/cover_modern_nostalgia.jpg">
@@ -100,7 +100,7 @@
     </div>
   </section>
 
-  <section class="ep-release single-release single-release--back-to-me" id="back-to-me-section">
+  <section class="ep-release single-release single-release--back-to-me" id="back-to-me-section" data-scroll-chapter data-chapter-label="Back to Me">
     <div class="ep-release-bg"></div>
     <div class="ep-release-content">
       <div class="ep-release-cover reveal-scale" role="button" tabindex="0" aria-label="View full Back to Me artwork" data-lightbox-src="assets/images/covers/cover_back_to_me.jpg">
@@ -132,7 +132,7 @@
     </div>
   </section>
 
-  <section class="ep-release single-release single-release--irrational" id="irrational-section">
+  <section class="ep-release single-release single-release--irrational" id="irrational-section" data-scroll-chapter data-chapter-label="Irrational">
     <div class="ep-release-bg"></div>
     <div class="ep-release-content">
       <div class="ep-release-cover reveal-scale" role="button" tabindex="0" aria-label="View full Irrational artwork" data-lightbox-src="assets/images/covers/cover_irrational.jpg">
@@ -171,7 +171,7 @@
     </div>
   </section>
 
-  <section class="shows-feature" id="upcoming-section">
+  <section class="shows-feature" id="upcoming-section" data-scroll-chapter data-chapter-label="Shows">
     <div class="shows-feature-inner">
       <h2 class="shows-feature-heading reveal">Upcoming Shows</h2>
       <!-- Past show history (not rendered): see data/shows.json → past -->
@@ -179,7 +179,7 @@
     </div>
   </section>
 
-  <section class="ep-release">
+  <section class="ep-release" id="sugar-on-the-rocks-section" data-scroll-chapter data-chapter-label="Sugar on the Rocks">
     <div class="ep-release-bg"></div>
     <div class="ep-release-content">
       <div class="ep-release-cover reveal-scale" role="button" tabindex="0" aria-label="View full Sugar on the Rocks artwork" data-lightbox-src="assets/images/optimized/covers/cover_sugar_on_the_rocks.jpg">
@@ -214,7 +214,7 @@
     </div>
   </section>
 
-  <section class="home-contact">
+  <section class="home-contact" id="contact-section" data-scroll-chapter data-chapter-label="Contact">
     <div class="home-contact-inner">
       <h2 class="reveal">Get In Touch</h2>
       <p class="reveal" style="--reveal-delay:.1s">Bookings, collaborations, and general inquiries.</p>
