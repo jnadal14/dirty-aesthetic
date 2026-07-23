@@ -318,7 +318,8 @@ window.addEventListener('beforeprint', () => {
 // Scroll in-page single sections so they land centered in the viewport.
 function scrollToCenteredSection(section){
   if(!section) return
-  const y = Math.max(0, section.offsetTop + section.offsetHeight / 2 - window.innerHeight / 2)
+  const sectionTop = section.getBoundingClientRect().top + window.scrollY
+  const y = Math.max(0, sectionTop + section.offsetHeight / 2 - window.innerHeight / 2)
 
   if(window.__lenis){
     window.__lenis.scrollTo(y, { duration: 1.45 })
@@ -336,9 +337,10 @@ function scrollToIrrationalSection(){
   if(!section) return
 
   const mobile = window.matchMedia('(max-width: 768px)').matches
+  const sectionTop = section.getBoundingClientRect().top + window.scrollY
   const y = Math.max(0, mobile
-    ? section.offsetTop + section.offsetHeight - window.innerHeight + 32
-    : section.offsetTop + section.offsetHeight / 2 - window.innerHeight / 2
+    ? sectionTop + section.offsetHeight - window.innerHeight + 32
+    : sectionTop + section.offsetHeight / 2 - window.innerHeight / 2
   )
 
   if(window.__lenis){
