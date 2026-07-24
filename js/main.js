@@ -587,7 +587,8 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const dateLabel = parts ? `${parts.month} ${parts.day}` : s.date
       const href = s.link || '#upcoming-section'
       const attrs = s.link ? ' target="_blank" rel="noopener"' : ''
-      return `<a class="btn ghost" href="${href}"${attrs}>${s.venue} ${dateLabel}</a>`
+      const label = s.ctaLabel || `${s.venue} ${dateLabel}`
+      return `<a class="btn ghost" href="${href}"${attrs}>${label}</a>`
     }).join('')
   }
 
@@ -617,7 +618,8 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const parts = parseDateParts(s.date)
       const row = document.createElement('a')
       const solo = data.upcoming.length === 1 ? ' show-row--solo' : ''
-      row.className = 'show-row reveal' + solo
+      const featured = s.banner ? ' show-row--featured' : ''
+      row.className = 'show-row reveal' + solo + featured
       row.style.setProperty('--reveal-delay', `${(i * 0.08).toFixed(2)}s`)
       if(s.link){
         row.href = s.link
@@ -628,17 +630,23 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       }
       const linkLabel = s.link ? (s.link.includes('cjsf') ? 'Stream Live' : 'Tickets') : ''
       const arrowHtml = s.link ? `<span class="show-row-arrow">${linkLabel} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>` : ''
-      const lineupHtml = s.lineup ? `<span class="show-row-lineup">w/ ${s.lineup}</span>` : ''
-      const posterHtml = s.poster ? `<div class="show-row-poster" data-poster-src="${s.poster}"><img src="${s.poster}" alt="${s.venue} poster" loading="lazy"></div>` : ''
+      const lineupHtml = s.lineup ? `<span class="show-row-lineup">${s.lineupPrefix || 'w/'} ${s.lineup}</span>` : ''
+      const title = s.title || s.venue
+      const location = s.title
+        ? [s.venue, s.city, s.time].filter(Boolean).join(' · ')
+        : [s.city, s.time].filter(Boolean).join(' · ')
+      const posterHtml = s.poster ? `<div class="show-row-poster" data-poster-src="${s.poster}"><img src="${s.poster}" alt="${title} poster" loading="lazy"></div>` : ''
+      const bannerHtml = s.banner ? `<div class="show-row-banner" aria-hidden="true"><img src="${s.banner}" alt="" loading="lazy"></div>` : ''
       row.innerHTML = `
+        ${bannerHtml}
         <div class="show-row-date">
           <span class="show-row-month">${parts ? parts.month : s.date}</span>
           <span class="show-row-day">${parts ? parts.dayOrd : ''}</span>
         </div>
         <div class="show-row-info">
-          <span class="show-row-venue">${s.venue} ${arrowHtml}</span>
+          <span class="show-row-venue">${title} ${arrowHtml}</span>
           ${lineupHtml}
-          <span class="show-row-city">${s.city}</span>
+          <span class="show-row-city">${location}</span>
         </div>
         ${posterHtml}`
       container.appendChild(row)

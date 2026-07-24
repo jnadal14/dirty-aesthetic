@@ -15,6 +15,19 @@
       "lineup": "Jesse and the Black Sheep",
       "poster": "assets/images/posters/ROXY_08:01:26.jpeg",
       "link": "https://www.showpass.com/sataug1/"
+    },
+    {
+      "date": "Aug 14, 2026",
+      "title": "Modern Nostalgia Album Release",
+      "city": "Vancouver",
+      "venue": "The Biltmore Cabaret",
+      "time": "Doors at 7 PM",
+      "lineup": "special guests",
+      "lineupPrefix": "with",
+      "ctaLabel": "Album Release Show August 14",
+      "poster": "assets/images/optimized/posters/modern-nostalgia-album-release-2026.webp",
+      "banner": "assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp",
+      "link": "https://admitone.com/events/vancouver/community/music/modern-nostalgia-album-release-party/MYCD1T"
     }
   ],
   "past": [
