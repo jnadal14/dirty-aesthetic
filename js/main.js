@@ -34,16 +34,16 @@ if (hamburger && nav) {
     }
   })
 
-  // Dynamically collapse nav when it overlaps the brand
+  // Keep the full navigation on regular phones. The compact menu is reserved
+  // for exceptionally narrow viewports where the links cannot remain usable.
   const header = document.querySelector('.site-header')
-  const brand = document.querySelector('.brand-container')
+  const ultraNarrowViewport = window.matchMedia('(max-width: 280px)')
   function checkNavFit() {
-    header.classList.remove('nav-collapsed')
-    nav.style.display = ''
-    const brandRight = brand.getBoundingClientRect().right
-    const navLeft = nav.getBoundingClientRect().left
-    if (navLeft < brandRight + 12) {
-      header.classList.add('nav-collapsed')
+    const shouldCollapse = ultraNarrowViewport.matches
+    header.classList.toggle('nav-collapsed', shouldCollapse)
+    if (!shouldCollapse) {
+      hamburger.classList.remove('active')
+      nav.classList.remove('active')
     }
   }
   checkNavFit()
@@ -89,7 +89,8 @@ window.addEventListener('beforeprint', () => {
   const backgroundConfig = [
     { selector: '.hero', cssVar: '--hero-bg-parallax', speed: 0.045 },
     { selector: '.shows-feature', cssVar: '--shows-bg-parallax', speed: 0.05 },
-    { selector: '.ep-release', cssVar: '--ep-bg-parallax', speed: 0.04 }
+    { selector: '.ep-release', cssVar: '--ep-bg-parallax', speed: 0.04 },
+    { selector: '.album-tracklist-section', cssVar: '--album-bg-parallax', speed: 0.04 }
   ]
 
   let enabled = false
@@ -203,7 +204,7 @@ window.addEventListener('beforeprint', () => {
 
     link.addEventListener('click', (event) => {
       event.preventDefault()
-      const top = index === 0 ? 0 : section.getBoundingClientRect().top + window.scrollY
+      const top = index === 0 ? 0 : section.offsetTop
       if (window.__lenis) {
         window.__lenis.scrollTo(top, { duration: 1.35 })
       } else {
@@ -220,12 +221,109 @@ window.addEventListener('beforeprint', () => {
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
   const ease = value => value * value * (3 - 2 * value)
+  const sectionScrollEase = value => -(Math.cos(Math.PI * value) - 1) / 2
+  const sectionScrollDuration = 1.25
+  const sectionTransitionDelay = 1375
+  const wheelQuietDelay = 160
+  const wheelThreshold = 10
   let ticking = false
   let spatialEnabled = false
+  let sectionTransitioning = false
+  let sectionTransitionFinished = true
+  let wheelQuiet = true
+  let wheelDelta = 0
+  let wheelQuietTimer = 0
+  let transitionTimer = 0
+
+  function tryUnlockSectionScroll(){
+    if (!sectionTransitionFinished || !wheelQuiet) return
+    sectionTransitioning = false
+    wheelDelta = 0
+  }
+
+  function markWheelQuiet(){
+    wheelQuietTimer = 0
+    wheelQuiet = true
+    if (!sectionTransitioning) wheelDelta = 0
+    tryUnlockSectionScroll()
+  }
+
+  function resetSectionScroll(){
+    clearTimeout(wheelQuietTimer)
+    clearTimeout(transitionTimer)
+    wheelQuietTimer = 0
+    transitionTimer = 0
+    sectionTransitioning = false
+    sectionTransitionFinished = true
+    wheelQuiet = true
+    wheelDelta = 0
+  }
+
+  function nearestChapterIndex(){
+    return chapters.reduce((nearest, section, index) => {
+      const nearestDistance = Math.abs(chapters[nearest].offsetTop - window.scrollY)
+      const sectionDistance = Math.abs(section.offsetTop - window.scrollY)
+      return sectionDistance < nearestDistance ? index : nearest
+    }, 0)
+  }
+
+  function handleSpatialWheel(event){
+    if (!spatialEnabled || reduceMotion.matches || event.ctrlKey || !event.deltaY) return
+
+    event.preventDefault()
+    event.stopImmediatePropagation()
+
+    wheelQuiet = false
+    clearTimeout(wheelQuietTimer)
+    wheelQuietTimer = window.setTimeout(markWheelQuiet, wheelQuietDelay)
+
+    // Once a transition begins, the rest of that gesture is momentum rather
+    // than another navigation command.
+    if (sectionTransitioning) return
+
+    const multiplier = event.deltaMode === 1
+      ? 16
+      : event.deltaMode === 2
+        ? window.innerHeight
+        : 1
+    wheelDelta += clamp(event.deltaY * multiplier, -120, 120)
+    if (Math.abs(wheelDelta) < wheelThreshold) return
+
+    const direction = Math.sign(wheelDelta)
+    const currentIndex = nearestChapterIndex()
+    const targetIndex = clamp(currentIndex + direction, 0, chapters.length - 1)
+    const targetTop = targetIndex === 0 ? 0 : chapters[targetIndex].offsetTop
+
+    wheelDelta = 0
+    sectionTransitioning = true
+    sectionTransitionFinished = targetIndex === currentIndex
+
+    if (targetIndex !== currentIndex) {
+      if (window.__lenis) {
+        window.__lenis.scrollTo(targetTop, {
+          duration: sectionScrollDuration,
+          easing: sectionScrollEase
+        })
+      } else {
+        window.scrollTo({ top: targetTop, behavior: 'smooth' })
+      }
+
+      clearTimeout(transitionTimer)
+      transitionTimer = window.setTimeout(() => {
+        transitionTimer = 0
+        sectionTransitionFinished = true
+        scheduleChapterUpdate()
+        tryUnlockSectionScroll()
+      }, sectionTransitionDelay)
+    } else {
+      tryUnlockSectionScroll()
+    }
+  }
 
   function refreshSpatialState(){
     spatialEnabled = spatialMotion.matches
     document.body.classList.toggle('spatial-scroll-active', spatialEnabled)
+    if (!spatialEnabled) resetSectionScroll()
     chapters.forEach((section, index) => {
       section.style.zIndex = spatialEnabled ? String(index + 1) : ''
     })
@@ -309,6 +407,7 @@ window.addEventListener('beforeprint', () => {
   }
 
   window.addEventListener('scroll', scheduleChapterUpdate, { passive: true })
+  window.addEventListener('wheel', handleSpatialWheel, { passive: false, capture: true })
   window.addEventListener('resize', refreshSpatialState, { passive: true })
   if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', refreshSpatialState)
   if (spatialMotion.addEventListener) spatialMotion.addEventListener('change', refreshSpatialState)
@@ -379,9 +478,8 @@ bindCenteredSectionScrollLinks()
 bindIrrationalScrollLinks()
 
 // ===== Lenis smooth-scroll =====
-// Loads Lenis from CDN and turns it on for the whole document.
-// Hooks all in-page anchor links to use lenis.scrollTo for buttery jumps.
-// Disabled when prefers-reduced-motion is set.
+// Lenis supplies the same gentle interpolation for programmatic section jumps
+// and regular free scrolling on smaller layouts and inner pages.
 ;(function loadLenis(){
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
@@ -455,7 +553,7 @@ bindIrrationalScrollLinks()
     dot.classList.remove('visible')
   })
 
-  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .ep-release-cover, .store-product-image, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
+  const hoverSelector = 'a, button, .btn, .show-row, .show-row-poster, .release, .release-link, .gallery-item, .toggle-btn, input, textarea, label, .ep-stream-btn, .ep-release-cover, .album-tracklist-cover, .store-product-image, .play-btn, .hamburger, .lightbox-nav, .lightbox-close'
 
   document.addEventListener('mouseover', (e) => {
     const isHover = !!e.target.closest(hoverSelector)

@@ -100,13 +100,7 @@ picture{display:contents}
 .hero h1{font-size:clamp(36px,8vw,72px);letter-spacing:2px;margin:0;animation:fadeUp .8s ease both;text-shadow:0 4px 30px rgba(0,0,0,.5);max-width:900px}
 .hero-logo{width:clamp(280px,60vw,600px);height:auto;filter:drop-shadow(0 4px 30px rgba(0,0,0,.5))}
 .hero p{margin:12px 0 28px;color:var(--muted);animation:fadeUp .8s ease .15s both;font-size:clamp(1em,2.5vw,1.2em)}
-.hero-ctas{
-  animation:fadeUp .8s ease .3s both;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:12px;
-}
+.hero-ctas{animation:fadeUp .8s ease .3s both;display:flex;flex-direction:column;align-items:center;gap:12px}
 .hero .cta-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 
 /* Site-wide parallax layers (content). Keep this list in sync with the
@@ -362,6 +356,22 @@ body.music-page-bg{
   text-transform:uppercase;
   box-shadow:0 4px 14px rgba(176,122,63,.35);
   pointer-events:none;
+}
+.release-presave-btn{
+  display:inline-block;
+  margin-top:11px;
+  padding:7px 12px 6px;
+  border:1px solid var(--accent);
+  border-radius:4px;
+  color:var(--ink);
+  font-size:.68em;
+  font-weight:700;
+  letter-spacing:1.6px;
+  text-transform:uppercase;
+}
+.release-presave-btn:hover{
+  background:var(--accent);
+  color:#0a0705;
 }
 @media (max-width:820px){
   .release-grid{grid-template-columns:repeat(2,1fr)}
@@ -1152,6 +1162,7 @@ body.privacy-page .privacy-page-main p{
   }
   .home-experience .shows-feature{min-height:72svh;display:flex;align-items:center}
   .home-experience .ep-release-content,
+  .home-experience .album-tracklist-layout,
   .home-experience .shows-feature-inner,
   .home-experience .home-contact-inner{
     opacity:var(--chapter-opacity);
@@ -1159,15 +1170,18 @@ body.privacy-page .privacy-page-main p{
     transform:translate3d(0,var(--chapter-drift),0);
     will-change:transform,filter,opacity;
   }
-  .home-experience .ep-release-info{
+  .home-experience .ep-release-info,
+  .home-experience .album-tracklist-panel{
     animation:none;
     transform:translate3d(var(--chapter-info-x),0,0);
     will-change:transform;
   }
-  .home-experience .ep-release-cover.reveal-scale{
+  .home-experience .ep-release-cover.reveal-scale,
+  .home-experience .album-tracklist-cover.reveal-scale{
     transform:translate3d(var(--chapter-cover-x),24px,0) rotate(var(--chapter-cover-rotate)) scale(.94);
   }
-  .home-experience .ep-release-cover.in-view.reveal-scale{
+  .home-experience .ep-release-cover.in-view.reveal-scale,
+  .home-experience .album-tracklist-cover.in-view.reveal-scale{
     transform:translate3d(var(--chapter-cover-x),0,0) rotate(var(--chapter-cover-rotate)) scale(1);
   }
 }
@@ -1211,17 +1225,21 @@ body.privacy-page .privacy-page-main p{
   /* The camera now moves the whole scene, so the smaller content drift from
      the fallback experience is neutralized. Element reveals still run. */
   .spatial-scroll-active .ep-release-content,
+  .spatial-scroll-active .album-tracklist-layout,
   .spatial-scroll-active .shows-feature-inner,
   .spatial-scroll-active .home-contact-inner{
     opacity:1;
     filter:none;
     transform:none;
   }
-  .spatial-scroll-active .ep-release-info{transform:none}
-  .spatial-scroll-active .ep-release-cover.reveal-scale{
+  .spatial-scroll-active .ep-release-info,
+  .spatial-scroll-active .album-tracklist-panel{transform:none}
+  .spatial-scroll-active .ep-release-cover.reveal-scale,
+  .spatial-scroll-active .album-tracklist-cover.reveal-scale{
     transform:translate3d(0,24px,0) scale(.94);
   }
-  .spatial-scroll-active .ep-release-cover.in-view.reveal-scale{
+  .spatial-scroll-active .ep-release-cover.in-view.reveal-scale,
+  .spatial-scroll-active .album-tracklist-cover.in-view.reveal-scale{
     transform:translate3d(0,0,0) scale(1);
   }
 
@@ -1260,6 +1278,7 @@ body.privacy-page .privacy-page-main p{
 @media (prefers-reduced-motion:reduce){
   .chapter-wipe{display:none}
   .btn,.btn::before,.btn::after{transition:none}
+  .album-hero-copy{animation:none}
 }
 
 /* Gallery masonry */
@@ -1354,11 +1373,23 @@ blockquote.tiktok-embed section{margin:0!important}
 .shows-feature{
   position:relative;
   padding:clamp(48px,8vw,80px) 0 clamp(40px,6vw,64px);
-  background:
+  background-color:#0a0705;
+  background-image:
     radial-gradient(ellipse 70% 50% at 15% 30%, rgba(176,122,63,.1) 0%, transparent 60%),
     radial-gradient(ellipse 50% 40% at 85% 70%, rgba(122,54,0,.07) 0%, transparent 60%),
     linear-gradient(180deg, rgba(10,7,5,.85) 0%, rgba(26,16,9,.8) 30%, rgba(26,16,9,.8) 70%, rgba(32,23,15,.9) 100%),
-    url('../assets/images/BACKGROUND/1.jpg') center calc(50% + var(--shows-bg-parallax, 0px))/cover no-repeat;
+    url('../assets/images/optimized/header-desktop.jpg');
+  background-image:
+    radial-gradient(ellipse 70% 50% at 15% 30%, rgba(176,122,63,.1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 70%, rgba(122,54,0,.07) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(10,7,5,.85) 0%, rgba(26,16,9,.8) 30%, rgba(26,16,9,.8) 70%, rgba(32,23,15,.9) 100%),
+    image-set(
+      url('../assets/images/optimized/header-desktop.webp') type('image/webp'),
+      url('../assets/images/optimized/header-desktop.jpg') type('image/jpeg')
+    );
+  background-position:center,center,center,center calc(50% + var(--shows-bg-parallax,0px));
+  background-size:auto,auto,auto,cover;
+  background-repeat:no-repeat;
   overflow:hidden;
 }
 .shows-feature::before{
@@ -1734,6 +1765,15 @@ a.show-row[href]{cursor:pointer}
 @media (max-width:640px){
   .shows-feature{
     padding:clamp(40px,8vw,64px) 0 clamp(32px,6vw,48px);
+    background-image:
+      radial-gradient(ellipse 70% 50% at 15% 30%, rgba(176,122,63,.1) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 85% 70%, rgba(122,54,0,.07) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(10,7,5,.85) 0%, rgba(26,16,9,.8) 30%, rgba(26,16,9,.8) 70%, rgba(32,23,15,.9) 100%),
+      image-set(
+        url('../assets/images/optimized/header-mobile.webp') type('image/webp'),
+        url('../assets/images/optimized/header-mobile.jpg') type('image/jpeg')
+      );
+    background-position:center,center,center,center calc(18% + var(--shows-bg-parallax,0px));
   }
   .shows-feature-inner{
     padding:0 clamp(16px,4vw,32px);
@@ -2670,9 +2710,12 @@ a.show-row[href]{cursor:pointer}
 
 /* Small mobile */
 @media (max-width:400px){
-  .brand-container{flex-direction:column;align-items:flex-start;gap:4px}
-  .brand img{height:28px}
+  .site-header{padding:11px 10px}
+  .brand-container{flex-direction:row;align-items:center;gap:4px}
+  .brand img{height:27px}
   .brand-subtitle{font-size:11px}
+  .nav{gap:5px}
+  .nav a{font-size:.74em;letter-spacing:0}
   
   .hero-logo{width:clamp(180px,80vw,280px)}
   .hero .cta-row{gap:8px}
@@ -2694,7 +2737,267 @@ a.show-row[href]{cursor:pointer}
 /* Large screens */
 @media (min-width:1200px){
   .page{max-width:1100px}
-  .hero h1{font-size:76px}
+}
+
+/* Compact album announcement — the wordmark remains primary over the album artwork. */
+[hidden]{display:none!important}
+.album-hero{
+  height:100svh;
+  min-height:640px;
+  background-image:url('../assets/images/optimized/modern-nostalgia-album-bg.jpg');
+  background-image:image-set(
+    url('../assets/images/optimized/modern-nostalgia-album-bg.webp') type('image/webp'),
+    url('../assets/images/optimized/modern-nostalgia-album-bg.jpg') type('image/jpeg')
+  );
+  background-position:center calc(50% + var(--hero-bg-parallax,0px));
+}
+.album-hero .hero-overlay{
+  background:linear-gradient(180deg,rgba(22,15,10,.3) 0%,rgba(22,15,10,.5) 52%,rgba(10,7,5,.88) 100%);
+  backdrop-filter:none;
+  filter:sepia(35%);
+}
+.album-hero .hero-inner{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:0;
+  width:100%;
+  min-height:0;
+  padding:clamp(78px,10vh,104px) 18px clamp(30px,5vh,52px);
+  text-align:center;
+}
+.album-hero h1{margin:0 0 clamp(14px,2.5vh,22px);line-height:1}
+.album-hero .hero-logo{
+  width:clamp(320px,48vw,590px);
+  margin:0;
+  filter:drop-shadow(0 5px 28px rgba(0,0,0,.72));
+}
+.album-hero-caption{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:5px 12px;
+  margin:10px 0 0;
+  color:var(--ink);
+  font-size:.78em;
+  letter-spacing:1.4px;
+  line-height:1.25;
+  text-transform:uppercase;
+  text-shadow:0 2px 14px rgba(0,0,0,.9);
+}
+.album-hero-caption span{color:#e0b78e;font-size:.78em;letter-spacing:2px}
+.album-hero .hero-ctas{
+  display:flex;
+  flex-flow:row wrap;
+  justify-content:center;
+  align-items:center;
+  gap:7px;
+  margin-top:12px;
+}
+.album-hero .hero-ctas > .cta-row{display:contents}
+.album-hero .hero-ctas .btn{
+  min-width:0;
+  padding:6px 10px 5px;
+  font-size:.62em;
+  letter-spacing:.5px;
+}
+.album-hero .hero-ctas .btn::after{width:9px}
+.album-presave-btn{background:var(--ink);color:#120c07;border-color:var(--ink)}
+
+/* Modern Nostalgia album tracklist */
+.album-tracklist-section{
+  position:relative;
+  display:flex;
+  align-items:center;
+  min-height:100svh;
+  padding:clamp(62px,8vh,92px) clamp(24px,5vw,72px);
+  overflow:hidden;
+  background-color:#080604;
+  background-image:url('../assets/images/optimized/modern-nostalgia-album-bg.jpg');
+  background-image:image-set(
+    url('../assets/images/optimized/modern-nostalgia-album-bg.webp') type('image/webp'),
+    url('../assets/images/optimized/modern-nostalgia-album-bg.jpg') type('image/jpeg')
+  );
+  background-position:center calc(50% + var(--album-bg-parallax,0px));
+  background-size:cover;
+}
+.album-tracklist-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse 48% 68% at 24% 52%,rgba(211,83,32,.16),transparent 64%),
+    linear-gradient(90deg,rgba(5,4,3,.65),rgba(5,4,3,.82) 42%,rgba(5,4,3,.94));
+  backdrop-filter:blur(2px) saturate(.72);
+}
+.album-tracklist-layout{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:minmax(230px,300px) minmax(0,1fr);
+  gap:clamp(32px,5vw,72px);
+  width:min(100%,1180px);
+  margin:0 auto;
+  align-items:center;
+}
+.album-tracklist-intro{min-width:0}
+.album-tracklist-cover{width:min(100%,265px);cursor:zoom-in}
+.album-tracklist-cover:focus-visible{outline:2px solid var(--ink);outline-offset:5px}
+.album-tracklist-cover img{
+  width:100%;
+  aspect-ratio:1;
+  object-fit:cover;
+  border:1px solid rgba(240,230,216,.22);
+  box-shadow:0 22px 64px rgba(0,0,0,.58);
+}
+.album-tracklist-copy{margin-top:20px}
+.album-tracklist-kicker{
+  color:#e0b78e;
+  font-size:.68em;
+  font-weight:700;
+  letter-spacing:3px;
+  text-transform:uppercase;
+}
+.album-tracklist-copy h2{
+  margin:4px 0 3px;
+  font-size:clamp(2.1em,4vw,3.6em);
+  font-weight:400;
+  letter-spacing:.5px;
+  line-height:.95;
+}
+.album-tracklist-copy p{
+  margin:8px 0 16px;
+  color:var(--muted);
+  font-size:.78em;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+}
+.album-tracklist-copy .btn{padding:8px 13px 7px;font-size:.72em}
+.album-tracklist-panel{
+  min-width:0;
+  padding:14px 16px 12px;
+  background:rgba(4,4,3,.7);
+  border:1px solid rgba(240,230,216,.11);
+  box-shadow:0 24px 70px rgba(0,0,0,.42);
+  backdrop-filter:blur(10px);
+}
+.album-tracklist-heading{
+  display:flex;
+  justify-content:flex-start;
+  gap:16px;
+  padding:0 8px 10px;
+  color:#e0b78e;
+  font-size:.62em;
+  font-weight:700;
+  letter-spacing:2.4px;
+  text-transform:uppercase;
+}
+.album-tracklist{list-style:none;margin:0;padding:0}
+.album-track{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto auto;
+  gap:10px;
+  min-height:38px;
+  align-items:center;
+  padding:6px 8px;
+  border-top:1px solid rgba(240,230,216,.07);
+  font-size:.84em;
+  line-height:1.1;
+}
+.album-track-num{color:rgba(240,230,216,.34);font-size:.76em;font-variant-numeric:tabular-nums}
+.album-track-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.album-track--locked{color:rgba(240,230,216,.32)}
+.album-track--locked .album-track-title{letter-spacing:3px}
+.album-track-state{
+  grid-column:3/5;
+  color:rgba(240,230,216,.26);
+  font-size:.58em;
+  letter-spacing:1.7px;
+  text-transform:uppercase;
+}
+.album-track--released{
+  margin:2px 0;
+  color:var(--ink);
+  background:rgba(240,230,216,.055);
+  border-color:rgba(224,183,142,.2);
+}
+.album-track--released .album-track-num{color:#e0b78e}
+.album-track-time{color:var(--muted);font-size:.7em;font-variant-numeric:tabular-nums}
+.album-track-streams{display:flex;gap:8px}
+.album-track-streams a{
+  color:#e0b78e;
+  font-size:.58em;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+}
+.album-track-streams a:hover{color:var(--ink)}
+
+@media (max-width:768px){
+  .album-hero{
+    height:100svh;
+    min-height:640px;
+  }
+  .album-hero .hero-inner{
+    position:absolute;
+    inset:0;
+    display:flex;
+    min-height:0;
+    padding:76px 14px 36px;
+  }
+  .album-hero .hero-logo{width:min(78vw,440px)}
+  .album-tracklist-section{min-height:0;padding:64px 18px}
+  .album-tracklist-layout{grid-template-columns:1fr;gap:28px}
+  .album-tracklist-intro{
+    display:grid;
+    grid-template-columns:minmax(120px,180px) minmax(0,1fr);
+    gap:22px;
+    align-items:center;
+    max-width:620px;
+    margin:0 auto;
+  }
+  .album-tracklist-cover{width:100%}
+  .album-tracklist-copy{margin:0}
+}
+@media (max-width:520px){
+  .album-hero{
+    min-height:610px;
+    background-position:center calc(50% + var(--hero-bg-parallax,0px));
+  }
+  .album-hero .hero-inner{padding:68px 10px 28px}
+  .album-hero h1{margin-bottom:12px}
+  .album-hero .hero-logo{width:min(82vw,360px)}
+  .album-hero-caption{max-width:320px;margin-top:8px;font-size:.68em}
+  .album-hero .hero-ctas{margin-top:10px;gap:5px}
+  .album-hero .hero-ctas .btn{padding:5px 8px 4px;font-size:.56em}
+  .album-tracklist-intro{grid-template-columns:120px minmax(0,1fr);gap:16px}
+  .album-tracklist-copy h2{font-size:clamp(1.75em,8vw,2.35em)}
+  .album-tracklist-panel{padding:10px 8px 8px}
+  .album-tracklist-heading{padding:0 5px 8px;font-size:.54em}
+  .album-track{
+    grid-template-columns:27px minmax(0,1fr) auto;
+    gap:7px;
+    min-height:36px;
+    padding:6px 5px;
+    font-size:.76em;
+  }
+  .album-track-state{grid-column:3}
+  .album-track-time{display:none}
+  .album-track-streams{gap:6px}
+}
+@media (max-height:500px) and (orientation:landscape){
+  .album-hero{height:100svh;min-height:500px}
+  .album-hero .hero-inner{
+    display:flex;
+    gap:0;
+    min-height:500px;
+    padding:64px 48px 28px;
+  }
+  .album-hero h1{margin:0 0 8px}
+  .album-hero .hero-logo{width:min(43vw,420px)}
+  .album-hero-caption{margin:0}
+  .album-hero .hero-ctas{margin-top:8px}
 }
 
 /* ===== PRINT STYLES ===== */

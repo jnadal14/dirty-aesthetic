@@ -216,9 +216,20 @@ r = process("BACKGROUND/BACK_EP.jpg", "back-ep.jpg", 1600, jpeg_q=80, webp_q=78)
 if r:
     report(ROOT / r["src"])
     report(ROOT / r["webp"])
+r = process(
+    "BACKGROUND/modern nostalgia full cover no text.png",
+    "modern-nostalgia-album-bg",
+    1920,
+    jpeg_q=84,
+    webp_q=82,
+)
+if r:
+    report(ROOT / r["src"])
+    report(ROOT / r["webp"])
 
 print("Album / single covers")
 for src_name in [
+    "cover_LP_modern_nostalgia.png",
     "cover_modern_nostalgia.jpg",
     "cover_back_to_me.jpg",
     "cover_irrational.jpg",

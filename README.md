@@ -6,7 +6,7 @@ Official website for Dirty Aesthetic, an indie garage rock band from Vancouver, 
 
 ## Pages
 
-- **Home** (`index.html`) — Landing page with hero image, upcoming shows, EP feature, and contact section
+- **Home** (`index.html`) — Modern Nostalgia announcement and partial tracklist, upcoming shows, Sugar on the Rocks EP, and contact section
 - **Music** (`music.html`) — Discography with streaming links (Spotify / Apple Music toggle)
 - **Watch** (`watch.html`) — Music videos and live performance footage
 - **Store** (`store.html`) — Merch and physical media
