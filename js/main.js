@@ -321,7 +321,10 @@ window.addEventListener('beforeprint', () => {
 
     const direction = Math.sign(wheelDelta)
     const currentIndex = nearestChapterIndex()
-    const targetIndex = clamp(currentIndex + direction, 0, chapters.length - 1)
+    const atFinalChapter = currentIndex === chapters.length - 1
+    const targetIndex = direction > 0 && atFinalChapter
+      ? 0
+      : clamp(currentIndex + direction, 0, chapters.length - 1)
     const targetTop = targetIndex === 0 ? 0 : chapters[targetIndex].offsetTop
 
     wheelDelta = 0
@@ -986,16 +989,22 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const lineupPhotos = document.querySelectorAll('[data-lineup]')
   if(!galleryRoot && !lineupPhotos.length) return
 
+  const EPK_ASSET_VERSION = '20260730-1738'
   const GALLERY_EAGER = 6
   const LAZY_ROOT_MARGIN = '500px 0px'
   const IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+
+  function versionAsset(path){
+    if(!path) return path
+    return `${path}${path.includes('?') ? '&' : '?'}v=${EPK_ASSET_VERSION}`
+  }
 
   function applyPicture(picture, image){
     if(!picture || !image) return
     const source = picture.querySelector('source[type="image/webp"]')
     const img = picture.querySelector('img')
-    if(source) source.srcset = image.webp
-    if(img) img.src = image.src
+    if(source) source.srcset = versionAsset(image.webp)
+    if(img) img.src = versionAsset(image.src)
   }
 
   function markImageLoaded(item, img){
@@ -1131,7 +1140,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     watchGalleryReveal(root)
   }
 
-  fetch('data/epk-images.json').then(r => {
+  fetch(`data/epk-images.json?v=${EPK_ASSET_VERSION}`).then(r => {
     if(!r.ok) throw new Error('manifest missing')
     return r.json()
   }).then(data => {

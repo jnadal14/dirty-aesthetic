@@ -18,11 +18,11 @@
     },
     "jacob": {
       "webp": "assets/images/optimized/lineup/jacob.webp",
-      "src": "assets/images/optimized/lineup/jacob.png",
-      "full": "assets/images/LINEUP/JACOB.png",
-      "type": "png",
+      "src": "assets/images/optimized/lineup/jacob.jpg",
+      "full": "assets/images/LINEUP/JACOB.jpg",
+      "type": "jpeg",
       "width": 900,
-      "height": 1125
+      "height": 1350
     },
     "josh-c": {
       "webp": "assets/images/optimized/lineup/josh-c.webp",
@@ -38,7 +38,7 @@
       "full": "assets/images/LINEUP/JOSH S.jpg",
       "type": "jpeg",
       "width": 900,
-      "height": 1125
+      "height": 1350
     }
   },
   "gallery": [
