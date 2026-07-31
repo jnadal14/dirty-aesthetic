@@ -1,3 +1,33 @@
+// A refresh always starts the current page from its beginning instead of
+// restoring the previous scroll position or reapplying a section hash.
+;(function resetScrollOnReload(){
+  const navigationEntry = typeof performance.getEntriesByType === 'function'
+    ? performance.getEntriesByType('navigation')[0]
+    : null
+  const isReload = navigationEntry
+    ? navigationEntry.type === 'reload'
+    : performance.navigation && performance.navigation.type === 1
+
+  if (!isReload) return
+
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+  if (window.location.hash) {
+    history.replaceState(history.state, '', `${window.location.pathname}${window.location.search}`)
+  }
+
+  function resetToTop(){
+    const previousScrollBehavior = document.documentElement.style.scrollBehavior
+    document.documentElement.style.scrollBehavior = 'auto'
+    window.scrollTo(0, 0)
+    document.documentElement.style.scrollBehavior = previousScrollBehavior
+  }
+
+  resetToTop()
+  document.addEventListener('DOMContentLoaded', resetToTop, { once: true })
+  window.addEventListener('load', resetToTop, { once: true })
+  window.addEventListener('pageshow', resetToTop, { once: true })
+})()
+
 // Set active navigation
 const currentPage = window.location.pathname.split('/').pop() || 'index.html'
 const navLinks = document.querySelectorAll('.nav a')
