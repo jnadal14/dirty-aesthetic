@@ -25,8 +25,10 @@ OUT_LINEUP = OUT / "lineup"
 OUT_GALLERY = OUT / "gallery"
 OUT_GALLERY_FULL = OUT / "gallery" / "full"
 OUT_MERCH = OUT / "merch"
+OUT_POSTERS_ROOT = OUT / "posters"
+OUT_POSTERS = OUT_POSTERS_ROOT / "archive"
 DATA = ROOT / "data"
-for d in (OUT, OUT_COVERS, OUT_LINEUP, OUT_GALLERY, OUT_GALLERY_FULL, OUT_MERCH, DATA):
+for d in (OUT, OUT_COVERS, OUT_LINEUP, OUT_GALLERY, OUT_GALLERY_FULL, OUT_MERCH, OUT_POSTERS_ROOT, OUT_POSTERS, DATA):
     d.mkdir(parents=True, exist_ok=True)
 
 CWEBP = (
@@ -69,6 +71,20 @@ def save_webp(src_path, dest_webp, quality=80, alpha=False):
     subprocess.run(cmd, check=True)
 
 
+def save_resized_webp(src_path, dest_webp, width, quality=80):
+    cmd = [
+        CWEBP,
+        "-q", str(quality),
+        "-m", "6",
+        "-mt",
+        "-quiet",
+        "-resize", str(width), "0",
+        str(src_path),
+        "-o", str(dest_webp),
+    ]
+    subprocess.run(cmd, check=True)
+
+
 def find_source(subdir, names):
     """Find first matching source file by base name and any common extension."""
     folder = SRC / subdir
@@ -78,6 +94,10 @@ def find_source(subdir, names):
             if path.exists():
                 return path
     return None
+
+
+def slugify(value):
+    return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
 
 
 def rel(path):
@@ -227,6 +247,19 @@ if r:
     report(ROOT / r["src"])
     report(ROOT / r["webp"])
 
+print("Featured show artwork")
+for src_name, out_name, width in [
+    ("MODERN NOSTALGIA ALBUM RELEASE_08:14:26.PNG", "modern-nostalgia-album-release-2026.webp", 1200),
+    ("MODERN NOSTALGIA ALBUM RELEASE_08:14:26_BANNER.PNG", "modern-nostalgia-album-release-2026-banner.webp", 2000),
+]:
+    src = SRC / "posters" / src_name
+    if not src.exists():
+        print(f"  SKIP posters/{src_name} (missing)")
+        continue
+    dest = OUT_POSTERS_ROOT / out_name
+    save_resized_webp(src, dest, width, quality=82)
+    report(dest)
+
 print("Album / single covers")
 for src_name in [
     "cover_LP_modern_nostalgia.png",
@@ -253,6 +286,30 @@ for slug, names in LINEUP_SOURCES.items():
     lineup_manifest[slug] = meta
     report(OUT_LINEUP / Path(meta["src"]).name)
     report(OUT_LINEUP / Path(meta["webp"]).name)
+
+print("Archived show posters")
+poster_manifest = {}
+shows_path = DATA / "shows.json"
+if shows_path.exists():
+    shows_data = json.loads(shows_path.read_text(encoding="utf-8"))
+    for show in shows_data.get("past", []):
+        poster_path = show.get("poster")
+        if not poster_path:
+            continue
+        src = ROOT / poster_path
+        if not src.exists():
+            print(f"  SKIP poster/{poster_path} (missing source)")
+            continue
+        out_base = slugify(f"{show.get('date', '')}-{show.get('venue', src.stem)}")
+        print(f"  {out_base} <= {src.relative_to(SRC)}")
+        meta = process_raster(src, OUT_POSTERS, out_base, 900, jpeg_q=82, webp_q=80)
+        poster_manifest[poster_path] = meta
+        report(OUT_POSTERS / Path(meta["src"]).name)
+        report(OUT_POSTERS / Path(meta["webp"]).name)
+
+poster_manifest_path = DATA / "poster-images.json"
+poster_manifest_path.write_text(json.dumps(poster_manifest, indent=2) + "\n", encoding="utf-8")
+print(f"Wrote {poster_manifest_path.relative_to(ROOT)}")
 
 print("Gallery photos")
 gallery_manifest = []

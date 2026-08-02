@@ -40,6 +40,10 @@
 <header class="site-header">
   <div class="brand-container">
     <a class="brand" href="index.html"><img src="assets/logos/DA_SPLAT/DA-OFF_WHITE.png" alt="Dirty Aesthetic" decoding="async" width="120" height="120"></a>
+    <a class="brand-subtitle brand-ticket" href="https://admitone.com/events/vancouver/community/music/modern-nostalgia-album-release-party/MYCD1T" target="_blank" rel="noopener">
+      <span class="brand-ticket-long">Album Release Tickets</span>
+      <span class="brand-ticket-short">Aug 14 Tickets</span>
+    </a>
   </div>
   <div class="hamburger" id="hamburger">
     <span></span>
@@ -63,12 +67,7 @@
       <p class="album-hero-caption"><span>New Album</span> Modern Nostalgia <span>August 12, 2026</span></p>
       <div class="hero-ctas">
         <a class="btn album-presave-btn" href="https://distrokid.com/hyperfollow/dirtyaesthetic/modern-nostalgia-2?ref=release" target="_blank" rel="noopener">Pre-Save</a>
-        <div class="cta-row" id="hero-shows">
-          <a class="btn ghost" href="#upcoming-section">Shows</a>
-        </div>
-        <div class="cta-row">
-          <a class="btn ghost" href="music.html">Listen</a>
-        </div>
+        <a class="btn ghost" href="music.html">Listen</a>
       </div>
     </div>
   </section>
@@ -122,9 +121,15 @@
 
   <section class="shows-feature" id="upcoming-section" data-scroll-chapter data-chapter-label="Shows">
     <div class="shows-feature-inner">
-      <h2 class="shows-feature-heading reveal">Upcoming Shows</h2>
+      <p class="shows-feature-kicker reveal" id="shows-feature-kicker" hidden>One Night Only</p>
+      <h2 class="shows-feature-heading reveal" id="shows-feature-heading">Upcoming Shows</h2>
       <!-- Past show history (not rendered): see data/shows.json → past -->
       <div id="upcoming" class="shows-editorial"></div>
+      <a class="shows-archive-link reveal" href="posters.html">
+        <span>Past Shows</span>
+        <strong>Explore the Poster Archive</strong>
+        <span class="shows-archive-link-arrow" aria-hidden="true">→</span>
+      </a>
     </div>
   </section>
 

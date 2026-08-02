@@ -1,6 +1,20 @@
 {
   "upcoming": [
     {
+      "date": "Aug 14, 2026",
+      "title": "Modern Nostalgia Album Release",
+      "city": "Vancouver",
+      "venue": "The Biltmore Cabaret",
+      "time": "Doors at 7 PM",
+      "lineup": "Nick Stone & The Gems, Crashout",
+      "lineupPrefix": "with",
+      "poster": "assets/images/optimized/posters/modern-nostalgia-album-release-2026.webp",
+      "banner": "assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp",
+      "link": "https://admitone.com/events/vancouver/community/music/modern-nostalgia-album-release-party/MYCD1T"
+    }
+  ],
+  "past": [
+    {
       "date": "Aug 1, 2026",
       "city": "Vancouver",
       "venue": "The Roxy Cabaret",
@@ -8,21 +22,6 @@
       "poster": "assets/images/posters/ROXY_08:01:26.jpeg",
       "link": "https://www.showpass.com/sataug1/"
     },
-    {
-      "date": "Aug 14, 2026",
-      "title": "Modern Nostalgia Album Release",
-      "city": "Vancouver",
-      "venue": "The Biltmore Cabaret",
-      "time": "Doors at 7 PM",
-      "lineup": "special guests",
-      "lineupPrefix": "with",
-      "ctaLabel": "Album Release Show August 14",
-      "poster": "assets/images/optimized/posters/modern-nostalgia-album-release-2026.webp",
-      "banner": "assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp",
-      "link": "https://admitone.com/events/vancouver/community/music/modern-nostalgia-album-release-party/MYCD1T"
-    }
-  ],
-  "past": [
     {
       "date": "Jul 30, 2026",
       "city": "Vancouver",
@@ -94,9 +93,10 @@
       "poster": "assets/images/posters/redgate_mar1.jpg"
     },
     {
-      "date": "Feb 23, 2026",
+      "date": "Feb 22, 2026",
       "city": "Vancouver",
       "venue": "Green Auto — New and Known",
+      "lineup": "Hell Crimes, Hot Mars, Tamis, Alien Child",
       "poster": "assets/images/posters/GREEN AUTO_NEW AND KNOWN_POSTER.jpeg",
       "link": "https://gigpit.ca/shows/event:vhIPyz2zli8"
     },
@@ -109,6 +109,7 @@
       "date": "Jan 16, 2026",
       "city": "Vancouver",
       "venue": "The Biltmore Cabaret — Sugar on the Rocks EP Release",
+      "lineup": "Blue Rivera, DAWN",
       "poster": "assets/images/posters/SOTR_SHOW_POSTER.JPG",
       "link": "https://admitone.com/events/vancouver/community/performance/dirty-aesthetic-presents-sugar-on-the-rocks-ep-release-show/SRWWLY"
     },

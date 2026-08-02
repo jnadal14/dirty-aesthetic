@@ -18,6 +18,7 @@ body::before{content:'';position:fixed;inset:0;background:url('data:image/svg+xm
 a{color:var(--ink);text-decoration:none;transition:color .2s ease}
 img{max-width:100%;display:block;height:auto}
 picture{display:contents}
+.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 
 @media (min-width:900px){
   html,body{font-size:19px}
@@ -46,6 +47,24 @@ picture{display:contents}
 .brand:hover{opacity:.8}
 .brand-subtitle{font-size:14px;color:var(--ink);opacity:.85;transition:all .2s ease;letter-spacing:.5px;text-decoration:none}
 .brand-subtitle:hover{opacity:1;color:var(--accent)}
+.brand-ticket{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 10px 5px;
+  border:1px solid rgba(248,143,158,.48);
+  border-radius:999px;
+  background:rgba(12,6,8,.7);
+  color:#fff1ed;
+  font-size:clamp(.68rem,1vw,.82rem);
+  font-weight:700;
+  letter-spacing:1px;
+  line-height:1.1;
+  text-transform:uppercase;
+  white-space:nowrap;
+  box-shadow:0 6px 18px rgba(0,0,0,.28);
+}
+.brand-ticket:hover{border-color:#f88f9e;background:#f88f9e;color:#16090b}
+.brand-ticket-short{display:none}
 .nav{display:flex;align-items:center;gap:clamp(12px,2.5vw,20px)}
 .nav a{opacity:.9;position:relative;padding-bottom:4px;transition:opacity .2s ease;white-space:nowrap;letter-spacing:.5px;font-size:clamp(1.05rem,1.2vw,1.2rem)}
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;z-index:1001}
@@ -315,9 +334,17 @@ main>.page{max-width:none}
 /* releases */
 /* Music page background */
 body.music-page-bg{
-  background:
-    linear-gradient(180deg, rgba(32,23,15,.92) 0%, rgba(32,23,15,.85) 50%, rgba(32,23,15,.92) 100%),
-    url('../assets/images/BACKGROUND/1.jpg') center/cover no-repeat fixed;
+  background-color:#090705;
+  background-image:
+    linear-gradient(180deg,rgba(12,8,6,.9) 0%,rgba(18,12,8,.82) 45%,rgba(8,6,4,.94) 100%),
+    image-set(
+      url('../assets/images/optimized/header-desktop.webp') type('image/webp'),
+      url('../assets/images/optimized/header-desktop.jpg') type('image/jpeg')
+    );
+  background-position:center,center;
+  background-size:cover,cover;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
 }
 
 .release-grid{
@@ -1030,6 +1057,8 @@ body.privacy-page .privacy-page-main p{
    The base experience adds gentle depth and a persistent section index.
    Large screens upgrade to the spatial reveal sequence farther below. */
 .home-experience main{position:relative}
+/* Passthrough wrapper on free-scroll layouts; becomes a real box in spatial mode. */
+.home-experience:not(.spatial-scroll-active) .chapter-scene{display:contents}
 .home-experience main > [data-scroll-chapter]{
   --chapter-drift:0px;
   --chapter-cover-x:0px;
@@ -1187,10 +1216,12 @@ body.privacy-page .privacy-page-main p{
   }
 }
 
-/* Spatial reveal mode: normal document scrolling drives a stack of sticky,
-   full-screen scenes. Each scene follows a different camera path while the
-   next one takes over, creating product-launch pacing without scroll-jacking. */
+/* Spatial reveal mode: sticky full-screen chapters with intentional section
+   jumps. Camera motion runs on an inner .chapter-scene so sticky compositing
+   stays stable while scenes swing between paths. */
 @media (min-width:1081px) and (min-height:680px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  .spatial-scroll-active{scroll-behavior:auto}
+  html:has(.spatial-scroll-active){scroll-behavior:auto}
   .spatial-scroll-active main{
     position:relative;
     background:#000;
@@ -1203,21 +1234,37 @@ body.privacy-page .privacy-page-main p{
     min-height:100svh;
     max-height:100svh;
     overflow:hidden;
+    /* Sticky shell only — no transform/filter here. */
+    box-shadow:0 -30px 90px rgba(0,0,0,.62),0 30px 90px rgba(0,0,0,.5);
+    contain:paint;
+  }
+  .spatial-scroll-active main > [data-scroll-chapter] > .chapter-scene{
+    width:100%;
+    height:100%;
+    min-height:100%;
     transform-origin:var(--scene-origin);
     transform:translate3d(var(--scene-x),var(--scene-y),0) rotate(var(--scene-rotate)) scale(var(--scene-scale));
     filter:blur(var(--scene-blur)) brightness(var(--scene-brightness));
     opacity:var(--scene-opacity);
     border-radius:var(--scene-radius);
-    box-shadow:0 -30px 90px rgba(0,0,0,.62),0 30px 90px rgba(0,0,0,.5);
     backface-visibility:hidden;
-    will-change:transform,filter,opacity,border-radius;
-    contain:paint;
+    will-change:transform,opacity;
   }
-  .spatial-scroll-active main > .hero{height:100svh}
+  .spatial-scroll-active main > .hero,
+  .spatial-scroll-active main > .hero > .chapter-scene{height:100svh}
   .spatial-scroll-active .chapter-wipe{display:none}
-  .spatial-scroll-active .ep-release,
-  .spatial-scroll-active .shows-feature,
-  .spatial-scroll-active .home-contact{
+  .spatial-scroll-active .hero > .chapter-scene{
+    position:relative;
+    display:block;
+  }
+  .spatial-scroll-active .album-tracklist-section > .chapter-scene{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .spatial-scroll-active .ep-release > .chapter-scene,
+  .spatial-scroll-active .shows-feature > .chapter-scene,
+  .spatial-scroll-active .home-contact > .chapter-scene{
     display:flex;
     align-items:center;
     justify-content:center;
@@ -1376,17 +1423,17 @@ blockquote.tiktok-embed section{margin:0!important}
   padding:clamp(48px,8vw,80px) 0 clamp(40px,6vw,64px);
   background-color:#0a0705;
   background-image:
-    radial-gradient(ellipse 70% 50% at 15% 30%, rgba(176,122,63,.1) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 85% 70%, rgba(122,54,0,.07) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(10,7,5,.85) 0%, rgba(26,16,9,.8) 30%, rgba(26,16,9,.8) 70%, rgba(32,23,15,.9) 100%),
-    url('../assets/images/optimized/header-desktop.jpg');
+    radial-gradient(ellipse 70% 60% at 20% 28%,rgba(248,143,158,.12) 0%,transparent 62%),
+    radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
+    linear-gradient(180deg,rgba(5,3,4,.76) 0%,rgba(8,5,6,.72) 40%,rgba(5,3,4,.9) 100%),
+    url('../assets/images/posters/MODERN NOSTALGIA ALBUM RELEASE_08:14:26_BANNER.PNG');
   background-image:
-    radial-gradient(ellipse 70% 50% at 15% 30%, rgba(176,122,63,.1) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 85% 70%, rgba(122,54,0,.07) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(10,7,5,.85) 0%, rgba(26,16,9,.8) 30%, rgba(26,16,9,.8) 70%, rgba(32,23,15,.9) 100%),
+    radial-gradient(ellipse 70% 60% at 20% 28%,rgba(248,143,158,.12) 0%,transparent 62%),
+    radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
+    linear-gradient(180deg,rgba(5,3,4,.76) 0%,rgba(8,5,6,.72) 40%,rgba(5,3,4,.9) 100%),
     image-set(
-      url('../assets/images/optimized/header-desktop.webp') type('image/webp'),
-      url('../assets/images/optimized/header-desktop.jpg') type('image/jpeg')
+      url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260802-supports') type('image/webp'),
+      url('../assets/images/posters/MODERN NOSTALGIA ALBUM RELEASE_08:14:26_BANNER.PNG') type('image/png')
     );
   background-position:center,center,center,center calc(50% + var(--shows-bg-parallax,0px));
   background-size:auto,auto,auto,cover;
@@ -1435,6 +1482,18 @@ blockquote.tiktok-embed section{margin:0!important}
   height:3px;
   background:var(--accent);
   border-radius:2px;
+}
+.shows-feature-kicker{
+  margin:0 0 4px;
+  color:#f88f9e;
+  font-size:clamp(.74em,1.3vw,.9em);
+  font-weight:700;
+  letter-spacing:3px;
+  line-height:1.2;
+  text-transform:uppercase;
+}
+.shows-feature-kicker:not([hidden]) + .shows-feature-heading{
+  margin-top:0;
 }
 
 /* Editorial show rows */
@@ -1732,6 +1791,97 @@ a.show-row[href]{cursor:pointer}
   align-self:center;
 }
 
+/* The sole album-release date is treated as the section's headline event. */
+.shows-editorial--solo .show-row--featured.show-row--solo{
+  border-color:rgba(248,143,158,.42);
+  background:#080506;
+  box-shadow:
+    0 24px 74px rgba(0,0,0,.58),
+    0 0 54px rgba(248,143,158,.09),
+    inset 0 1px 0 rgba(255,255,255,.1);
+}
+.shows-editorial--solo .show-row--featured.show-row--solo:hover{
+  border-color:rgba(248,143,158,.68);
+  box-shadow:
+    0 30px 82px rgba(0,0,0,.64),
+    0 0 66px rgba(248,143,158,.14),
+    inset 0 1px 0 rgba(255,255,255,.12);
+}
+.shows-editorial--solo .show-row--featured.show-row--solo::before{
+  background:
+    linear-gradient(100deg,rgba(6,4,5,.97) 0%,rgba(6,4,5,.88) 42%,rgba(6,4,5,.52) 74%,rgba(6,4,5,.34) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.66));
+}
+.shows-editorial--solo .show-row--featured.show-row--solo .show-row-banner img{
+  opacity:.84;
+  filter:saturate(1.03) contrast(1.08);
+}
+.shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px 14px;
+  color:#fff4f1;
+  font-size:clamp(1.45em,3vw,2.1em);
+  line-height:1.06;
+}
+.shows-editorial--solo .show-row--featured.show-row--solo .show-row-arrow{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin:0;
+  padding:9px 15px 8px;
+  border:1px solid rgba(248,143,158,.62);
+  border-radius:999px;
+  background:#f88f9e;
+  color:#16090b;
+  font-size:.42em;
+  font-style:normal;
+  font-weight:700;
+  letter-spacing:2px;
+}
+.shows-editorial--solo .show-row--featured.show-row--solo:hover .show-row-arrow{
+  background:#fff1ed;
+  color:#16090b;
+}
+
+.shows-archive-link{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:clamp(12px,2vw,22px);
+  margin-top:clamp(20px,3vw,30px);
+  padding:clamp(14px,2vw,19px) clamp(16px,2.5vw,24px);
+  border:1px solid rgba(176,122,63,.3);
+  border-radius:12px;
+  background:rgba(6,4,3,.62);
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .3s ease,background .3s ease;
+}
+.shows-archive-link > span:first-child{
+  color:var(--accent);
+  font-size:.72em;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.shows-archive-link strong{
+  font-size:clamp(1em,1.8vw,1.18em);
+  font-weight:400;
+  letter-spacing:.5px;
+}
+.shows-archive-link-arrow{
+  color:var(--accent);
+  font-size:1.5em;
+  line-height:1;
+  transition:transform .3s ease;
+}
+.shows-archive-link:hover{
+  transform:translateY(-3px);
+  border-color:rgba(176,122,63,.58);
+  background:rgba(176,122,63,.1);
+}
+.shows-archive-link:hover .shows-archive-link-arrow{transform:translateX(5px)}
+
 @media (max-width:720px){
   .shows-editorial--solo .show-row--solo{
     display:flex;
@@ -1761,20 +1911,52 @@ a.show-row[href]{cursor:pointer}
     align-items:center;
     max-width:100%;
   }
+  .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
+    justify-content:center;
+  }
+  .shows-archive-link{
+    grid-template-columns:1fr auto;
+    text-align:left;
+  }
+  .shows-archive-link > span:first-child{grid-column:1}
+  .shows-archive-link strong{grid-column:1}
+  .shows-archive-link-arrow{grid-column:2;grid-row:1 / 3}
+}
+
+@media (min-width:1081px) and (max-height:940px) and (hover:hover) and (pointer:fine){
+  .spatial-scroll-active .shows-feature{padding:38px 0 24px}
+  .spatial-scroll-active .shows-feature-kicker{font-size:.68em}
+  .spatial-scroll-active .shows-feature-heading{
+    margin-bottom:14px;
+    padding-bottom:10px;
+    font-size:clamp(1.65em,3.7vw,2.55em);
+  }
+  .spatial-scroll-active .shows-editorial--solo .show-row--solo{
+    grid-template-columns:minmax(190px,min(30vw,300px)) 1fr;
+    padding:18px;
+  }
+  .spatial-scroll-active .shows-editorial--solo .show-row--solo .show-row-poster img{
+    min-height:230px;
+    max-height:42vh;
+  }
+  .spatial-scroll-active .shows-archive-link{
+    margin-top:12px;
+    padding:10px 16px;
+  }
 }
 
 @media (max-width:640px){
   .shows-feature{
     padding:clamp(40px,8vw,64px) 0 clamp(32px,6vw,48px);
     background-image:
-      radial-gradient(ellipse 70% 50% at 15% 30%, rgba(176,122,63,.1) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 85% 70%, rgba(122,54,0,.07) 0%, transparent 60%),
-      linear-gradient(180deg, rgba(10,7,5,.85) 0%, rgba(26,16,9,.8) 30%, rgba(26,16,9,.8) 70%, rgba(32,23,15,.9) 100%),
+      radial-gradient(ellipse 70% 60% at 20% 28%,rgba(248,143,158,.12) 0%,transparent 62%),
+      radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
+      linear-gradient(180deg,rgba(5,3,4,.84) 0%,rgba(8,5,6,.8) 46%,rgba(5,3,4,.94) 100%),
       image-set(
-        url('../assets/images/optimized/header-mobile.webp') type('image/webp'),
-        url('../assets/images/optimized/header-mobile.jpg') type('image/jpeg')
+        url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260802-supports') type('image/webp'),
+        url('../assets/images/posters/MODERN NOSTALGIA ALBUM RELEASE_08:14:26_BANNER.PNG') type('image/png')
       );
-    background-position:center,center,center,center calc(18% + var(--shows-bg-parallax,0px));
+    background-position:center,center,center,center calc(50% + var(--shows-bg-parallax,0px));
   }
   .shows-feature-inner{
     padding:0 clamp(16px,4vw,32px);
@@ -2659,8 +2841,20 @@ a.show-row[href]{cursor:pointer}
   .site-header{padding:12px 16px}
   .brand-container{gap:10px}
   .brand img{height:32px}
+  .brand-ticket{padding:5px 8px 4px;font-size:.62rem;letter-spacing:.6px}
+  .brand-ticket-long{display:none}
+  .brand-ticket-short{display:inline}
   .nav{gap:6px}
   .nav a{font-size:.8em;letter-spacing:0}
+  body.music-page-bg{
+    background-image:
+      linear-gradient(180deg,rgba(12,8,6,.9) 0%,rgba(18,12,8,.84) 45%,rgba(8,6,4,.95) 100%),
+      image-set(
+        url('../assets/images/optimized/header-mobile.webp') type('image/webp'),
+        url('../assets/images/optimized/header-mobile.jpg') type('image/jpeg')
+      );
+    background-attachment:scroll;
+  }
   
   .hero{
     height:100vh;
@@ -2715,6 +2909,7 @@ a.show-row[href]{cursor:pointer}
   .brand-container{flex-direction:row;align-items:center;gap:4px}
   .brand img{height:27px}
   .brand-subtitle{font-size:11px}
+  .brand-ticket{padding:4px 6px 3px;font-size:.54rem;letter-spacing:.35px}
   .nav{gap:5px}
   .nav a{font-size:.74em;letter-spacing:0}
   
@@ -2999,6 +3194,174 @@ a.show-row[href]{cursor:pointer}
   .album-hero .hero-logo{width:min(43vw,420px)}
   .album-hero-caption{margin:0}
   .album-hero .hero-ctas{margin-top:8px}
+}
+
+/* ===== SHOW POSTER ARCHIVE ===== */
+.poster-archive-page{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 14% 5%,rgba(176,122,63,.15),transparent 28rem),
+    radial-gradient(circle at 88% 28%,rgba(122,54,0,.12),transparent 34rem),
+    #050403;
+}
+.poster-archive-page .site-header{
+  background:linear-gradient(180deg,rgba(0,0,0,.72),rgba(0,0,0,.08));
+}
+.poster-archive-main{
+  width:min(100%,1440px);
+  min-height:100vh;
+  margin:0 auto;
+  padding:clamp(92px,10vw,118px) clamp(18px,4vw,56px) clamp(72px,9vw,116px);
+}
+.poster-archive-back{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  width:max-content;
+  padding:10px 16px;
+  border:1px solid rgba(176,122,63,.4);
+  border-radius:999px;
+  background:rgba(5,4,3,.88);
+  color:var(--ink);
+  font-size:clamp(.78em,1.2vw,.9em);
+  letter-spacing:1px;
+  line-height:1.2;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  backdrop-filter:blur(10px);
+  transition:transform .25s ease,border-color .25s ease,background .25s ease;
+}
+.poster-archive-back:hover{
+  transform:translateX(-4px);
+  border-color:rgba(176,122,63,.72);
+  background:rgba(176,122,63,.14);
+}
+.poster-archive-back--sticky{
+  position:sticky;
+  z-index:80;
+  top:18px;
+}
+.poster-archive-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(24px,3vw,42px) clamp(18px,2.5vw,34px);
+  margin-top:clamp(28px,4vw,48px);
+}
+.poster-archive-card{
+  min-width:0;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:16px;
+  background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+  box-shadow:0 18px 48px rgba(0,0,0,.32);
+  transition:
+    opacity 1s cubic-bezier(.2,.7,.2,1) var(--reveal-delay,0s),
+    transform .45s cubic-bezier(.2,.8,.2,1),
+    filter 1s cubic-bezier(.2,.7,.2,1) var(--reveal-delay,0s),
+    border-color .35s ease,
+    box-shadow .35s ease;
+}
+.poster-archive-card.in-view:hover{
+  transform:translateY(-7px);
+  border-color:rgba(176,122,63,.38);
+  box-shadow:0 26px 64px rgba(0,0,0,.48),0 0 0 1px rgba(176,122,63,.08);
+}
+.poster-archive-art{
+  display:block;
+  width:100%;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  border:0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  border-radius:0;
+  background:#080706;
+  color:inherit;
+  cursor:zoom-in;
+}
+.poster-archive-art img{
+  width:100%;
+  aspect-ratio:4 / 5;
+  object-fit:contain;
+  object-position:center;
+  background:#080706;
+  transition:transform .55s cubic-bezier(.2,.8,.2,1),filter .35s ease;
+}
+.poster-archive-art:hover img,
+.poster-archive-art:focus-visible img{
+  transform:scale(1.025);
+  filter:brightness(1.08);
+}
+.poster-archive-art:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
+.poster-archive-details{
+  position:relative;
+  min-height:220px;
+  padding:clamp(18px,2.4vw,28px);
+}
+.poster-archive-date{
+  margin:0 0 8px;
+  color:var(--accent);
+  font-size:.78em;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.poster-archive-details h2{
+  margin:0;
+  font-size:clamp(1.2em,2.1vw,1.65em);
+  line-height:1.12;
+}
+.poster-archive-location{
+  margin:7px 0 20px;
+  color:rgba(255,255,255,.48);
+  font-size:.78em;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+.poster-archive-lineup{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  margin:0;
+  color:rgba(255,255,255,.78);
+  line-height:1.42;
+}
+.poster-archive-lineup span{
+  color:#f88f9e;
+  font-size:.68em;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.poster-archive-lineup strong{font-size:.9em;font-weight:400}
+.poster-archive-note{
+  display:inline-flex;
+  margin-top:16px;
+  padding:5px 9px;
+  border:1px solid rgba(248,143,158,.38);
+  border-radius:999px;
+  color:#f8a2ae;
+  font-size:.66em;
+  font-weight:700;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+.poster-archive-empty{
+  grid-column:1 / -1;
+  margin:40px auto;
+  color:var(--muted);
+  text-align:center;
+}
+.poster-archive-back--bottom{margin:clamp(52px,7vw,88px) auto 0}
+
+@media (max-width:920px){
+  .poster-archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:580px){
+  .poster-archive-main{padding-left:14px;padding-right:14px}
+  .poster-archive-grid{grid-template-columns:1fr;gap:24px}
+  .poster-archive-card{width:min(100%,430px);margin:0 auto}
+  .poster-archive-details{min-height:0}
+  .poster-archive-back--sticky{top:10px}
 }
 
 /* ===== PRINT STYLES ===== */

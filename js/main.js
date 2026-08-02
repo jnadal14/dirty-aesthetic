@@ -180,11 +180,15 @@ window.addEventListener('beforeprint', () => {
   }
 
   function refreshState() {
-    enabled = !reduceMotion.matches
+    // Spatial sticky chapters own motion on the homepage — parallax fights them.
+    enabled = !reduceMotion.matches && !document.body.classList.contains('spatial-scroll-active')
     contentTargets = mapTargets(contentConfig)
     backgroundTargets = mapTargets(backgroundConfig)
+    if (!enabled) resetParallax()
     scheduleUpdate()
   }
+
+  window.__refreshParallaxState = refreshState
 
   window.addEventListener('scroll', scheduleUpdate, { passive: true })
   window.addEventListener('resize', refreshState, { passive: true })
@@ -235,8 +239,14 @@ window.addEventListener('beforeprint', () => {
     link.addEventListener('click', (event) => {
       event.preventDefault()
       const top = index === 0 ? 0 : section.offsetTop
-      if (window.__lenis) {
-        window.__lenis.scrollTo(top, { duration: 1.35 })
+      if (spatialEnabled && !reduceMotion.matches) {
+        const direction = Math.sign(index - targetChapterIndex) || 1
+        scrollToChapterIndex(index, direction)
+      } else if (window.__lenis) {
+        window.__lenis.scrollTo(top, {
+          duration: sectionScrollDuration,
+          easing: sectionScrollEase
+        })
       } else {
         window.scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' })
       }
@@ -249,44 +259,58 @@ window.addEventListener('beforeprint', () => {
   document.body.appendChild(nav)
   document.body.classList.add('home-experience')
 
+  // Keep sticky on the chapter shell; camera motion lives on an inner scene so
+  // sticky + transform/filter don't fight compositing.
+  chapters.forEach(section => {
+    if (section.querySelector(':scope > .chapter-scene')) return
+    const scene = document.createElement('div')
+    scene.className = 'chapter-scene'
+    Array.from(section.childNodes).forEach(child => {
+      if (child.nodeType === 1 && child.classList.contains('chapter-wipe')) return
+      scene.appendChild(child)
+    })
+    section.insertBefore(scene, section.firstChild)
+  })
+
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
   const ease = value => value * value * (3 - 2 * value)
-  const sectionScrollEase = value => -(Math.cos(Math.PI * value) - 1) / 2
-  const sectionScrollDuration = 1.25
-  const sectionTransitionDelay = 1375
-  const wheelQuietDelay = 160
-  const wheelThreshold = 10
+  // Snappy swing with a short ease-out overshoot (easeOutBack-ish).
+  const sectionScrollEase = value => {
+    const c1 = 1.25
+    const c3 = c1 + 1
+    return 1 + c3 * Math.pow(value - 1, 3) + c1 * Math.pow(value - 1, 2)
+  }
+  const sectionScrollDuration = .55
+  const wheelThreshold = 48
+  const wheelInertiaAbsorb = 220
+  const wheelIdleReset = 280
   let ticking = false
   let spatialEnabled = false
-  let sectionTransitioning = false
-  let sectionTransitionFinished = true
-  let wheelQuiet = true
+  let targetChapterIndex = 0
+  let lastCommandDirection = 0
+  let lastCommandTime = 0
+  let transitionEndTime = 0
   let wheelDelta = 0
-  let wheelQuietTimer = 0
-  let transitionTimer = 0
+  let wheelIdleTimer = 0
+  let settleTimer = 0
 
-  function tryUnlockSectionScroll(){
-    if (!sectionTransitionFinished || !wheelQuiet) return
-    sectionTransitioning = false
-    wheelDelta = 0
-  }
-
-  function markWheelQuiet(){
-    wheelQuietTimer = 0
-    wheelQuiet = true
-    if (!sectionTransitioning) wheelDelta = 0
-    tryUnlockSectionScroll()
+  function syncLenisWheelMode(){
+    const lenis = window.__lenis
+    if (!lenis || !lenis.options) return
+    // Spatial mode owns the wheel; Lenis only drives programmatic jumps.
+    lenis.options.smoothWheel = !spatialEnabled
   }
 
   function resetSectionScroll(){
-    clearTimeout(wheelQuietTimer)
-    clearTimeout(transitionTimer)
-    wheelQuietTimer = 0
-    transitionTimer = 0
-    sectionTransitioning = false
-    sectionTransitionFinished = true
-    wheelQuiet = true
+    clearTimeout(wheelIdleTimer)
+    clearTimeout(settleTimer)
+    wheelIdleTimer = 0
+    settleTimer = 0
     wheelDelta = 0
+    lastCommandDirection = 0
+    lastCommandTime = 0
+    transitionEndTime = 0
+    targetChapterIndex = nearestChapterIndex()
   }
 
   function nearestChapterIndex(){
@@ -297,66 +321,100 @@ window.addEventListener('beforeprint', () => {
     }, 0)
   }
 
+  function scrollToChapterIndex(index, direction = 0){
+    const targetIndex = clamp(index, 0, chapters.length - 1)
+    if (targetIndex === targetChapterIndex && performance.now() < transitionEndTime) {
+      // Same target mid-flight — keep the current tween.
+      if (direction) lastCommandDirection = direction
+      return
+    }
+
+    const targetTop = targetIndex === 0 ? 0 : chapters[targetIndex].offsetTop
+    const commandTime = performance.now()
+
+    targetChapterIndex = targetIndex
+    lastCommandTime = commandTime
+    transitionEndTime = commandTime + sectionScrollDuration * 1000
+    if (direction) lastCommandDirection = direction
+    wheelDelta = 0
+
+    if (window.__lenis) {
+      window.__lenis.scrollTo(targetTop, {
+        duration: sectionScrollDuration,
+        easing: sectionScrollEase,
+        immediate: false,
+        force: true,
+        lock: false
+      })
+    } else {
+      window.scrollTo({ top: targetTop, behavior: 'smooth' })
+    }
+
+    clearTimeout(settleTimer)
+    settleTimer = window.setTimeout(() => {
+      if (lastCommandTime !== commandTime) return
+      settleTimer = 0
+      targetChapterIndex = nearestChapterIndex()
+      scheduleChapterUpdate()
+    }, sectionScrollDuration * 1000 + 60)
+  }
+
   function handleSpatialWheel(event){
     if (!spatialEnabled || reduceMotion.matches || event.ctrlKey || !event.deltaY) return
 
     event.preventDefault()
     event.stopImmediatePropagation()
 
-    wheelQuiet = false
-    clearTimeout(wheelQuietTimer)
-    wheelQuietTimer = window.setTimeout(markWheelQuiet, wheelQuietDelay)
-
-    // Once a transition begins, the rest of that gesture is momentum rather
-    // than another navigation command.
-    if (sectionTransitioning) return
-
     const multiplier = event.deltaMode === 1
       ? 16
       : event.deltaMode === 2
         ? window.innerHeight
         : 1
-    wheelDelta += clamp(event.deltaY * multiplier, -120, 120)
+    const normalizedDelta = clamp(event.deltaY * multiplier, -140, 140)
+    const direction = Math.sign(normalizedDelta)
+    if (!direction) return
+
+    const now = performance.now()
+    const inFlight = now < transitionEndTime
+
+    clearTimeout(wheelIdleTimer)
+    wheelIdleTimer = window.setTimeout(() => {
+      wheelDelta = 0
+      if (performance.now() >= transitionEndTime) {
+        targetChapterIndex = nearestChapterIndex()
+      }
+    }, wheelIdleReset)
+
+    // Mid-transition: only honor a clear counter-gesture. Same-direction
+    // trackpad inertia is swallowed so one flick can't skip chapters.
+    if (inFlight) {
+      if (lastCommandDirection && direction === -lastCommandDirection) {
+        const reverseIndex = clamp(targetChapterIndex + direction, 0, chapters.length - 1)
+        if (reverseIndex !== targetChapterIndex) {
+          scrollToChapterIndex(reverseIndex, direction)
+        }
+      }
+      return
+    }
+
+    // After a jump settles, briefly absorb leftover trackpad inertia.
+    if (now < transitionEndTime + wheelInertiaAbsorb) return
+
+    wheelDelta += normalizedDelta
     if (Math.abs(wheelDelta) < wheelThreshold) return
 
-    const direction = Math.sign(wheelDelta)
-    const currentIndex = nearestChapterIndex()
-    const atFinalChapter = currentIndex === chapters.length - 1
-    const targetIndex = direction > 0 && atFinalChapter
-      ? 0
-      : clamp(currentIndex + direction, 0, chapters.length - 1)
-    const targetTop = targetIndex === 0 ? 0 : chapters[targetIndex].offsetTop
-
+    targetChapterIndex = nearestChapterIndex()
+    const nextIndex = clamp(targetChapterIndex + direction, 0, chapters.length - 1)
     wheelDelta = 0
-    sectionTransitioning = true
-    sectionTransitionFinished = targetIndex === currentIndex
-
-    if (targetIndex !== currentIndex) {
-      if (window.__lenis) {
-        window.__lenis.scrollTo(targetTop, {
-          duration: sectionScrollDuration,
-          easing: sectionScrollEase
-        })
-      } else {
-        window.scrollTo({ top: targetTop, behavior: 'smooth' })
-      }
-
-      clearTimeout(transitionTimer)
-      transitionTimer = window.setTimeout(() => {
-        transitionTimer = 0
-        sectionTransitionFinished = true
-        scheduleChapterUpdate()
-        tryUnlockSectionScroll()
-      }, sectionTransitionDelay)
-    } else {
-      tryUnlockSectionScroll()
-    }
+    if (nextIndex !== targetChapterIndex) scrollToChapterIndex(nextIndex, direction)
   }
 
   function refreshSpatialState(){
     spatialEnabled = spatialMotion.matches
     document.body.classList.toggle('spatial-scroll-active', spatialEnabled)
-    if (!spatialEnabled) resetSectionScroll()
+    syncLenisWheelMode()
+    if (typeof window.__refreshParallaxState === 'function') window.__refreshParallaxState()
+    resetSectionScroll()
     chapters.forEach((section, index) => {
       section.style.zIndex = spatialEnabled ? String(index + 1) : ''
     })
@@ -390,14 +448,15 @@ window.addEventListener('beforeprint', () => {
           const exit = nextSection ? ease(clamp(1 - nextFlowTop / viewportHeight, 0, 1)) : 0
           const entryRemaining = 1 - entry
           const exitDirection = index % 2 === 0 ? -1 : 1
-          const x = path.x * entryRemaining + exitDirection * 8 * exit
-          const y = path.y * entryRemaining - 4.5 * exit
-          const scale = 1 - (1 - path.scale) * entryRemaining - .13 * exit
-          const rotate = path.rotate * entryRemaining + exitDirection * 1.35 * exit
-          const blur = 4.5 * entryRemaining + 2.8 * exit
-          const brightness = 1 - .22 * entryRemaining - .24 * exit
-          const opacity = 1 - .34 * entryRemaining - .26 * exit
-          const radius = 44 * entryRemaining + 34 * exit
+          const x = path.x * entryRemaining + exitDirection * 6 * exit
+          const y = path.y * entryRemaining - 3.5 * exit
+          const scale = 1 - (1 - path.scale) * entryRemaining - .1 * exit
+          const rotate = path.rotate * entryRemaining + exitDirection * 1.1 * exit
+          // Keep blur light — per-frame filter on large scenes is expensive and mushy.
+          const blur = 1.6 * entryRemaining + 1.1 * exit
+          const brightness = 1 - .16 * entryRemaining - .18 * exit
+          const opacity = 1 - .28 * entryRemaining - .22 * exit
+          const radius = 28 * entryRemaining + 22 * exit
 
           section.style.setProperty('--scene-x', `${x.toFixed(3)}vw`)
           section.style.setProperty('--scene-y', `${y.toFixed(3)}vh`)
@@ -522,10 +581,12 @@ bindIrrationalScrollLinks()
   script.onload = () => {
     if (typeof window.Lenis !== 'function') return
 
+    const spatialActive = document.body.classList.contains('spatial-scroll-active')
     const lenis = new window.Lenis({
       duration: 1.05,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
+      // Homepage spatial mode owns wheel gestures; Lenis only animates jumps there.
+      smoothWheel: !spatialActive,
       syncTouch: false
     })
 
@@ -709,18 +770,24 @@ function parseDateParts(dateStr) {
 
 // Load shows
 const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><span class="show-row-venue">TBA</span></div>`
+const featuredShowAssetVersion = '20260802-supports'
+
+function showMediaUrl(path){
+  if(!path || !path.includes('modern-nostalgia-album-release-2026')) return path
+  return `${path}${path.includes('?') ? '&' : '?'}v=${featuredShowAssetVersion}`
+}
 
 fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
-  const heroShows = document.getElementById('hero-shows')
-  if(heroShows && data.upcoming && data.upcoming.length){
-    heroShows.innerHTML = data.upcoming.map(s => {
-      const parts = parseDateParts(s.date)
-      const dateLabel = parts ? `${parts.month} ${parts.day}` : s.date
-      const href = s.link || '#upcoming-section'
-      const attrs = s.link ? ' target="_blank" rel="noopener"' : ''
-      const label = s.ctaLabel || `${s.venue} ${dateLabel}`
-      return `<a class="btn ghost" href="${href}"${attrs}>${label}</a>`
-    }).join('')
+  const showsHeading = document.getElementById('shows-feature-heading')
+  const showsKicker = document.getElementById('shows-feature-kicker')
+  const featuredSingle = data.upcoming && data.upcoming.length === 1 && data.upcoming[0].title
+
+  if(featuredSingle && showsHeading){
+    showsHeading.textContent = data.upcoming[0].title
+    if(showsKicker){
+      showsKicker.textContent = `One Night Only · ${data.upcoming[0].date}`
+      showsKicker.hidden = false
+    }
   }
 
   const container=document.getElementById('upcoming')
@@ -766,8 +833,10 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const location = s.title
         ? [s.venue, s.city, s.time].filter(Boolean).join(' · ')
         : [s.city, s.time].filter(Boolean).join(' · ')
-      const posterHtml = s.poster ? `<div class="show-row-poster" data-poster-src="${s.poster}"><img src="${s.poster}" alt="${title} poster" loading="lazy"></div>` : ''
-      const bannerHtml = s.banner ? `<div class="show-row-banner" aria-hidden="true"><img src="${s.banner}" alt="" loading="lazy"></div>` : ''
+      const posterSrc = showMediaUrl(s.poster)
+      const bannerSrc = showMediaUrl(s.banner)
+      const posterHtml = posterSrc ? `<div class="show-row-poster" data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${title} poster" loading="lazy"></div>` : ''
+      const bannerHtml = bannerSrc ? `<div class="show-row-banner" aria-hidden="true"><img src="${bannerSrc}" alt="" loading="lazy"></div>` : ''
       row.innerHTML = `
         ${bannerHtml}
         <div class="show-row-date">
@@ -825,6 +894,100 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     container.appendChild(li)
   }
 })
+
+// Poster archive — builds the gallery from the same past-show records used by
+// the homepage, with optimized thumbnails and full originals in the lightbox.
+;(function(){
+  const grid = document.getElementById('poster-archive-grid')
+  if(!grid) return
+
+  const showsRequest = fetch('data/shows.json', { cache: 'no-store' }).then(response => {
+    if(!response.ok) throw new Error('Shows archive missing')
+    return response.json()
+  })
+  const imagesRequest = fetch('data/poster-images.json?v=20260802', { cache: 'no-store' })
+    .then(response => response.ok ? response.json() : {})
+    .catch(() => ({}))
+
+  Promise.all([showsRequest, imagesRequest]).then(([data, posterImages]) => {
+    const archivedShows = Array.isArray(data.past)
+      ? data.past.filter(show => show.poster)
+      : []
+
+    grid.innerHTML = ''
+    if(!archivedShows.length){
+      const empty = document.createElement('p')
+      empty.className = 'poster-archive-empty'
+      empty.textContent = 'The poster archive is being assembled.'
+      grid.appendChild(empty)
+      return
+    }
+
+    archivedShows.forEach((show, index) => {
+      const optimized = posterImages[show.poster] || {}
+      const title = show.title || show.venue
+      const card = document.createElement('article')
+      card.className = 'poster-archive-card reveal-scale'
+      card.style.setProperty('--reveal-delay', `${Math.min(index * 0.06, 0.36).toFixed(2)}s`)
+
+      const artwork = document.createElement('button')
+      artwork.className = 'poster-archive-art gallery-item'
+      artwork.type = 'button'
+      artwork.dataset.fullSrc = show.poster
+      artwork.setAttribute('aria-label', `View ${title} poster from ${show.date}`)
+
+      const image = document.createElement('img')
+      image.src = optimized.webp || optimized.src || show.poster
+      image.alt = `${title} show poster — ${show.date}`
+      image.loading = index < 3 ? 'eager' : 'lazy'
+      image.decoding = 'async'
+      if(index < 2) image.fetchPriority = 'high'
+      if(optimized.width && optimized.height){
+        image.width = optimized.width
+        image.height = optimized.height
+      }
+      artwork.appendChild(image)
+
+      const details = document.createElement('div')
+      details.className = 'poster-archive-details'
+
+      const date = document.createElement('p')
+      date.className = 'poster-archive-date'
+      date.textContent = show.date
+
+      const heading = document.createElement('h2')
+      heading.textContent = title
+
+      const location = document.createElement('p')
+      location.className = 'poster-archive-location'
+      location.textContent = show.city || 'Vancouver'
+
+      const lineup = document.createElement('p')
+      lineup.className = 'poster-archive-lineup'
+      const lineupLabel = document.createElement('span')
+      lineupLabel.textContent = show.lineupPrefix === 'with' ? 'With' : 'On the bill'
+      const lineupNames = document.createElement('strong')
+      lineupNames.textContent = show.lineup || 'Lineup details unavailable'
+      lineup.append(lineupLabel, lineupNames)
+
+      details.append(date, heading, location, lineup)
+      if(show.notes){
+        const note = document.createElement('span')
+        note.className = 'poster-archive-note'
+        note.textContent = show.notes
+        details.appendChild(note)
+      }
+
+      card.append(artwork, details)
+      grid.appendChild(card)
+    })
+
+    if(typeof window.__observeReveal === 'function') window.__observeReveal(grid)
+    if(typeof window.__bindGalleryLightbox === 'function') window.__bindGalleryLightbox()
+  }).catch(() => {
+    grid.innerHTML = '<p class="poster-archive-empty">The poster archive could not be loaded. Please try again.</p>'
+  })
+})()
 
 // Swing-in animation for band member cards on scroll
 ;(function(){
