@@ -109,11 +109,12 @@ window.addEventListener('beforeprint', () => {
   // either escapes overflow:hidden boundaries (heading slipping under the
   // hero) or exposes the CSS-var inheritance bug to revealed children
   // (form/heading stutter). What's left is just the hero text and the
-  // gentle whole-page drift on inner pages.
+  // gentle whole-page drift on inner pages. Music deliberately opts out:
+  // its long cover grid should stay anchored to native scroll rather than
+  // feeding a transform back into its own position calculation.
   const contentConfig = [
     { selector: '.hero-inner', speed: 0.08 },
-    { selector: '.music-header', speed: 0.04 },
-    { selector: '.page', speed: 0.03 }
+    { selector: 'body:not(.music-page-bg) .page', speed: 0.03 }
   ]
 
   const backgroundConfig = [
@@ -574,6 +575,9 @@ bindIrrationalScrollLinks()
 // and regular free scrolling on smaller layouts and inner pages.
 ;(function loadLenis(){
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  // The music grid is a conventional long page. Native scrolling avoids a
+  // second interpolator fighting the browser while covers enter the viewport.
+  if (document.body.classList.contains('music-page-bg')) return
 
   const script = document.createElement('script')
   script.src = 'https://unpkg.com/lenis@1.1.20/dist/lenis.min.js'

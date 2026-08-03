@@ -127,8 +127,7 @@ picture{display:contents}
    contentConfig array in js/main.js — adding a selector here without the
    matching entry there will leave the element static (and vice versa). */
 .hero-inner,
-.music-header,
-.page{
+body:not(.music-page-bg) .page{
   transform:translate3d(0, var(--parallax-y, 0px), 0);
   will-change:transform;
 }
@@ -335,6 +334,15 @@ main>.page{max-width:none}
 /* Music page background */
 body.music-page-bg{
   background-color:#090705;
+  background-image:none;
+  isolation:isolate;
+}
+body.music-page-bg::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
   background-image:
     linear-gradient(180deg,rgba(12,8,6,.9) 0%,rgba(18,12,8,.82) 45%,rgba(8,6,4,.94) 100%),
     image-set(
@@ -344,7 +352,7 @@ body.music-page-bg{
   background-position:center,center;
   background-size:cover,cover;
   background-repeat:no-repeat;
-  background-attachment:fixed;
+  transform:translateZ(0);
 }
 
 .release-grid{
@@ -2846,14 +2854,14 @@ a.show-row[href]{cursor:pointer}
   .brand-ticket-short{display:inline}
   .nav{gap:6px}
   .nav a{font-size:.8em;letter-spacing:0}
-  body.music-page-bg{
+  body.music-page-bg::after{
+    position:absolute;
     background-image:
       linear-gradient(180deg,rgba(12,8,6,.9) 0%,rgba(18,12,8,.84) 45%,rgba(8,6,4,.95) 100%),
       image-set(
         url('../assets/images/optimized/header-mobile.webp') type('image/webp'),
         url('../assets/images/optimized/header-mobile.jpg') type('image/jpeg')
       );
-    background-attachment:scroll;
   }
   
   .hero{
