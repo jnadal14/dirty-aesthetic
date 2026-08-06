@@ -211,10 +211,12 @@ window.addEventListener('beforeprint', () => {
   // input is ignored while a transition is in flight and accepted immediately
   // afterwards. Nothing can extend that deadline, so it cannot deadlock.
 
-  const SECTION_DURATION = 620   // ms per transition
-  const WHEEL_THRESHOLD = 40     // accumulated delta before advancing
-  const WHEEL_TAIL_FLOOR = 5     // below this is momentum decay, not intent
-  const GESTURE_RESET = 200      // ms of quiet that starts a fresh accumulation
+  const SECTION_DURATION = 620    // ms per transition
+  const WHEEL_THRESHOLD = 40      // accumulated delta before advancing
+  const WHEEL_TAIL_FLOOR = 5      // below this is momentum decay, not intent
+  const GESTURE_GAP = 90          // ms of quiet that marks a genuinely new gesture
+  const CONTINUOUS_ADVANCE = 950  // ms; unbroken input still steps at this rate
+  const SUSTAIN_RATIO = .5        // vs the gesture's peak: sustained, not decaying
 
   const easeInOutCubic = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
@@ -224,6 +226,9 @@ window.addEventListener('beforeprint', () => {
   let tweenFrame = 0
   let wheelAccum = 0
   let lastWheelTime = 0
+  let lastAdvanceAt = 0
+  let sawGapSinceAdvance = true
+  let gesturePeak = 0
 
   function currentSectionIndex(){
     const y = window.scrollY
@@ -271,28 +276,73 @@ window.addEventListener('beforeprint', () => {
 
     const multiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewportHeight : 1
     const delta = event.deltaY * multiplier
-    const now = performance.now()
+    // The event's own timestamp, not when the handler happened to run.
+    const now = event.timeStamp || performance.now()
 
-    // Mid-transition: swallow it, and keep the accumulator empty so momentum
-    // arriving during the animation cannot queue up a second jump.
+    const magnitude = Math.abs(delta)
+    const gap = now - lastWheelTime
+
+    // Mid-transition. Momentum arrives as an unbroken stream and is dropped, so
+    // a fling cannot buy itself extra sections. A distinct new gesture — a
+    // pause in front of it and real weight behind it — retargets one further
+    // along instead, so notches during the animation chain smoothly rather than
+    // being thrown away.
     if (now < animatingUntil) {
-      wheelAccum = 0
       lastWheelTime = now
+      wheelAccum = 0
+      if (gap > GESTURE_GAP && magnitude >= WHEEL_THRESHOLD) {
+        gesturePeak = magnitude
+        sawGapSinceAdvance = false
+        lastAdvanceAt = now
+        goToSection(targetIndex + Math.sign(delta))
+      }
       return
     }
 
-    if (now - lastWheelTime > GESTURE_RESET) wheelAccum = 0
     lastWheelTime = now
+    // Only a real pause starts a new gesture — and only then does the peak
+    // reset. Keeping the peak across the whole unbroken stream is what lets a
+    // decaying tail be told apart from sustained input below.
+    if (gap > GESTURE_GAP) {
+      sawGapSinceAdvance = true
+      wheelAccum = 0
+      gesturePeak = 0
+    }
 
     // The tail of a trackpad fling decays toward zero. Real intent — a wheel
     // notch or a fresh push — arrives well above this.
-    if (Math.abs(delta) < WHEEL_TAIL_FLOOR) return
+    if (magnitude < WHEEL_TAIL_FLOOR) return
 
+    gesturePeak = Math.max(gesturePeak, magnitude)
     wheelAccum += delta
     if (Math.abs(wheelAccum) < WHEEL_THRESHOLD) return
 
+    // A fling outlives the transition: the tween runs 620ms while momentum
+    // keeps firing for a second or more. The tail was accumulating the instant
+    // the transition ended and stealing a second step, so a gesture aimed at a
+    // section sailed straight past it.
+    //
+    // An unbroken stream of events is one gesture, however long it runs, so it
+    // is held off until either a genuine pause or CONTINUOUS_ADVANCE. Past that
+    // window, sustained input still steps — a spun wheel keeps arriving near
+    // its own peak — while a decaying tail, which by then is a small fraction
+    // of the peak it started from, does not. Judging the magnitude against the
+    // gesture's own peak is what separates the two without ever locking out.
+    if (!sawGapSinceAdvance) {
+      if (now - lastAdvanceAt < CONTINUOUS_ADVANCE) {
+        wheelAccum = 0
+        return
+      }
+      if (magnitude < gesturePeak * SUSTAIN_RATIO) {
+        wheelAccum = 0
+        return
+      }
+    }
+
     const direction = Math.sign(wheelAccum)
     wheelAccum = 0
+    sawGapSinceAdvance = false
+    lastAdvanceAt = now
     goToSection(currentSectionIndex() + direction)
   }
 
