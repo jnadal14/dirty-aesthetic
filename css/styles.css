@@ -8,7 +8,11 @@
   --glow:rgba(176,122,63,.15);
 }
 *{box-sizing:border-box}
-@font-face{font-family:'Nafta';src:url('../assets/fonts/NaftaLight-Regular.ttf') format('truetype');font-display:swap}
+/* woff2 only: 37 KB against 81 KB for the same outlines, and it loads on every
+   page. No .ttf fallback — woff2 has been supported everywhere since 2016, and
+   listing it only gave browsers a second file to pull. The .ttf stays in
+   assets/fonts/ as the source this is generated from. */
+@font-face{font-family:'Nafta';src:url('../assets/fonts/NaftaLight-Regular.woff2') format('woff2');font-display:swap}
 
 /* Base with subtle noise texture */
 html{scroll-behavior:smooth}
@@ -434,7 +438,10 @@ body.music-page-bg::after{
 body.watch-page-bg{
   background:
     linear-gradient(180deg, rgba(32,23,15,.92) 0%, rgba(32,23,15,.85) 50%, rgba(32,23,15,.92) 100%),
-    url('../assets/images/BACKGROUND/3.jpg') center/cover no-repeat fixed;
+    image-set(
+      url('../assets/images/optimized/backgrounds/watch-bg.webp') type('image/webp'),
+      url('../assets/images/optimized/backgrounds/watch-bg.jpg') type('image/jpeg')
+    ) center/cover no-repeat fixed;
 }
 body.store-page-bg{
   background-color:#0a0705;
@@ -638,7 +645,10 @@ body.privacy-page .privacy-page-main p{
   animation:fadeUp .7s ease both;
   background:
     linear-gradient(180deg, rgba(32,23,15,.5) 0%, rgba(32,23,15,.65) 50%, rgba(32,23,15,.8) 100%),
-    url('../assets/images/BACKGROUND/2.jpg') center/cover no-repeat;
+    image-set(
+      url('../assets/images/optimized/backgrounds/epk-bg.webp') type('image/webp'),
+      url('../assets/images/optimized/backgrounds/epk-bg.jpg') type('image/jpeg')
+    ) center/cover no-repeat;
 }
 .epk-intro-photo{
   position:relative;
@@ -940,7 +950,10 @@ body.privacy-page .privacy-page-main p{
     gap:clamp(20px,4vw,36px);
     background:
       linear-gradient(180deg, rgba(32,23,15,.45) 0%, rgba(32,23,15,.7) 50%, rgba(32,23,15,.9) 100%),
-      url('../assets/images/BACKGROUND/2.jpg') center top/cover no-repeat;
+      image-set(
+      url('../assets/images/optimized/backgrounds/epk-bg.webp') type('image/webp'),
+      url('../assets/images/optimized/backgrounds/epk-bg.jpg') type('image/jpeg')
+    ) center top/cover no-repeat;
   }
   .epk-intro-photo{
     width:clamp(110px,22vw,180px);

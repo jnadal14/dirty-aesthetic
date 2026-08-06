@@ -18,10 +18,7 @@ assets/images/LINEUP/
 assets/images/covers/
 assets/images/MERCH/
 
-# BACKGROUND is mixed — 2.jpg and 3.jpg are referenced directly by css/styles.css.
-assets/images/BACKGROUND/*
-!assets/images/BACKGROUND/2.jpg
-!assets/images/BACKGROUND/3.jpg
+assets/images/BACKGROUND/
 
 # Loose masters sitting at the root of assets/images/
 assets/images/HEADER.jpg

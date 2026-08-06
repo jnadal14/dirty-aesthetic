@@ -13,6 +13,7 @@ import json
 import re
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 from PIL import Image, ImageOps
@@ -27,8 +28,10 @@ OUT_GALLERY_FULL = OUT / "gallery" / "full"
 OUT_MERCH = OUT / "merch"
 OUT_POSTERS_ROOT = OUT / "posters"
 OUT_POSTERS = OUT_POSTERS_ROOT / "archive"
+OUT_BACKGROUNDS = OUT / "backgrounds"
+OUT_LOGOS = OUT / "logos"
 DATA = ROOT / "data"
-for d in (OUT, OUT_COVERS, OUT_LINEUP, OUT_GALLERY, OUT_GALLERY_FULL, OUT_MERCH, OUT_POSTERS_ROOT, OUT_POSTERS, DATA):
+for d in (OUT, OUT_COVERS, OUT_LINEUP, OUT_GALLERY, OUT_GALLERY_FULL, OUT_MERCH, OUT_POSTERS_ROOT, OUT_POSTERS, OUT_BACKGROUNDS, OUT_LOGOS, DATA):
     d.mkdir(parents=True, exist_ok=True)
 
 CWEBP = (
@@ -69,6 +72,22 @@ def save_webp(src_path, dest_webp, quality=80, alpha=False):
         cmd.extend(["-alpha_q", "100"])
     cmd.extend([str(src_path), "-o", str(dest_webp)])
     subprocess.run(cmd, check=True)
+
+
+def save_webp_from_image(img, dest_webp, quality=80, alpha=False):
+    """Encode WebP from an in-memory image via a lossless intermediate.
+
+    Encoding from the JPEG we just wrote means compressing JPEG artifacts:
+    that costs quality *and* bytes. One archive poster came out at 324 KB
+    through the JPEG against 279 KB encoded from the source.
+    """
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as handle:
+        tmp = Path(handle.name)
+    try:
+        img.save(tmp, "PNG")
+        save_webp(tmp, dest_webp, quality, alpha=alpha)
+    finally:
+        tmp.unlink(missing_ok=True)
 
 
 def save_resized_webp(src_path, dest_webp, width, quality=80):
@@ -132,13 +151,13 @@ def process_gallery_item(src_path, out_dir, out_base, grid_w=800, lightbox_w=160
     out_jpg = out_dir / f"{out_base}.jpg"
     save_jpeg(grid, out_jpg, quality=80)
     out_webp = out_dir / f"{out_base}.webp"
-    save_webp(out_jpg, out_webp, 76)
+    save_webp_from_image(grid, out_webp, 76)
 
     lb = flatten_alpha(resize_to_width(img, lightbox_w))
     lb_jpg = OUT_GALLERY_FULL / f"{out_base}.jpg"
     save_jpeg(lb, lb_jpg, quality=84)
     lb_webp = OUT_GALLERY_FULL / f"{out_base}.webp"
-    save_webp(lb_jpg, lb_webp, 80)
+    save_webp_from_image(lb, lb_webp, 80)
 
     return {
         "webp": rel(out_webp),
@@ -180,7 +199,7 @@ def save_variant(img, out_dir, out_base, jpeg_q, webp_q):
     out_jpg = out_dir / f"{out_base}.jpg"
     save_jpeg(img, out_jpg, jpeg_q)
     out_webp = out_jpg.with_suffix(".webp")
-    save_webp(out_jpg, out_webp, webp_q)
+    save_webp_from_image(img.convert("RGB"), out_webp, webp_q)
     return out_jpg, out_webp, "jpeg"
 
 
@@ -306,6 +325,41 @@ for src_name, out_name, width, jpeg_fallback in [
             save_jpeg(resized, jpeg_dest, quality=82)
             report(jpeg_dest)
 
+print("Page backgrounds")
+# These were being served straight from assets/images/BACKGROUND/ as full-size
+# JPEGs with no WebP variant — 500 KB and 672 KB on every EPK and Watch load.
+for src_name, out_base in [("2.jpg", "epk-bg"), ("3.jpg", "watch-bg")]:
+    src = SRC / "BACKGROUND" / src_name
+    if not src.exists():
+        print(f"  SKIP BACKGROUND/{src_name} (missing)")
+        continue
+    meta = process_raster(src, OUT_BACKGROUNDS, out_base, 1600, jpeg_q=80, webp_q=76)
+    report(ROOT / meta["src"])
+    report(ROOT / meta["webp"])
+
+print("Logos")
+# The wordmark shipped at 2657px wide for a 600px maximum display size, and the
+# splat at 989px for a 48px one. Both load on every page.
+#
+# These are flat white-on-transparent artwork, so a palette PNG beats both the
+# truecolour PNG and lossy WebP by a wide margin: the wordmark is 28 KB as a
+# 256-colour palette against 133 KB truecolour and 67 KB WebP. Staying PNG also
+# means the pages keep a plain <img src> with no <picture> fallback.
+for rel_src, out_base, width in [
+    ("DA_SPLAT/DA-OFF_WHITE.png", "da-splat", 240),
+    ("FULL_NAME/FULL-OFF_WHITE.png", "da-wordmark", 1400),
+]:
+    src = ROOT / "assets" / "logos" / rel_src
+    if not src.exists():
+        print(f"  SKIP logos/{rel_src} (missing)")
+        continue
+    with Image.open(src) as image:
+        art = ImageOps.exif_transpose(image).convert("RGBA")
+        art = resize_to_width(art, width)
+        dest = OUT_LOGOS / f"{out_base}.png"
+        art.quantize(colors=256, method=Image.FASTOCTREE).save(dest, "PNG", optimize=True)
+        report(dest)
+
 print("Album / single covers")
 # Only these open in the lightbox (index.html), so only these need the larger
 # variant. The rest appear at grid size on music.html and nowhere else.
@@ -358,7 +412,10 @@ if shows_path.exists():
             continue
         out_base = slugify(f"{show.get('date', '')}-{show.get('venue', src.stem)}")
         print(f"  {out_base} <= {src.relative_to(SRC)}")
-        meta = process_raster(src, OUT_POSTERS, out_base, 900, jpeg_q=82, webp_q=80,
+        # Grid thumbnails render about 430px wide in a 3-column layout, and a
+        # full-size version is one click away in the lightbox, so these do not
+        # need archival quality.
+        meta = process_raster(src, OUT_POSTERS, out_base, 900, jpeg_q=78, webp_q=72,
                               lightbox_width=1600)
         poster_manifest[poster_path] = meta
         report(OUT_POSTERS / Path(meta["src"]).name)
