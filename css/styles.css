@@ -111,7 +111,7 @@ picture{display:contents}
     url('../assets/images/optimized/header-desktop.webp') type('image/webp'),
     url('../assets/images/optimized/header-desktop.jpg') type('image/jpeg')
   );
-  background-position:center calc(55% + var(--hero-bg-parallax, 0px));
+  background-position:center 55%;
   background-size:cover;
   background-repeat:no-repeat;
 }
@@ -423,6 +423,10 @@ body.music-page-bg::after{
 }
 
 /* Watch page */
+/* These keep background-attachment:fixed. Moving them to a fixed layer would
+   mean clobbering body::before, which is the site-wide film grain, and both
+   pages are barely taller than the viewport — there is almost nothing to
+   repaint on scroll, so the swap is not worth the collision. */
 body.watch-page-bg{
   background:
     linear-gradient(180deg, rgba(32,23,15,.92) 0%, rgba(32,23,15,.85) 50%, rgba(32,23,15,.92) 100%),
@@ -1072,18 +1076,11 @@ body.privacy-page .privacy-page-main p{
   --chapter-cover-x:0px;
   --chapter-info-x:0px;
   --chapter-cover-rotate:0deg;
-  --chapter-blur:0px;
   --chapter-opacity:1;
   --chapter-wipe-y:-70%;
   --chapter-wipe-opacity:0;
-  --scene-x:0vw;
-  --scene-y:0vh;
-  --scene-scale:1;
-  --scene-rotate:0deg;
-  --scene-blur:0px;
-  --scene-brightness:1;
+  --scene-transform:none;
   --scene-opacity:1;
-  --scene-radius:0px;
   --scene-origin:center center;
   position:relative;
   isolation:isolate;
@@ -1204,9 +1201,8 @@ body.privacy-page .privacy-page-main p{
   .home-experience .shows-feature-inner,
   .home-experience .home-contact-inner{
     opacity:var(--chapter-opacity);
-    filter:blur(var(--chapter-blur));
     transform:translate3d(0,var(--chapter-drift),0);
-    will-change:transform,filter,opacity;
+    will-change:transform,opacity;
   }
   .home-experience .ep-release-info,
   .home-experience .album-tracklist-panel{
@@ -1251,10 +1247,11 @@ body.privacy-page .privacy-page-main p{
     height:100%;
     min-height:100%;
     transform-origin:var(--scene-origin);
-    transform:translate3d(var(--scene-x),var(--scene-y),0) rotate(var(--scene-rotate)) scale(var(--scene-scale));
-    filter:blur(var(--scene-blur)) brightness(var(--scene-brightness));
+    /* Transform and opacity only. Animating filter/border-radius here meant a
+       blur convolution and a re-clip on five stacked full-viewport layers on
+       every scroll frame, which is what made the page stutter. */
+    transform:var(--scene-transform,none);
     opacity:var(--scene-opacity);
-    border-radius:var(--scene-radius);
     backface-visibility:hidden;
     will-change:transform,opacity;
   }
@@ -1276,6 +1273,9 @@ body.privacy-page .privacy-page-main p{
     display:flex;
     align-items:center;
     justify-content:center;
+  }
+  .spatial-scroll-active .shows-feature::before{
+    animation:none;
   }
 
   /* The camera now moves the whole scene, so the smaller content drift from
@@ -1434,16 +1434,16 @@ blockquote.tiktok-embed section{margin:0!important}
     radial-gradient(ellipse 70% 60% at 20% 28%,rgba(248,143,158,.12) 0%,transparent 62%),
     radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
     linear-gradient(180deg,rgba(5,3,4,.76) 0%,rgba(8,5,6,.72) 40%,rgba(5,3,4,.9) 100%),
-    url('../assets/images/posters/MODERN NOSTALGIA ALBUM RELEASE_08:14:26_BANNER.PNG');
+    url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance');
   background-image:
     radial-gradient(ellipse 70% 60% at 20% 28%,rgba(248,143,158,.12) 0%,transparent 62%),
     radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
     linear-gradient(180deg,rgba(5,3,4,.76) 0%,rgba(8,5,6,.72) 40%,rgba(5,3,4,.9) 100%),
     image-set(
-      url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260802-supports') type('image/webp'),
-      url('../assets/images/posters/MODERN NOSTALGIA ALBUM RELEASE_08:14:26_BANNER.PNG') type('image/png')
+      url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260805-performance') type('image/webp'),
+      url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance') type('image/jpeg')
     );
-  background-position:center,center,center,center calc(50% + var(--shows-bg-parallax,0px));
+  background-position:center,center,center,center;
   background-size:auto,auto,auto,cover;
   background-repeat:no-repeat;
   overflow:hidden;
@@ -1675,7 +1675,6 @@ a.show-row[href]{cursor:pointer}
   object-fit:cover;
   object-position:center;
   opacity:.72;
-  filter:saturate(.9) contrast(1.04);
 }
 .show-row--featured .show-row-month{
   color:#f88f9e;
@@ -1822,7 +1821,6 @@ a.show-row[href]{cursor:pointer}
 }
 .shows-editorial--solo .show-row--featured.show-row--solo .show-row-banner img{
   opacity:.84;
-  filter:saturate(1.03) contrast(1.08);
 }
 .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
   display:flex;
@@ -1961,10 +1959,10 @@ a.show-row[href]{cursor:pointer}
       radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
       linear-gradient(180deg,rgba(5,3,4,.84) 0%,rgba(8,5,6,.8) 46%,rgba(5,3,4,.94) 100%),
       image-set(
-        url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260802-supports') type('image/webp'),
-        url('../assets/images/posters/MODERN NOSTALGIA ALBUM RELEASE_08:14:26_BANNER.PNG') type('image/png')
+        url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260805-performance') type('image/webp'),
+        url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance') type('image/jpeg')
       );
-    background-position:center,center,center,center calc(50% + var(--shows-bg-parallax,0px));
+    background-position:center,center,center,center;
   }
   .shows-feature-inner{
     padding:0 clamp(16px,4vw,32px);
@@ -2077,7 +2075,7 @@ a.show-row[href]{cursor:pointer}
     url('../assets/images/optimized/back-ep.webp') type('image/webp'),
     url('../assets/images/optimized/back-ep.jpg') type('image/jpeg')
   );
-  background-position:center calc(50% + var(--ep-bg-parallax, 0px));
+  background-position:center 50%;
   background-size:cover;
   background-repeat:no-repeat;
 }
@@ -2311,7 +2309,7 @@ a.show-row[href]{cursor:pointer}
 /* Single Release — reuses .ep-release scaffolding, swaps background + adds date/blurb styles */
 .single-release{
   background-color:#0a0705;
-  background-position:center calc(50% + var(--ep-bg-parallax, 0px));
+  background-position:center 50%;
   background-size:cover;
   background-repeat:no-repeat;
 }
@@ -2872,7 +2870,7 @@ a.show-row[href]{cursor:pointer}
       url('../assets/images/optimized/header-mobile.webp') type('image/webp'),
       url('../assets/images/optimized/header-mobile.jpg') type('image/jpeg')
     );
-    background-position:center calc(0% + var(--hero-bg-parallax, 0px));
+    background-position:center 0%;
     background-size:cover;
     background-repeat:no-repeat;
   }
@@ -2953,7 +2951,7 @@ a.show-row[href]{cursor:pointer}
     url('../assets/images/optimized/modern-nostalgia-album-bg.webp') type('image/webp'),
     url('../assets/images/optimized/modern-nostalgia-album-bg.jpg') type('image/jpeg')
   );
-  background-position:center calc(50% + var(--hero-bg-parallax,0px));
+  background-position:center 50%;
 }
 .album-hero .hero-overlay{
   background:linear-gradient(180deg,rgba(22,15,10,.3) 0%,rgba(22,15,10,.5) 52%,rgba(10,7,5,.88) 100%);
@@ -3025,7 +3023,7 @@ a.show-row[href]{cursor:pointer}
     url('../assets/images/optimized/modern-nostalgia-album-bg.webp') type('image/webp'),
     url('../assets/images/optimized/modern-nostalgia-album-bg.jpg') type('image/jpeg')
   );
-  background-position:center calc(50% + var(--album-bg-parallax,0px));
+  background-position:center 50%;
   background-size:cover;
 }
 .album-tracklist-overlay{
@@ -3167,7 +3165,7 @@ a.show-row[href]{cursor:pointer}
 @media (max-width:520px){
   .album-hero{
     min-height:610px;
-    background-position:center calc(50% + var(--hero-bg-parallax,0px));
+    background-position:center 50%;
   }
   .album-hero .hero-inner{padding:68px 10px 28px}
   .album-hero h1{margin-bottom:12px}

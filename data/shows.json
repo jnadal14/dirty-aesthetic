@@ -9,7 +9,11 @@
       "lineup": "Nick Stone & The Gems, Crashout",
       "lineupPrefix": "with",
       "poster": "assets/images/optimized/posters/modern-nostalgia-album-release-2026.webp",
+      "posterWidth": 900,
+      "posterHeight": 1112,
       "banner": "assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp",
+      "bannerWidth": 1600,
+      "bannerHeight": 800,
       "link": "https://admitone.com/events/vancouver/community/music/modern-nostalgia-album-release-party/MYCD1T"
     }
   ],

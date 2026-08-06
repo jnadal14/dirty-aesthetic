@@ -3,42 +3,57 @@
     "bardia": {
       "webp": "assets/images/optimized/lineup/bardia.webp",
       "src": "assets/images/optimized/lineup/bardia.jpg",
-      "full": "assets/images/LINEUP/BARDIA.jpg",
+      "full": "assets/images/optimized/lineup/full/bardia.jpg",
       "type": "jpeg",
       "width": 900,
-      "height": 1350
+      "height": 1350,
+      "fullWebp": "assets/images/optimized/lineup/full/bardia.webp",
+      "fullWidth": 1600,
+      "fullHeight": 2400
     },
     "dylan": {
       "webp": "assets/images/optimized/lineup/dylan.webp",
       "src": "assets/images/optimized/lineup/dylan.jpg",
-      "full": "assets/images/LINEUP/DYLAN.jpg",
+      "full": "assets/images/optimized/lineup/full/dylan.jpg",
       "type": "jpeg",
       "width": 800,
-      "height": 1200
+      "height": 1200,
+      "fullWebp": "assets/images/optimized/lineup/full/dylan.webp",
+      "fullWidth": 800,
+      "fullHeight": 1200
     },
     "jacob": {
       "webp": "assets/images/optimized/lineup/jacob.webp",
       "src": "assets/images/optimized/lineup/jacob.jpg",
-      "full": "assets/images/LINEUP/JACOB.jpg",
+      "full": "assets/images/optimized/lineup/full/jacob.jpg",
       "type": "jpeg",
       "width": 900,
-      "height": 1350
+      "height": 1350,
+      "fullWebp": "assets/images/optimized/lineup/full/jacob.webp",
+      "fullWidth": 1600,
+      "fullHeight": 2400
     },
     "josh-c": {
       "webp": "assets/images/optimized/lineup/josh-c.webp",
       "src": "assets/images/optimized/lineup/josh-c.jpg",
-      "full": "assets/images/LINEUP/JOSH C.jpg",
+      "full": "assets/images/optimized/lineup/full/josh-c.jpg",
       "type": "jpeg",
       "width": 900,
-      "height": 1350
+      "height": 1350,
+      "fullWebp": "assets/images/optimized/lineup/full/josh-c.webp",
+      "fullWidth": 1600,
+      "fullHeight": 2400
     },
     "josh-s": {
       "webp": "assets/images/optimized/lineup/josh-s.webp",
       "src": "assets/images/optimized/lineup/josh-s.jpg",
-      "full": "assets/images/LINEUP/JOSH S.jpg",
+      "full": "assets/images/optimized/lineup/full/josh-s.jpg",
       "type": "jpeg",
       "width": 900,
-      "height": 1350
+      "height": 1350,
+      "fullWebp": "assets/images/optimized/lineup/full/josh-s.webp",
+      "fullWidth": 1600,
+      "fullHeight": 2400
     }
   },
   "gallery": [

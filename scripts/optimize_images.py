@@ -151,38 +151,72 @@ def process_gallery_item(src_path, out_dir, out_base, grid_w=800, lightbox_w=160
     }
 
 
-def process_raster(src_path, out_dir, out_base, target_width, jpeg_q=82, webp_q=80):
+def has_real_transparency(img):
+    """True only when the alpha channel is actually used.
+
+    Plenty of source PNGs carry a fully-opaque alpha channel. Treating those as
+    transparent forced a PNG encode — one poster came out at 2.2 MB that JPEG
+    encodes in well under a tenth of that.
+    """
+    if img.mode == "P":
+        if "transparency" not in img.info:
+            return False
+        img = img.convert("RGBA")
+    if img.mode not in ("RGBA", "LA"):
+        return False
+    alpha_min, _ = img.getchannel("A").getextrema()
+    return alpha_min < 255
+
+
+def save_variant(img, out_dir, out_base, jpeg_q, webp_q):
+    """Write one sized variant, keeping alpha as PNG and everything else JPEG."""
+    if has_real_transparency(img):
+        out_png = out_dir / f"{out_base}.png"
+        img.save(out_png, "PNG", optimize=True)
+        out_webp = out_dir / f"{out_base}.webp"
+        save_webp(out_png, out_webp, webp_q, alpha=True)
+        return out_png, out_webp, "png"
+
+    out_jpg = out_dir / f"{out_base}.jpg"
+    save_jpeg(img, out_jpg, jpeg_q)
+    out_webp = out_jpg.with_suffix(".webp")
+    save_webp(out_jpg, out_webp, webp_q)
+    return out_jpg, out_webp, "jpeg"
+
+
+def process_raster(src_path, out_dir, out_base, target_width, jpeg_q=82, webp_q=80,
+                   lightbox_width=None):
+    """Display-sized variant, plus an optional lightbox-sized one.
+
+    Without lightbox_width the manifest's "full" points at the untouched
+    original — fine for a build input, ruinous when the lightbox serves it to a
+    visitor, since these run 3000x3000 and up (10-24 MB per click).
+    """
     img = Image.open(src_path)
     img = ImageOps.exif_transpose(img)
     resized = resize_to_width(img, target_width)
-    has_alpha = "A" in resized.mode or (resized.mode == "P" and "transparency" in resized.info)
 
-    if has_alpha:
-        out_png = out_dir / f"{out_base}.png"
-        resized.save(out_png, "PNG", optimize=True)
-        out_webp = out_dir / f"{out_base}.webp"
-        save_webp(out_png, out_webp, webp_q, alpha=True)
-        return {
-            "webp": rel(out_webp),
-            "src": rel(out_png),
-            "full": rel(src_path),
-            "type": "png",
-            "width": resized.width,
-            "height": resized.height,
-        }
-
-    out_jpg = out_dir / f"{out_base}.jpg"
-    save_jpeg(resized, out_jpg, jpeg_q)
-    out_webp = out_jpg.with_suffix(".webp")
-    save_webp(out_jpg, out_webp, webp_q)
-    return {
+    out_src, out_webp, kind = save_variant(resized, out_dir, out_base, jpeg_q, webp_q)
+    meta = {
         "webp": rel(out_webp),
-        "src": rel(out_jpg),
+        "src": rel(out_src),
         "full": rel(src_path),
-        "type": "jpeg",
+        "type": kind,
         "width": resized.width,
         "height": resized.height,
     }
+
+    if lightbox_width:
+        full_dir = out_dir / "full"
+        full_dir.mkdir(parents=True, exist_ok=True)
+        full = resize_to_width(img, lightbox_width)
+        full_src, full_webp, _ = save_variant(full, full_dir, out_base, 84, 80)
+        meta["full"] = rel(full_src)
+        meta["fullWebp"] = rel(full_webp)
+        meta["fullWidth"] = full.width
+        meta["fullHeight"] = full.height
+
+    return meta
 
 
 def process(src_name, out_name, target_width, jpeg_q=82, webp_q=80):
@@ -190,19 +224,25 @@ def process(src_name, out_name, target_width, jpeg_q=82, webp_q=80):
     if not src.exists():
         print(f"  SKIP {src_name} (missing)")
         return None
-    meta = process_raster(src, OUT, out_name, target_width, jpeg_q, webp_q)
+    # Strip any extension from out_name. Passing "header-desktop.jpg" through
+    # produced header-desktop.jpg.jpg while the pages referenced
+    # header-desktop.jpg, so the file the site actually served stopped being
+    # regenerated and silently went stale.
+    out_base = Path(out_name).stem
+    meta = process_raster(src, OUT, out_base, target_width, jpeg_q, webp_q)
     report(OUT / Path(meta["src"]).name)
     report(OUT / Path(meta["webp"]).name)
     return meta
 
 
-def process_cover(src_name, out_name=None, target=1200, jpeg_q=85, webp_q=82):
+def process_cover(src_name, out_name=None, target=1200, jpeg_q=85, webp_q=82, lightbox=1600):
     src = SRC / "covers" / src_name
     if not src.exists():
         print(f"  SKIP covers/{src_name} (missing)")
         return None
     out_base = Path(out_name or src_name).stem
-    meta = process_raster(src, OUT_COVERS, out_base, target, jpeg_q, webp_q)
+    meta = process_raster(src, OUT_COVERS, out_base, target, jpeg_q, webp_q,
+                          lightbox_width=lightbox)
     report(OUT_COVERS / Path(meta["src"]).name)
     report(OUT_COVERS / Path(meta["webp"]).name)
     return meta
@@ -248,9 +288,9 @@ if r:
     report(ROOT / r["webp"])
 
 print("Featured show artwork")
-for src_name, out_name, width in [
-    ("MODERN NOSTALGIA ALBUM RELEASE_08:14:26.PNG", "modern-nostalgia-album-release-2026.webp", 1200),
-    ("MODERN NOSTALGIA ALBUM RELEASE_08:14:26_BANNER.PNG", "modern-nostalgia-album-release-2026-banner.webp", 2000),
+for src_name, out_name, width, jpeg_fallback in [
+    ("MODERN NOSTALGIA ALBUM RELEASE_08:14:26.PNG", "modern-nostalgia-album-release-2026.webp", 900, None),
+    ("MODERN NOSTALGIA ALBUM RELEASE_08:14:26_BANNER.PNG", "modern-nostalgia-album-release-2026-banner.webp", 1600, "modern-nostalgia-album-release-2026-banner.jpg"),
 ]:
     src = SRC / "posters" / src_name
     if not src.exists():
@@ -259,8 +299,22 @@ for src_name, out_name, width in [
     dest = OUT_POSTERS_ROOT / out_name
     save_resized_webp(src, dest, width, quality=82)
     report(dest)
+    if jpeg_fallback:
+        with Image.open(src) as image:
+            resized = resize_to_width(ImageOps.exif_transpose(image), width)
+            jpeg_dest = OUT_POSTERS_ROOT / jpeg_fallback
+            save_jpeg(resized, jpeg_dest, quality=82)
+            report(jpeg_dest)
 
 print("Album / single covers")
+# Only these open in the lightbox (index.html), so only these need the larger
+# variant. The rest appear at grid size on music.html and nowhere else.
+COVERS_WITH_LIGHTBOX = {
+    "cover_LP_modern_nostalgia.png",
+    "cover_back_to_me.jpg",
+    "cover_irrational.jpg",
+    "cover_sugar_on_the_rocks.jpg",
+}
 for src_name in [
     "cover_LP_modern_nostalgia.png",
     "cover_modern_nostalgia.jpg",
@@ -272,7 +326,8 @@ for src_name in [
     "cover_while_i_wonder.jpg",
     "cover_run.jpg",
 ]:
-    process_cover(src_name, target=1200, jpeg_q=85, webp_q=82)
+    process_cover(src_name, target=1200, jpeg_q=85, webp_q=82,
+                  lightbox=1600 if src_name in COVERS_WITH_LIGHTBOX else None)
 
 print("Lineup portraits")
 lineup_manifest = {}
@@ -282,7 +337,8 @@ for slug, names in LINEUP_SOURCES.items():
         print(f"  SKIP lineup/{slug} (missing source for {names})")
         continue
     print(f"  {slug} <= {src.relative_to(SRC)}")
-    meta = process_raster(src, OUT_LINEUP, slug, 900, jpeg_q=84, webp_q=82)
+    meta = process_raster(src, OUT_LINEUP, slug, 900, jpeg_q=84, webp_q=82,
+                          lightbox_width=1600)
     lineup_manifest[slug] = meta
     report(OUT_LINEUP / Path(meta["src"]).name)
     report(OUT_LINEUP / Path(meta["webp"]).name)
@@ -302,7 +358,8 @@ if shows_path.exists():
             continue
         out_base = slugify(f"{show.get('date', '')}-{show.get('venue', src.stem)}")
         print(f"  {out_base} <= {src.relative_to(SRC)}")
-        meta = process_raster(src, OUT_POSTERS, out_base, 900, jpeg_q=82, webp_q=80)
+        meta = process_raster(src, OUT_POSTERS, out_base, 900, jpeg_q=82, webp_q=80,
+                              lightbox_width=1600)
         poster_manifest[poster_path] = meta
         report(OUT_POSTERS / Path(meta["src"]).name)
         report(OUT_POSTERS / Path(meta["webp"]).name)

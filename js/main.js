@@ -100,114 +100,32 @@ window.addEventListener('beforeprint', () => {
   }
 })
 
-// Site-wide parallax scrolling (desktop, reduced-motion aware)
-;(function(){
+// ===== Scroll motion =====
+// Everything that reacts to scroll position lives here: one scroll listener,
+// one requestAnimationFrame, one cached set of measurements. A frame does
+// nothing but write compositor-only custom properties — no layout reads, no
+// paint-triggering properties.
+//
+// Wheel events are deliberately NOT intercepted. A previous version ran a
+// gesture state machine that called preventDefault() on every wheel event and
+// then required a decaying momentum tail followed by a fresh rising impulse
+// before it would accept another gesture. A mouse wheel emits uniform deltas
+// that never decay, so that condition was unreachable and every scroll after
+// the first was swallowed until the user stopped moving entirely.
+;(function scrollMotion(){
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+  const spatialMotion = window.matchMedia('(min-width: 1081px) and (min-height: 680px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)')
 
-  // Keep this list small and conservative. Section "inner" containers were
-  // removed because their content drifts faster than the page scroll and
-  // either escapes overflow:hidden boundaries (heading slipping under the
-  // hero) or exposes the CSS-var inheritance bug to revealed children
-  // (form/heading stutter). What's left is just the hero text and the
-  // gentle whole-page drift on inner pages. Music deliberately opts out:
-  // its long cover grid should stay anchored to native scroll rather than
-  // feeding a transform back into its own position calculation.
-  const contentConfig = [
+  const chapters = Array.from(document.querySelectorAll('[data-scroll-chapter]'))
+
+  // Content drift only. The section backgrounds used to parallax by animating
+  // background-position, which repaints the whole section every frame; at these
+  // speeds that bought about 20px of travel and cost a full-viewport repaint.
+  const parallaxConfig = [
     { selector: '.hero-inner', speed: 0.08 },
     { selector: 'body:not(.music-page-bg) .page', speed: 0.03 }
   ]
 
-  const backgroundConfig = [
-    { selector: '.hero', cssVar: '--hero-bg-parallax', speed: 0.045 },
-    { selector: '.shows-feature', cssVar: '--shows-bg-parallax', speed: 0.05 },
-    { selector: '.ep-release', cssVar: '--ep-bg-parallax', speed: 0.04 },
-    { selector: '.album-tracklist-section', cssVar: '--album-bg-parallax', speed: 0.04 }
-  ]
-
-  let enabled = false
-  let ticking = false
-  let contentTargets = []
-  let backgroundTargets = []
-
-  function mapTargets(config) {
-    const targets = []
-    for (let i = 0; i < config.length; i++) {
-      const def = config[i]
-      const nodes = document.querySelectorAll(def.selector)
-      nodes.forEach(node => targets.push({ node, ...def }))
-    }
-    return targets
-  }
-
-  function resetParallax() {
-    contentTargets.forEach(({ node }) => node.style.setProperty('--parallax-y', '0px'))
-    backgroundTargets.forEach(({ node, cssVar }) => node.style.setProperty(cssVar, '0px'))
-  }
-
-  function updateParallax() {
-    if (!enabled) {
-      resetParallax()
-      ticking = false
-      return
-    }
-
-    const vh = window.innerHeight || document.documentElement.clientHeight
-
-    // Always compute against actual position. The previous activeZone
-    // shortcut snapped --parallax-y to 0 for off-screen elements and then
-    // jumped to the full calculated offset (often ±20-50px) the instant
-    // they re-entered the buffer, which read as a visible jolt.
-    contentTargets.forEach(({ node, speed }) => {
-      const rect = node.getBoundingClientRect()
-      const center = rect.top + rect.height / 2
-      const offset = (vh / 2 - center) * speed
-      node.style.setProperty('--parallax-y', `${offset.toFixed(2)}px`)
-    })
-
-    backgroundTargets.forEach(({ node, speed, cssVar }) => {
-      const rect = node.getBoundingClientRect()
-      const center = rect.top + rect.height / 2
-      const offset = (vh / 2 - center) * speed
-      node.style.setProperty(cssVar, `${offset.toFixed(2)}px`)
-    })
-
-    ticking = false
-  }
-
-  function scheduleUpdate() {
-    if (ticking) return
-    ticking = true
-    requestAnimationFrame(updateParallax)
-  }
-
-  function refreshState() {
-    // Spatial sticky chapters own motion on the homepage — parallax fights them.
-    enabled = !reduceMotion.matches && !document.body.classList.contains('spatial-scroll-active')
-    contentTargets = mapTargets(contentConfig)
-    backgroundTargets = mapTargets(backgroundConfig)
-    if (!enabled) resetParallax()
-    scheduleUpdate()
-  }
-
-  window.__refreshParallaxState = refreshState
-
-  window.addEventListener('scroll', scheduleUpdate, { passive: true })
-  window.addEventListener('resize', refreshState, { passive: true })
-  if (reduceMotion.addEventListener) {
-    reduceMotion.addEventListener('change', refreshState)
-  }
-
-  refreshState()
-})()
-
-// Homepage chapter navigation and section-to-section motion. This keeps the
-// existing layouts intact, adding only focus, depth and a persistent index.
-;(function homeScrollExperience(){
-  const chapters = Array.from(document.querySelectorAll('[data-scroll-chapter]'))
-  if (!chapters.length) return
-
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-  const spatialMotion = window.matchMedia('(min-width: 1081px) and (min-height: 680px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)')
   const cameraPaths = [
     { x:0, y:0, scale:1, rotate:0, origin:'center center' },
     { x:14, y:11, scale:.78, rotate:2.4, origin:'left bottom' },
@@ -217,294 +135,225 @@ window.addEventListener('beforeprint', () => {
     { x:-15, y:10, scale:.76, rotate:-1.7, origin:'right bottom' },
     { x:0, y:14, scale:.7, rotate:.7, origin:'center bottom' }
   ]
-  const nav = document.createElement('nav')
-  nav.className = 'chapter-nav'
-  nav.setAttribute('aria-label', 'Homepage sections')
-
-  const links = chapters.map((section, index) => {
-    if (!section.id) section.id = `chapter-${index + 1}`
-    if (index > 0) {
-      const wipe = document.createElement('span')
-      wipe.className = 'chapter-wipe'
-      wipe.setAttribute('aria-hidden', 'true')
-      section.appendChild(wipe)
-    }
-
-    const link = document.createElement('a')
-    link.className = 'chapter-nav-link'
-    link.href = `#${section.id}`
-    link.setAttribute('aria-label', `Go to ${section.dataset.chapterLabel}`)
-    link.innerHTML = `<span class="chapter-nav-number">${String(index + 1).padStart(2, '0')}</span><span class="chapter-nav-label">${section.dataset.chapterLabel}</span>`
-    nav.appendChild(link)
-
-    link.addEventListener('click', (event) => {
-      event.preventDefault()
-      const top = index === 0 ? 0 : section.offsetTop
-      if (spatialEnabled && !reduceMotion.matches) {
-        const direction = Math.sign(index - targetChapterIndex) || 1
-        scrollToChapterIndex(index, direction)
-      } else if (window.__lenis) {
-        window.__lenis.scrollTo(top, {
-          duration: sectionScrollDuration,
-          easing: sectionScrollEase
-        })
-      } else {
-        window.scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' })
-      }
-      window.history.replaceState(null, '', link.hash)
-    })
-
-    return link
-  })
-
-  document.body.appendChild(nav)
-  document.body.classList.add('home-experience')
-
-  // Keep sticky on the chapter shell; camera motion lives on an inner scene so
-  // sticky + transform/filter don't fight compositing.
-  chapters.forEach(section => {
-    if (section.querySelector(':scope > .chapter-scene')) return
-    const scene = document.createElement('div')
-    scene.className = 'chapter-scene'
-    Array.from(section.childNodes).forEach(child => {
-      if (child.nodeType === 1 && child.classList.contains('chapter-wipe')) return
-      scene.appendChild(child)
-    })
-    section.insertBefore(scene, section.firstChild)
-  })
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
   const ease = value => value * value * (3 - 2 * value)
-  // Snappy swing with a short ease-out overshoot (easeOutBack-ish).
-  const sectionScrollEase = value => {
-    const c1 = 1.25
-    const c3 = c1 + 1
-    return 1 + c3 * Math.pow(value - 1, 3) + c1 * Math.pow(value - 1, 2)
-  }
-  const sectionScrollDuration = .55
-  const wheelThreshold = 48
-  const wheelInertiaAbsorb = 220
-  const wheelIdleReset = 280
-  let ticking = false
+
   let spatialEnabled = false
-  let targetChapterIndex = 0
-  let lastCommandDirection = 0
-  let lastCommandTime = 0
-  let transitionEndTime = 0
-  let wheelDelta = 0
-  let wheelIdleTimer = 0
-  let settleTimer = 0
+  let parallaxEnabled = false
+  let frame = 0
+  let viewportHeight = 0
+  let scrollable = 1
+  let parallaxTargets = []
+  let chapterMetrics = []
+  let nav = null
+  let links = []
 
-  function syncLenisWheelMode(){
-    const lenis = window.__lenis
-    if (!lenis || !lenis.options) return
-    // Spatial mode owns the wheel; Lenis only drives programmatic jumps.
-    lenis.options.smoothWheel = !spatialEnabled
+  // ---- Chapter scaffolding (homepage only) ----
+
+  if (chapters.length) {
+    nav = document.createElement('nav')
+    nav.className = 'chapter-nav'
+    nav.setAttribute('aria-label', 'Homepage sections')
+
+    links = chapters.map((section, index) => {
+      if (!section.id) section.id = `chapter-${index + 1}`
+      if (index > 0) {
+        const wipe = document.createElement('span')
+        wipe.className = 'chapter-wipe'
+        wipe.setAttribute('aria-hidden', 'true')
+        section.appendChild(wipe)
+      }
+
+      const link = document.createElement('a')
+      link.className = 'chapter-nav-link'
+      link.href = `#${section.id}`
+      link.setAttribute('aria-label', `Go to ${section.dataset.chapterLabel}`)
+      link.innerHTML = `<span class="chapter-nav-number">${String(index + 1).padStart(2, '0')}</span><span class="chapter-nav-label">${section.dataset.chapterLabel}</span>`
+      nav.appendChild(link)
+
+      link.addEventListener('click', (event) => {
+        event.preventDefault()
+        scrollToChapter(index)
+        window.history.replaceState(null, '', link.hash)
+      })
+
+      return link
+    })
+
+    document.body.appendChild(nav)
+    document.body.classList.add('home-experience')
+
+    // Sticky stays on the chapter shell; camera motion runs on an inner scene
+    // so sticky positioning and transforms don't fight over the same layer.
+    chapters.forEach(section => {
+      if (section.querySelector(':scope > .chapter-scene')) return
+      const scene = document.createElement('div')
+      scene.className = 'chapter-scene'
+      Array.from(section.childNodes).forEach(child => {
+        if (child.nodeType === 1 && child.classList.contains('chapter-wipe')) return
+        scene.appendChild(child)
+      })
+      section.insertBefore(scene, section.firstChild)
+    })
   }
 
-  function resetSectionScroll(){
-    clearTimeout(wheelIdleTimer)
-    clearTimeout(settleTimer)
-    wheelIdleTimer = 0
-    settleTimer = 0
-    wheelDelta = 0
-    lastCommandDirection = 0
-    lastCommandTime = 0
-    transitionEndTime = 0
-    targetChapterIndex = nearestChapterIndex()
-  }
-
-  function nearestChapterIndex(){
-    return chapters.reduce((nearest, section, index) => {
-      const nearestDistance = Math.abs(chapters[nearest].offsetTop - window.scrollY)
-      const sectionDistance = Math.abs(section.offsetTop - window.scrollY)
-      return sectionDistance < nearestDistance ? index : nearest
-    }, 0)
-  }
-
-  function scrollToChapterIndex(index, direction = 0){
-    const targetIndex = clamp(index, 0, chapters.length - 1)
-    if (targetIndex === targetChapterIndex && performance.now() < transitionEndTime) {
-      // Same target mid-flight — keep the current tween.
-      if (direction) lastCommandDirection = direction
-      return
-    }
-
-    const targetTop = targetIndex === 0 ? 0 : chapters[targetIndex].offsetTop
-    const commandTime = performance.now()
-
-    targetChapterIndex = targetIndex
-    lastCommandTime = commandTime
-    transitionEndTime = commandTime + sectionScrollDuration * 1000
-    if (direction) lastCommandDirection = direction
-    wheelDelta = 0
+  function scrollToChapter(index){
+    const bounded = clamp(index, 0, chapters.length - 1)
+    const section = chapters[bounded]
+    if (!section) return
+    const top = bounded === 0 ? 0 : (chapterMetrics[bounded]?.top ?? section.offsetTop)
 
     if (window.__lenis) {
-      window.__lenis.scrollTo(targetTop, {
-        duration: sectionScrollDuration,
-        easing: sectionScrollEase,
-        immediate: false,
-        force: true,
-        lock: false
-      })
+      window.__lenis.scrollTo(top, { duration: 1.05 })
     } else {
-      window.scrollTo({ top: targetTop, behavior: 'smooth' })
+      window.scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' })
     }
-
-    clearTimeout(settleTimer)
-    settleTimer = window.setTimeout(() => {
-      if (lastCommandTime !== commandTime) return
-      settleTimer = 0
-      targetChapterIndex = nearestChapterIndex()
-      scheduleChapterUpdate()
-    }, sectionScrollDuration * 1000 + 60)
   }
 
-  function handleSpatialWheel(event){
-    if (!spatialEnabled || reduceMotion.matches || event.ctrlKey || !event.deltaY) return
+  // ---- Measure ----
+  // Runs on load, resize and media-query changes. Never during a scroll, so no
+  // scroll frame is ever forced to flush layout.
 
-    event.preventDefault()
-    event.stopImmediatePropagation()
+  function measure(){
+    viewportHeight = window.innerHeight || document.documentElement.clientHeight
+    scrollable = Math.max(1, document.documentElement.scrollHeight - viewportHeight)
 
-    const multiplier = event.deltaMode === 1
-      ? 16
-      : event.deltaMode === 2
-        ? window.innerHeight
-        : 1
-    const normalizedDelta = clamp(event.deltaY * multiplier, -140, 140)
-    const direction = Math.sign(normalizedDelta)
-    if (!direction) return
-
-    const now = performance.now()
-    const inFlight = now < transitionEndTime
-
-    clearTimeout(wheelIdleTimer)
-    wheelIdleTimer = window.setTimeout(() => {
-      wheelDelta = 0
-      if (performance.now() >= transitionEndTime) {
-        targetChapterIndex = nearestChapterIndex()
-      }
-    }, wheelIdleReset)
-
-    // Mid-transition: only honor a clear counter-gesture. Same-direction
-    // trackpad inertia is swallowed so one flick can't skip chapters.
-    if (inFlight) {
-      if (lastCommandDirection && direction === -lastCommandDirection) {
-        const reverseIndex = clamp(targetChapterIndex + direction, 0, chapters.length - 1)
-        if (reverseIndex !== targetChapterIndex) {
-          scrollToChapterIndex(reverseIndex, direction)
-        }
-      }
-      return
-    }
-
-    // After a jump settles, briefly absorb leftover trackpad inertia.
-    if (now < transitionEndTime + wheelInertiaAbsorb) return
-
-    wheelDelta += normalizedDelta
-    if (Math.abs(wheelDelta) < wheelThreshold) return
-
-    targetChapterIndex = nearestChapterIndex()
-    const nextIndex = clamp(targetChapterIndex + direction, 0, chapters.length - 1)
-    wheelDelta = 0
-    if (nextIndex !== targetChapterIndex) scrollToChapterIndex(nextIndex, direction)
-  }
-
-  function refreshSpatialState(){
-    spatialEnabled = spatialMotion.matches
-    document.body.classList.toggle('spatial-scroll-active', spatialEnabled)
-    syncLenisWheelMode()
-    if (typeof window.__refreshParallaxState === 'function') window.__refreshParallaxState()
-    resetSectionScroll()
-    chapters.forEach((section, index) => {
-      section.style.zIndex = spatialEnabled ? String(index + 1) : ''
+    const scrollY = window.scrollY
+    parallaxTargets = []
+    parallaxConfig.forEach(({ selector, speed }) => {
+      document.querySelectorAll(selector).forEach(node => {
+        const rect = node.getBoundingClientRect()
+        parallaxTargets.push({ node, speed, top: rect.top + scrollY, height: rect.height })
+      })
     })
-    scheduleChapterUpdate()
+
+    chapterMetrics = chapters.map(section => ({
+      top: section.offsetTop,
+      height: section.offsetHeight
+    }))
   }
 
-  function updateChapters(){
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight
-    const scrollable = Math.max(1, document.documentElement.scrollHeight - viewportHeight)
-    const pageProgress = clamp(window.scrollY / scrollable, 0, 1)
-    nav.style.setProperty('--page-progress', pageProgress.toFixed(4))
+  // ---- Per-frame update ----
+
+  function update(){
+    frame = 0
+    const scrollY = window.scrollY
+
+    for (let i = 0; i < parallaxTargets.length; i++) {
+      const target = parallaxTargets[i]
+      if (!parallaxEnabled) {
+        target.node.style.setProperty('--parallax-y', '0px')
+        continue
+      }
+      const center = target.top - scrollY + target.height / 2
+      const offset = (viewportHeight / 2 - center) * target.speed
+      target.node.style.setProperty('--parallax-y', `${offset.toFixed(2)}px`)
+    }
+
+    if (!chapters.length) return
+
+    nav.style.setProperty('--page-progress', clamp(scrollY / scrollable, 0, 1).toFixed(4))
 
     let activeIndex = 0
-    const chapterAnchor = window.scrollY + viewportHeight * .45
+    const chapterAnchor = scrollY + viewportHeight * .45
+
+    for (let index = 0; index < chapters.length; index++) {
+      const section = chapters[index]
+      const metrics = chapterMetrics[index]
+      if (!metrics) continue
+      if (metrics.top <= chapterAnchor) activeIndex = index
+      if (reduceMotion.matches) continue
+
+      const flowTop = metrics.top - scrollY
+
+      if (spatialEnabled) {
+        const path = cameraPaths[index] || cameraPaths[cameraPaths.length - 1]
+        const hasNext = index + 1 < chapters.length
+        const nextFlowTop = hasNext ? chapterMetrics[index + 1].top - scrollY : viewportHeight
+        const entry = ease(clamp(1 - flowTop / viewportHeight, 0, 1))
+        const exit = hasNext ? ease(clamp(1 - nextFlowTop / viewportHeight, 0, 1)) : 0
+        const entryRemaining = 1 - entry
+        const exitDirection = index % 2 === 0 ? -1 : 1
+        const x = path.x * entryRemaining + exitDirection * 6 * exit
+        const y = path.y * entryRemaining - 3.5 * exit
+        const scale = 1 - (1 - path.scale) * entryRemaining - .1 * exit
+        const rotate = path.rotate * entryRemaining + exitDirection * 1.1 * exit
+        const opacity = 1 - .28 * entryRemaining - .22 * exit
+
+        // One string write instead of four, and both properties are
+        // compositor-only. The previous version also animated blur(),
+        // brightness() and border-radius here — a filter pass plus a re-clip
+        // on five stacked full-viewport layers, every single frame.
+        section.style.setProperty('--scene-transform',
+          `translate3d(${x.toFixed(3)}vw, ${y.toFixed(3)}vh, 0) rotate(${rotate.toFixed(3)}deg) scale(${scale.toFixed(4)})`)
+        section.style.setProperty('--scene-opacity', opacity.toFixed(3))
+      } else {
+        const sectionCenter = flowTop + metrics.height / 2
+        const normalized = clamp((sectionCenter - viewportHeight / 2) / (viewportHeight * .9), -1, 1)
+        const distance = Math.abs(normalized)
+        const entryProgress = clamp(1 - ((flowTop - viewportHeight * .12) / (viewportHeight * .76)), 0, 1)
+        section.style.setProperty('--chapter-drift', `${(normalized * 14).toFixed(2)}px`)
+        section.style.setProperty('--chapter-cover-x', `${(normalized * -16).toFixed(2)}px`)
+        section.style.setProperty('--chapter-info-x', `${(normalized * 16).toFixed(2)}px`)
+        section.style.setProperty('--chapter-cover-rotate', `${(normalized * -.75).toFixed(3)}deg`)
+        section.style.setProperty('--chapter-opacity', `${(1 - distance * .12).toFixed(3)}`)
+        section.style.setProperty('--chapter-wipe-y', `${(-72 * entryProgress).toFixed(2)}%`)
+        section.style.setProperty('--chapter-wipe-opacity', `${(.72 * (1 - entryProgress)).toFixed(3)}`)
+      }
+    }
+
+    for (let i = 0; i < links.length; i++) {
+      const active = i === activeIndex
+      links[i].classList.toggle('is-active', active)
+      if (active) links[i].setAttribute('aria-current', 'step')
+      else links[i].removeAttribute('aria-current')
+    }
+  }
+
+  function schedule(){
+    if (frame) return
+    frame = requestAnimationFrame(update)
+  }
+
+  // ---- State ----
+
+  function refreshState(){
+    spatialEnabled = chapters.length > 0 && spatialMotion.matches
+    // Spatial chapters own the motion on the homepage; page-level drift on top
+    // of them just fights the camera.
+    parallaxEnabled = !reduceMotion.matches && !spatialEnabled
+
+    document.body.classList.toggle('spatial-scroll-active', spatialEnabled)
+
+    const lenis = window.__lenis
+    if (lenis && lenis.options) lenis.options.smoothWheel = !reduceMotion.matches
 
     chapters.forEach((section, index) => {
-      const rect = section.getBoundingClientRect()
-      const viewportCenter = viewportHeight / 2
-      const sectionCenter = rect.top + rect.height / 2
-      const centerDistance = sectionCenter - viewportCenter
-      const normalized = clamp(centerDistance / (viewportHeight * .9), -1, 1)
-      if (section.offsetTop <= chapterAnchor) activeIndex = index
-
-      if (!reduceMotion.matches) {
-        if (spatialEnabled) {
-          const path = cameraPaths[index] || cameraPaths[cameraPaths.length - 1]
-          const flowTop = section.offsetTop - window.scrollY
-          const nextSection = chapters[index + 1]
-          const nextFlowTop = nextSection ? nextSection.offsetTop - window.scrollY : viewportHeight
-          const entry = ease(clamp(1 - flowTop / viewportHeight, 0, 1))
-          const exit = nextSection ? ease(clamp(1 - nextFlowTop / viewportHeight, 0, 1)) : 0
-          const entryRemaining = 1 - entry
-          const exitDirection = index % 2 === 0 ? -1 : 1
-          const x = path.x * entryRemaining + exitDirection * 6 * exit
-          const y = path.y * entryRemaining - 3.5 * exit
-          const scale = 1 - (1 - path.scale) * entryRemaining - .1 * exit
-          const rotate = path.rotate * entryRemaining + exitDirection * 1.1 * exit
-          // Keep blur light — per-frame filter on large scenes is expensive and mushy.
-          const blur = 1.6 * entryRemaining + 1.1 * exit
-          const brightness = 1 - .16 * entryRemaining - .18 * exit
-          const opacity = 1 - .28 * entryRemaining - .22 * exit
-          const radius = 28 * entryRemaining + 22 * exit
-
-          section.style.setProperty('--scene-x', `${x.toFixed(3)}vw`)
-          section.style.setProperty('--scene-y', `${y.toFixed(3)}vh`)
-          section.style.setProperty('--scene-scale', scale.toFixed(4))
-          section.style.setProperty('--scene-rotate', `${rotate.toFixed(3)}deg`)
-          section.style.setProperty('--scene-blur', `${blur.toFixed(2)}px`)
-          section.style.setProperty('--scene-brightness', brightness.toFixed(3))
-          section.style.setProperty('--scene-opacity', opacity.toFixed(3))
-          section.style.setProperty('--scene-radius', `${radius.toFixed(2)}px`)
-          section.style.setProperty('--scene-origin', path.origin)
-        } else {
-          const distance = Math.abs(normalized)
-          const entryProgress = clamp(1 - ((rect.top - viewportHeight * .12) / (viewportHeight * .76)), 0, 1)
-          section.style.setProperty('--chapter-drift', `${(normalized * 14).toFixed(2)}px`)
-          section.style.setProperty('--chapter-cover-x', `${(normalized * -16).toFixed(2)}px`)
-          section.style.setProperty('--chapter-info-x', `${(normalized * 16).toFixed(2)}px`)
-          section.style.setProperty('--chapter-cover-rotate', `${(normalized * -.75).toFixed(3)}deg`)
-          section.style.setProperty('--chapter-blur', `${(distance * 1.1).toFixed(2)}px`)
-          section.style.setProperty('--chapter-opacity', `${(1 - distance * .12).toFixed(3)}`)
-          section.style.setProperty('--chapter-wipe-y', `${(-72 * entryProgress).toFixed(2)}%`)
-          section.style.setProperty('--chapter-wipe-opacity', `${(.72 * (1 - entryProgress)).toFixed(3)}`)
-        }
-      }
+      section.style.zIndex = spatialEnabled ? String(index + 1) : ''
+      // transform-origin is fixed per chapter — no reason to rewrite it 120
+      // times a second along with the animated values.
+      const path = cameraPaths[index] || cameraPaths[cameraPaths.length - 1]
+      section.style.setProperty('--scene-origin', path.origin)
     })
 
-    links.forEach((link, index) => {
-      const active = index === activeIndex
-      link.classList.toggle('is-active', active)
-      if (active) link.setAttribute('aria-current', 'step')
-      else link.removeAttribute('aria-current')
-    })
-
-    ticking = false
+    measure()
+    schedule()
   }
 
-  function scheduleChapterUpdate(){
-    if (ticking) return
-    ticking = true
-    requestAnimationFrame(updateChapters)
-  }
+  window.addEventListener('scroll', schedule, { passive: true })
+  window.addEventListener('resize', refreshState, { passive: true })
+  window.addEventListener('load', refreshState)
+  if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', refreshState)
+  if (spatialMotion.addEventListener) spatialMotion.addEventListener('change', refreshState)
 
-  window.addEventListener('scroll', scheduleChapterUpdate, { passive: true })
-  window.addEventListener('wheel', handleSpatialWheel, { passive: false, capture: true })
-  window.addEventListener('resize', refreshSpatialState, { passive: true })
-  if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', refreshSpatialState)
-  if (spatialMotion.addEventListener) spatialMotion.addEventListener('change', refreshSpatialState)
-  refreshSpatialState()
+  // Late-loading images change section offsets; re-measure once they settle
+  // rather than re-reading layout on every frame to stay correct.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure)
+
+  window.__remeasureScroll = () => { measure(); schedule() }
+
+  refreshState()
 })()
 
 // Scroll in-page single sections so they land centered in the viewport.
@@ -579,18 +428,19 @@ bindIrrationalScrollLinks()
   // second interpolator fighting the browser while covers enter the viewport.
   if (document.body.classList.contains('music-page-bg')) return
 
+  // Served from the repo rather than unpkg: a third-party CDN meant scrolling
+  // behaved one way before the script landed and another way after, and a slow
+  // response left the page on native scroll indefinitely.
   const script = document.createElement('script')
-  script.src = 'https://unpkg.com/lenis@1.1.20/dist/lenis.min.js'
+  script.src = 'vendor/lenis.min.js'
   script.async = true
   script.onload = () => {
     if (typeof window.Lenis !== 'function') return
 
-    const spatialActive = document.body.classList.contains('spatial-scroll-active')
     const lenis = new window.Lenis({
       duration: 1.05,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      // Homepage spatial mode owns wheel gestures; Lenis only animates jumps there.
-      smoothWheel: !spatialActive,
+      smoothWheel: true,
       syncTouch: false
     })
 
@@ -637,6 +487,12 @@ bindIrrationalScrollLinks()
     dx += (tx - dx) * 0.45
     dy += (ty - dy) * 0.45
     dot.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0) translate(-50%, -50%)`
+    // Park the loop once the dot has caught up. It used to run forever after
+    // the first mousemove, holding a frame callback open for the whole session.
+    if (Math.abs(tx - dx) < 0.1 && Math.abs(ty - dy) < 0.1) {
+      raf = null
+      return
+    }
     raf = requestAnimationFrame(tick)
   }
 
@@ -774,7 +630,7 @@ function parseDateParts(dateStr) {
 
 // Load shows
 const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><span class="show-row-venue">TBA</span></div>`
-const featuredShowAssetVersion = '20260802-supports'
+const featuredShowAssetVersion = '20260805-performance'
 
 function showMediaUrl(path){
   if(!path || !path.includes('modern-nostalgia-album-release-2026')) return path
@@ -792,6 +648,9 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       showsKicker.textContent = `One Night Only · ${data.upcoming[0].date}`
       showsKicker.hidden = false
     }
+  } else {
+    if(showsHeading) showsHeading.textContent = 'Upcoming Shows'
+    if(showsKicker) showsKicker.hidden = true
   }
 
   const container=document.getElementById('upcoming')
@@ -799,6 +658,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const editorial = container.classList.contains('shows-editorial')
 
   if(!data.upcoming || data.upcoming.length===0){
+    container.innerHTML = ''
     if(editorial){
       container.classList.remove('shows-editorial--solo')
       container.innerHTML = emptyShowsEditorialHtml
@@ -811,6 +671,9 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     return
   }
 
+  // Replace the static August 14 fallback only after the live show data has
+  // loaded successfully, so a failed request never erases the promotion.
+  container.innerHTML = ''
   if (editorial) {
     container.classList.toggle('shows-editorial--solo', data.upcoming.length === 1)
   }
@@ -839,8 +702,11 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
         : [s.city, s.time].filter(Boolean).join(' · ')
       const posterSrc = showMediaUrl(s.poster)
       const bannerSrc = showMediaUrl(s.banner)
-      const posterHtml = posterSrc ? `<div class="show-row-poster" data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${title} poster" loading="lazy"></div>` : ''
-      const bannerHtml = bannerSrc ? `<div class="show-row-banner" aria-hidden="true"><img src="${bannerSrc}" alt="" loading="lazy"></div>` : ''
+      const posterDimensions = s.posterWidth && s.posterHeight ? ` width="${s.posterWidth}" height="${s.posterHeight}"` : ''
+      const bannerDimensions = s.bannerWidth && s.bannerHeight ? ` width="${s.bannerWidth}" height="${s.bannerHeight}"` : ''
+      const mediaLoading = i === 0 ? 'eager' : 'lazy'
+      const posterHtml = posterSrc ? `<div class="show-row-poster" data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${title} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>` : ''
+      const bannerHtml = bannerSrc ? `<div class="show-row-banner" aria-hidden="true"><img src="${bannerSrc}" alt="" loading="${mediaLoading}" decoding="async"${bannerDimensions}></div>` : ''
       row.innerHTML = `
         ${bannerHtml}
         <div class="show-row-date">
@@ -888,6 +754,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
 }).catch(()=>{
   const container=document.getElementById('upcoming')
   if(!container)return
+  if(container.children.length) return
   if(container.classList.contains('shows-editorial')){
     container.classList.remove('shows-editorial--solo')
     container.innerHTML = emptyShowsEditorialHtml
@@ -937,7 +804,10 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const artwork = document.createElement('button')
       artwork.className = 'poster-archive-art gallery-item'
       artwork.type = 'button'
-      artwork.dataset.fullSrc = show.poster
+      // Prefer the lightbox-sized derivative; the raw poster scans run several
+      // megabytes each and were being handed straight to the overlay.
+      artwork.dataset.fullSrc = optimized.full || show.poster
+      if(optimized.fullWebp) artwork.dataset.fullWebp = optimized.fullWebp
       artwork.setAttribute('aria-label', `View ${title} poster from ${show.date}`)
 
       const image = document.createElement('img')
