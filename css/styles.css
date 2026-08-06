@@ -12,7 +12,11 @@
 
 /* Base with subtle noise texture */
 html{scroll-behavior:smooth}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:17px;line-height:1.65;overflow-x:hidden}
+/* overflow-x:clip clips exactly like hidden but does NOT make html/body a
+   scroll container. As `hidden` they were, which silently disables
+   scroll-snap-type on the root and breaks position:sticky. The `hidden`
+   declaration stays first as a fallback for engines without `clip`. */
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:17px;line-height:1.65;overflow-x:hidden;overflow-x:clip}
 body{min-height:100vh;position:relative;padding-bottom:env(safe-area-inset-bottom)}
 body::before{content:'';position:fixed;inset:0;background:url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.03"/></svg>');pointer-events:none;z-index:9999}
 a{color:var(--ink);text-decoration:none;transition:color .2s ease}
@@ -1225,22 +1229,44 @@ body.privacy-page .privacy-page-main p{
    stays stable while scenes swing between paths. */
 @media (min-width:1081px) and (min-height:680px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
   .spatial-scroll-active{scroll-behavior:auto}
-  html:has(.spatial-scroll-active){scroll-behavior:auto}
+  /* One throw of the wheel or trackpad lands on exactly one section.
+     The browser segments the gesture itself using real device and gesture-phase
+     information; scroll-snap-stop:always is what stops a hard fling from flying
+     past several sections at once. Doing this in JS means guessing where one
+     gesture ends from delta shapes alone, which is what used to swallow every
+     scroll after the first. */
+  html:has(.spatial-scroll-active){
+    scroll-behavior:auto;
+    scroll-snap-type:y mandatory;
+    scroll-padding-top:0;
+  }
   .spatial-scroll-active main{
     position:relative;
     background:#000;
   }
+  /* Normal flow, not sticky. A sticky element's snap area collapses to the
+     viewport top once it sticks, so every section reports the same snap
+     position and snapping stops working entirely — verified in this engine:
+     sticky sections all resolved to a single snap point, in-flow ones snapped
+     correctly. Section-per-gesture snapping is worth more than the stacked
+     pinning effect it replaces. */
   .spatial-scroll-active main > [data-scroll-chapter]{
-    position:sticky;
-    top:0;
+    position:relative;
     width:100%;
     height:100svh;
     min-height:100svh;
     max-height:100svh;
     overflow:hidden;
-    /* Sticky shell only — no transform/filter here. */
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
     box-shadow:0 -30px 90px rgba(0,0,0,.62),0 30px 90px rgba(0,0,0,.5);
     contain:paint;
+  }
+  /* The footer lives after <main>. Without its own snap point, mandatory
+     snapping would keep pulling back to the last section and strand it. */
+  .spatial-scroll-active .site-footer{
+    scroll-snap-align:end;
+    scroll-snap-stop:always;
   }
   .spatial-scroll-active main > [data-scroll-chapter] > .chapter-scene{
     width:100%;

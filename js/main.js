@@ -204,11 +204,35 @@ window.addEventListener('beforeprint', () => {
     if (!section) return
     const top = bounded === 0 ? 0 : (chapterMetrics[bounded]?.top ?? section.offsetTop)
 
-    if (window.__lenis) {
+    if (!spatialEnabled && window.__lenis) {
       window.__lenis.scrollTo(top, { duration: 1.05 })
-    } else {
-      window.scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' })
+      return
     }
+
+    if (reduceMotion.matches) {
+      window.scrollTo({ top, behavior: 'auto' })
+      return
+    }
+
+    // scroll-snap-type:mandatory cancels smooth programmatic scrolls outright —
+    // the jump just never happens. Lift snapping for the duration of the
+    // animation and restore it once the scroll settles.
+    const root = document.documentElement
+    let restored = false
+    const restore = () => {
+      if (restored) return
+      restored = true
+      root.style.scrollSnapType = ''
+    }
+
+    root.style.scrollSnapType = 'none'
+    window.scrollTo({ top, behavior: 'smooth' })
+
+    // Restore on a timer rather than on scrollend: scrollend can fire before
+    // the smooth scroll has begun, which would re-enable snapping mid-flight
+    // and cancel the very jump we just started. The target is a snap point
+    // anyway, so there is nothing for snapping to correct when it comes back.
+    window.setTimeout(restore, 900)
   }
 
   // ---- Measure ----
@@ -316,6 +340,20 @@ window.addEventListener('beforeprint', () => {
     frame = requestAnimationFrame(update)
   }
 
+  // A frame queued while the tab is hidden may never be delivered, which would
+  // leave `frame` set forever and permanently deadlock every later schedule().
+  // Coming back visible, drop any stale request and re-measure — offsets can
+  // have changed while we were away.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return
+    if (frame) {
+      cancelAnimationFrame(frame)
+      frame = 0
+    }
+    measure()
+    schedule()
+  })
+
   // ---- State ----
 
   function refreshState(){
@@ -326,8 +364,12 @@ window.addEventListener('beforeprint', () => {
 
     document.body.classList.toggle('spatial-scroll-active', spatialEnabled)
 
+    // CSS scroll-snap owns the wheel in spatial mode. Lenis interpolating the
+    // same gesture would land the page between snap points and fight the
+    // browser's own snap animation, so it stands down and only drives
+    // programmatic jumps there.
     const lenis = window.__lenis
-    if (lenis && lenis.options) lenis.options.smoothWheel = !reduceMotion.matches
+    if (lenis && lenis.options) lenis.options.smoothWheel = !reduceMotion.matches && !spatialEnabled
 
     chapters.forEach((section, index) => {
       section.style.zIndex = spatialEnabled ? String(index + 1) : ''
