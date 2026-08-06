@@ -1242,16 +1242,13 @@ body.privacy-page .privacy-page-main p{
    stays stable while scenes swing between paths. */
 @media (min-width:1081px) and (min-height:680px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
   .spatial-scroll-active{scroll-behavior:auto}
-  /* One throw of the wheel or trackpad lands on exactly one section.
-     The browser segments the gesture itself using real device and gesture-phase
-     information; scroll-snap-stop:always is what stops a hard fling from flying
-     past several sections at once. Doing this in JS means guessing where one
-     gesture ends from delta shapes alone, which is what used to swallow every
-     scroll after the first. */
+  /* No CSS scroll-snap here. Under `mandatory` snap a single wheel notch moves
+     ~100px of an 800px section, never reaches the halfway point, and the browser
+     pulls straight back to where it started — the page reads as frozen. The
+     section tween in main.js drives these transitions instead, and snapping
+     would fight it. scroll-behavior stays auto so the tween is not double-eased. */
   html:has(.spatial-scroll-active){
     scroll-behavior:auto;
-    scroll-snap-type:y mandatory;
-    scroll-padding-top:0;
   }
   .spatial-scroll-active main{
     position:relative;
@@ -1270,16 +1267,8 @@ body.privacy-page .privacy-page-main p{
     min-height:100svh;
     max-height:100svh;
     overflow:hidden;
-    scroll-snap-align:start;
-    scroll-snap-stop:always;
     box-shadow:0 -30px 90px rgba(0,0,0,.62),0 30px 90px rgba(0,0,0,.5);
     contain:paint;
-  }
-  /* The footer lives after <main>. Without its own snap point, mandatory
-     snapping would keep pulling back to the last section and strand it. */
-  .spatial-scroll-active .site-footer{
-    scroll-snap-align:end;
-    scroll-snap-stop:always;
   }
   .spatial-scroll-active main > [data-scroll-chapter] > .chapter-scene{
     width:100%;

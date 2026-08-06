@@ -106,12 +106,10 @@ window.addEventListener('beforeprint', () => {
 // nothing but write compositor-only custom properties — no layout reads, no
 // paint-triggering properties.
 //
-// Wheel events are deliberately NOT intercepted. A previous version ran a
-// gesture state machine that called preventDefault() on every wheel event and
-// then required a decaying momentum tail followed by a fresh rising impulse
-// before it would accept another gesture. A mouse wheel emits uniform deltas
-// that never decay, so that condition was unreachable and every scroll after
-// the first was swallowed until the user stopped moving entirely.
+// On the homepage desktop layout this also takes over the wheel so one gesture
+// advances exactly one full-screen section — see the section-navigation block
+// below for why that cannot be done with CSS scroll-snap, and for the rule that
+// keeps it from repeating the old implementation's lockout.
 ;(function scrollMotion(){
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
   const spatialMotion = window.matchMedia('(min-width: 1081px) and (min-height: 680px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)')
@@ -142,6 +140,7 @@ window.addEventListener('beforeprint', () => {
   let spatialEnabled = false
   let parallaxEnabled = false
   let frame = 0
+  let frameRequestedAt = 0
   let viewportHeight = 0
   let scrollable = 1
   let parallaxTargets = []
@@ -198,41 +197,128 @@ window.addEventListener('beforeprint', () => {
     })
   }
 
-  function scrollToChapter(index){
-    const bounded = clamp(index, 0, chapters.length - 1)
-    const section = chapters[bounded]
-    if (!section) return
-    const top = bounded === 0 ? 0 : (chapterMetrics[bounded]?.top ?? section.offsetTop)
+  // ---- Section-per-gesture navigation ----
+  //
+  // CSS scroll-snap alone does not do this. Under `mandatory` snap a single
+  // wheel notch moves ~100px of an 800px section, never crosses the halfway
+  // point, and the browser snaps straight back — the page appears not to move
+  // at all. Snap handles trackpad throws well and a mouse wheel badly, so the
+  // transition is animated here instead and CSS snapping is off.
+  //
+  // The lockout rule that broke the old implementation was requiring a decaying
+  // momentum tail followed by a rising one before accepting another gesture,
+  // which a uniform mouse wheel can never satisfy. This uses a plain deadline:
+  // input is ignored while a transition is in flight and accepted immediately
+  // afterwards. Nothing can extend that deadline, so it cannot deadlock.
 
-    if (!spatialEnabled && window.__lenis) {
-      window.__lenis.scrollTo(top, { duration: 1.05 })
-      return
+  const SECTION_DURATION = 620   // ms per transition
+  const WHEEL_THRESHOLD = 40     // accumulated delta before advancing
+  const WHEEL_TAIL_FLOOR = 5     // below this is momentum decay, not intent
+  const GESTURE_RESET = 200      // ms of quiet that starts a fresh accumulation
+
+  const easeInOutCubic = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+
+  let sectionTargets = []
+  let targetIndex = 0
+  let animatingUntil = 0
+  let tweenFrame = 0
+  let wheelAccum = 0
+  let lastWheelTime = 0
+
+  function currentSectionIndex(){
+    const y = window.scrollY
+    let nearest = 0
+    for (let i = 1; i < sectionTargets.length; i++) {
+      if (Math.abs(sectionTargets[i] - y) < Math.abs(sectionTargets[nearest] - y)) nearest = i
     }
+    return nearest
+  }
 
+  function tweenTo(top){
+    if (tweenFrame) cancelAnimationFrame(tweenFrame)
+    const from = window.scrollY
+    const distance = top - from
+    if (!distance) return
+    const start = performance.now()
+    animatingUntil = start + SECTION_DURATION
+
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / SECTION_DURATION)
+      window.scrollTo(0, Math.round(from + distance * easeInOutCubic(t)))
+      tweenFrame = t < 1 ? requestAnimationFrame(step) : 0
+    }
+    tweenFrame = requestAnimationFrame(step)
+  }
+
+  function goToSection(index){
+    const next = clamp(index, 0, sectionTargets.length - 1)
+    // Never arm the deadline for a move that is not happening — at the first or
+    // last section that would block input for no reason.
+    if (next === targetIndex && performance.now() < animatingUntil) return
+    targetIndex = next
+    const top = sectionTargets[next]
+    if (top === undefined || Math.round(top) === Math.round(window.scrollY)) return
     if (reduceMotion.matches) {
-      window.scrollTo({ top, behavior: 'auto' })
+      window.scrollTo(0, top)
+      return
+    }
+    tweenTo(top)
+  }
+
+  function handleWheel(event){
+    if (!spatialEnabled || reduceMotion.matches || event.ctrlKey || !event.deltaY) return
+    event.preventDefault()
+
+    const multiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewportHeight : 1
+    const delta = event.deltaY * multiplier
+    const now = performance.now()
+
+    // Mid-transition: swallow it, and keep the accumulator empty so momentum
+    // arriving during the animation cannot queue up a second jump.
+    if (now < animatingUntil) {
+      wheelAccum = 0
+      lastWheelTime = now
       return
     }
 
-    // scroll-snap-type:mandatory cancels smooth programmatic scrolls outright —
-    // the jump just never happens. Lift snapping for the duration of the
-    // animation and restore it once the scroll settles.
-    const root = document.documentElement
-    let restored = false
-    const restore = () => {
-      if (restored) return
-      restored = true
-      root.style.scrollSnapType = ''
+    if (now - lastWheelTime > GESTURE_RESET) wheelAccum = 0
+    lastWheelTime = now
+
+    // The tail of a trackpad fling decays toward zero. Real intent — a wheel
+    // notch or a fresh push — arrives well above this.
+    if (Math.abs(delta) < WHEEL_TAIL_FLOOR) return
+
+    wheelAccum += delta
+    if (Math.abs(wheelAccum) < WHEEL_THRESHOLD) return
+
+    const direction = Math.sign(wheelAccum)
+    wheelAccum = 0
+    goToSection(currentSectionIndex() + direction)
+  }
+
+  function handleKey(event){
+    if (!spatialEnabled) return
+    const forward = ['ArrowDown', 'PageDown', ' '].includes(event.key)
+    const back = ['ArrowUp', 'PageUp'].includes(event.key)
+    const tag = (event.target.tagName || '').toLowerCase()
+    if (tag === 'input' || tag === 'textarea' || event.target.isContentEditable) return
+    if (!forward && !back && event.key !== 'Home' && event.key !== 'End') return
+    event.preventDefault()
+    if (event.key === 'Home') return goToSection(0)
+    if (event.key === 'End') return goToSection(sectionTargets.length - 1)
+    goToSection(currentSectionIndex() + (forward ? 1 : -1))
+  }
+
+  function scrollToChapter(index){
+    if (spatialEnabled) {
+      goToSection(clamp(index, 0, sectionTargets.length - 1))
+      return
     }
-
-    root.style.scrollSnapType = 'none'
-    window.scrollTo({ top, behavior: 'smooth' })
-
-    // Restore on a timer rather than on scrollend: scrollend can fire before
-    // the smooth scroll has begun, which would re-enable snapping mid-flight
-    // and cancel the very jump we just started. The target is a snap point
-    // anyway, so there is nothing for snapping to correct when it comes back.
-    window.setTimeout(restore, 900)
+    const section = chapters[clamp(index, 0, chapters.length - 1)]
+    if (!section) return
+    const top = index === 0 ? 0 : (chapterMetrics[index]?.top ?? section.offsetTop)
+    if (window.__lenis) window.__lenis.scrollTo(top, { duration: 1.05 })
+    else window.scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' })
   }
 
   // ---- Measure ----
@@ -256,6 +342,15 @@ window.addEventListener('beforeprint', () => {
       top: section.offsetTop,
       height: section.offsetHeight
     }))
+
+    // Stops the wheel steps between. The footer sits after <main>, so add the
+    // page bottom as a final stop or it becomes unreachable once JS owns the
+    // wheel.
+    sectionTargets = chapterMetrics.map(m => m.top)
+    const maxScroll = document.documentElement.scrollHeight - viewportHeight
+    const lastChapterTop = sectionTargets[sectionTargets.length - 1] ?? 0
+    if (maxScroll > lastChapterTop + 8) sectionTargets.push(maxScroll)
+    targetIndex = currentSectionIndex()
   }
 
   // ---- Per-frame update ----
@@ -336,7 +431,16 @@ window.addEventListener('beforeprint', () => {
   }
 
   function schedule(){
-    if (frame) return
+    const now = performance.now()
+    if (frame) {
+      // A frame requested long ago and never delivered means frames were
+      // suspended (background tab, throttled renderer). Without this the guard
+      // stays armed forever and every later schedule() is a no-op — the whole
+      // scroll engine silently stops updating. Re-arm instead of staying stuck.
+      if (now - frameRequestedAt < 1000) return
+      cancelAnimationFrame(frame)
+    }
+    frameRequestedAt = now
     frame = requestAnimationFrame(update)
   }
 
@@ -351,6 +455,22 @@ window.addEventListener('beforeprint', () => {
       frame = 0
     }
     measure()
+
+    // Frames stop while hidden, so a transition in flight when the tab went
+    // away never finished and the page is parked between two sections. Settle
+    // onto the nearest one instead of leaving it stranded.
+    if (spatialEnabled) {
+      if (tweenFrame) {
+        cancelAnimationFrame(tweenFrame)
+        tweenFrame = 0
+      }
+      animatingUntil = 0
+      wheelAccum = 0
+      targetIndex = currentSectionIndex()
+      const top = sectionTargets[targetIndex]
+      if (top !== undefined && Math.round(top) !== Math.round(window.scrollY)) window.scrollTo(0, top)
+    }
+
     schedule()
   })
 
@@ -364,12 +484,18 @@ window.addEventListener('beforeprint', () => {
 
     document.body.classList.toggle('spatial-scroll-active', spatialEnabled)
 
-    // CSS scroll-snap owns the wheel in spatial mode. Lenis interpolating the
-    // same gesture would land the page between snap points and fight the
-    // browser's own snap animation, so it stands down and only drives
-    // programmatic jumps there.
+    // The section tween owns the wheel in spatial mode; Lenis interpolating the
+    // same gesture would fight it. It still drives ordinary scrolling on every
+    // other layout and page.
     const lenis = window.__lenis
     if (lenis && lenis.options) lenis.options.smoothWheel = !reduceMotion.matches && !spatialEnabled
+
+    // Leaving spatial mode mid-transition must not strand the deadline.
+    if (!spatialEnabled) {
+      animatingUntil = 0
+      wheelAccum = 0
+      if (tweenFrame) { cancelAnimationFrame(tweenFrame); tweenFrame = 0 }
+    }
 
     chapters.forEach((section, index) => {
       section.style.zIndex = spatialEnabled ? String(index + 1) : ''
@@ -384,6 +510,8 @@ window.addEventListener('beforeprint', () => {
   }
 
   window.addEventListener('scroll', schedule, { passive: true })
+  window.addEventListener('wheel', handleWheel, { passive: false })
+  window.addEventListener('keydown', handleKey)
   window.addEventListener('resize', refreshState, { passive: true })
   window.addEventListener('load', refreshState)
   if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', refreshState)
