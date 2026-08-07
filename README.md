@@ -27,24 +27,40 @@ Static site — no frameworks, no build step.
 ## Structure
 
 ```
-├── assets/
-│   ├── fonts/          # Custom typefaces
-│   ├── images/
-│   │   ├── covers/     # Album / single artwork
-│   │   ├── GALLERY/    # EPK photo gallery
-│   │   ├── LINEUP/     # Band member photos
-│   │   ├── posters/    # Show posters
-│   │   └── press/      # Press / promo photos
-│   └── logos/           # Band logos (splat, full name variants)
-├── css/
-│   └── styles.css      # All styles including responsive + print
-├── data/
-│   ├── shows.json         # Upcoming shows + past archive (see below)
-│   └── poster-images.json # Generated optimized poster paths
-├── js/
-│   └── main.js         # Nav, shows, lightbox, scroll animations
-└── *.html              # Pages
+_source/             # Full-resolution masters — GITIGNORED, never published.
+                     #   Inputs to scripts/optimize_images.py only.
+                     #   NOT backed up by git — keep a copy elsewhere.
+  gallery/  gallery-archive/  gallery-staging/  archive/
+  lineup/  covers/  posters/  backgrounds/  merch/  press/
+  logos/  fonts/  misc/  social/
+
+assets/              # Only what the browser loads. All committed.
+  fonts/             #   woff2 the pages actually request
+  downloads/         #   EPK pdf
+  images/
+    covers/   full/  #   grid size + lightbox size
+    gallery/  full/
+    lineup/   full/
+    posters/  archive/  archive/full/
+    backgrounds/  logos/  merch/
+css/styles.css
+js/main.js
+vendor/lenis.min.js  # vendored, not a CDN dependency at runtime
+data/                # shows.json + generated image manifests
+scripts/             # optimize_images.py, generate_epk_pdf.py
 ```
+
+## Images
+
+Drop full-resolution originals into the matching `_source/` folder, then:
+
+```
+python3 scripts/optimize_images.py
+```
+
+It writes every web variant into `assets/images/` and regenerates
+`data/epk-images.json` and `data/poster-images.json`. Commit `assets/` and the
+manifests; `_source/` stays local.
 
 ## Shows
 
