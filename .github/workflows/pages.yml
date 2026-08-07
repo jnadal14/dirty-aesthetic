@@ -1,0 +1,50 @@
+# Publishes the site with a shallow checkout.
+#
+# The built-in Pages builder clones the full repository, and this one carries
+# close to a gigabyte of history from years of committed camera originals. That
+# clone stopped fitting inside the builder's 15 minute limit, so every build was
+# cancelled before it could deploy. actions/checkout takes only the tip commit,
+# which is about 60 MB, so the deploy no longer depends on the size of history.
+#
+# Requires Settings -> Pages -> Source = "GitHub Actions".
+
+name: Deploy site to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it mid-flight.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout (tip commit only)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
