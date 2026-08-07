@@ -1,36 +1,16 @@
-# Camera masters and working folders.
+# Full-resolution masters. These are the inputs to scripts/optimize_images.py
+# and are never served, so they stay out of the repository entirely.
 #
-# These are *inputs* to scripts/optimize_images.py, not files the site serves —
-# only assets/images/optimized/ is deployed. Tracking them pushed the repo past
-# 1.4 GB of assets with a 1.3 GB .git, which makes every clone painful.
+# Committing them is what grew this repo past 990 MB and eventually broke the
+# GitHub Pages build, which has to clone the whole history to publish.
 #
-# Copies that were already committed remain in git history, so nothing is lost
-# and they can still be recovered. History is deliberately NOT rewritten:
-# that would mean force-pushing over the published repo.
-#
-# Keep these folders backed up somewhere other than git.
+# _source/ is NOT backed up by git. Keep it backed up somewhere else.
+_source/
 
-assets/images/GALLERY/
-assets/images/GALLERY ARCHIVE/
-assets/images/GALLERY_STAGING/
-assets/images/ARCHIVE/
-assets/images/LINEUP/
-assets/images/covers/
-assets/images/MERCH/
+# Everything the site actually serves lives in assets/ and is committed.
 
-assets/images/BACKGROUND/
-
-# Loose masters sitting at the root of assets/images/
-assets/images/HEADER.jpg
-assets/images/HEADER.jpeg
-assets/images/HEADER_MOBILE.jpg
-assets/images/FULL_PROFILE.jpg
-assets/images/15.png
-assets/images/1.jpg
-
-# assets/images/posters/ stays tracked: data/shows.json references those paths
-# directly and the poster archive falls back to them.
-
+# macOS / Python noise
 .DS_Store
+**/.DS_Store
 __pycache__/
 *.pyc

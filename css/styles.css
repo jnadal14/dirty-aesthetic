@@ -114,10 +114,10 @@ picture{display:contents}
   height:100vh;
   overflow:hidden;
   background-color:#0a0705;
-  background-image:url('../assets/images/optimized/header-desktop.jpg');
+  background-image:url('../assets/images/header-desktop.jpg');
   background-image:image-set(
-    url('../assets/images/optimized/header-desktop.webp') type('image/webp'),
-    url('../assets/images/optimized/header-desktop.jpg') type('image/jpeg')
+    url('../assets/images/header-desktop.webp') type('image/webp'),
+    url('../assets/images/header-desktop.jpg') type('image/jpeg')
   );
   background-position:center 55%;
   background-size:cover;
@@ -354,8 +354,8 @@ body.music-page-bg::after{
   background-image:
     linear-gradient(180deg,rgba(12,8,6,.9) 0%,rgba(18,12,8,.82) 45%,rgba(8,6,4,.94) 100%),
     image-set(
-      url('../assets/images/optimized/header-desktop.webp') type('image/webp'),
-      url('../assets/images/optimized/header-desktop.jpg') type('image/jpeg')
+      url('../assets/images/header-desktop.webp') type('image/webp'),
+      url('../assets/images/header-desktop.jpg') type('image/jpeg')
     );
   background-position:center,center;
   background-size:cover,cover;
@@ -439,20 +439,20 @@ body.watch-page-bg{
   background:
     linear-gradient(180deg, rgba(32,23,15,.92) 0%, rgba(32,23,15,.85) 50%, rgba(32,23,15,.92) 100%),
     image-set(
-      url('../assets/images/optimized/backgrounds/watch-bg.webp') type('image/webp'),
-      url('../assets/images/optimized/backgrounds/watch-bg.jpg') type('image/jpeg')
+      url('../assets/images/backgrounds/watch-bg.webp') type('image/webp'),
+      url('../assets/images/backgrounds/watch-bg.jpg') type('image/jpeg')
     ) center/cover no-repeat fixed;
 }
 body.store-page-bg{
   background-color:#0a0705;
   background-image:
     linear-gradient(180deg, rgba(10,7,5,.88) 0%, rgba(32,23,15,.78) 45%, rgba(10,7,5,.92) 100%),
-    url('../assets/images/optimized/merch/ldean-merch-bg.jpg');
+    url('../assets/images/merch/ldean-merch-bg.jpg');
   background-image:
     linear-gradient(180deg, rgba(10,7,5,.88) 0%, rgba(32,23,15,.78) 45%, rgba(10,7,5,.92) 100%),
     image-set(
-      url('../assets/images/optimized/merch/ldean-merch-bg.webp') type('image/webp'),
-      url('../assets/images/optimized/merch/ldean-merch-bg.jpg') type('image/jpeg')
+      url('../assets/images/merch/ldean-merch-bg.webp') type('image/webp'),
+      url('../assets/images/merch/ldean-merch-bg.jpg') type('image/jpeg')
     );
   background-position:center;
   background-size:cover;
@@ -646,8 +646,8 @@ body.privacy-page .privacy-page-main p{
   background:
     linear-gradient(180deg, rgba(32,23,15,.5) 0%, rgba(32,23,15,.65) 50%, rgba(32,23,15,.8) 100%),
     image-set(
-      url('../assets/images/optimized/backgrounds/epk-bg.webp') type('image/webp'),
-      url('../assets/images/optimized/backgrounds/epk-bg.jpg') type('image/jpeg')
+      url('../assets/images/backgrounds/epk-bg.webp') type('image/webp'),
+      url('../assets/images/backgrounds/epk-bg.jpg') type('image/jpeg')
     ) center/cover no-repeat;
 }
 .epk-intro-photo{
@@ -951,8 +951,8 @@ body.privacy-page .privacy-page-main p{
     background:
       linear-gradient(180deg, rgba(32,23,15,.45) 0%, rgba(32,23,15,.7) 50%, rgba(32,23,15,.9) 100%),
       image-set(
-      url('../assets/images/optimized/backgrounds/epk-bg.webp') type('image/webp'),
-      url('../assets/images/optimized/backgrounds/epk-bg.jpg') type('image/jpeg')
+      url('../assets/images/backgrounds/epk-bg.webp') type('image/webp'),
+      url('../assets/images/backgrounds/epk-bg.jpg') type('image/jpeg')
     ) center top/cover no-repeat;
   }
   .epk-intro-photo{
@@ -1296,11 +1296,27 @@ body.privacy-page .privacy-page-main p{
     justify-content:center;
   }
   .spatial-scroll-active .ep-release > .chapter-scene,
-  .spatial-scroll-active .shows-feature > .chapter-scene,
-  .spatial-scroll-active .home-contact > .chapter-scene{
+  .spatial-scroll-active .shows-feature > .chapter-scene{
     display:flex;
     align-items:center;
     justify-content:center;
+  }
+  /* Contact carries the footer, so its scene is a column: the form centres in
+     the space above and the footer sits on the floor of the same slide. That
+     keeps the footer part of this section instead of an extra scroll stop. */
+  .spatial-scroll-active .home-contact > .chapter-scene{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+  .spatial-scroll-active .home-contact-inner{
+    margin:auto 0;
+  }
+  .spatial-scroll-active .home-contact > .chapter-scene > .site-footer{
+    margin-top:auto;
+    width:100%;
+    flex-shrink:0;
   }
   .spatial-scroll-active .shows-feature::before{
     animation:none;
@@ -1335,8 +1351,14 @@ body.privacy-page .privacy-page-main p{
 
   /* The final form condenses into two columns so Contact remains a reveal
      scene, while the regular one-column form is preserved everywhere else. */
+  /* Less bottom padding than top: the footer now occupies the lower edge, so
+     the form lifts slightly rather than sitting dead centre. */
   .spatial-scroll-active .home-contact{
-    padding:clamp(68px,8vh,92px) clamp(48px,7vw,96px);
+    padding:clamp(68px,8vh,92px) clamp(48px,7vw,96px) 0;
+  }
+  .spatial-scroll-active .home-contact .site-footer{
+    padding:18px clamp(16px,4vw,32px);
+    gap:10px;
   }
   .spatial-scroll-active .home-contact-inner{
     width:min(100%,1040px);
@@ -1462,14 +1484,14 @@ blockquote.tiktok-embed section{margin:0!important}
     radial-gradient(ellipse 70% 60% at 20% 28%,rgba(248,143,158,.12) 0%,transparent 62%),
     radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
     linear-gradient(180deg,rgba(5,3,4,.76) 0%,rgba(8,5,6,.72) 40%,rgba(5,3,4,.9) 100%),
-    url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance');
+    url('../assets/images/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance');
   background-image:
     radial-gradient(ellipse 70% 60% at 20% 28%,rgba(248,143,158,.12) 0%,transparent 62%),
     radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
     linear-gradient(180deg,rgba(5,3,4,.76) 0%,rgba(8,5,6,.72) 40%,rgba(5,3,4,.9) 100%),
     image-set(
-      url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260805-performance') type('image/webp'),
-      url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance') type('image/jpeg')
+      url('../assets/images/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260805-performance') type('image/webp'),
+      url('../assets/images/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance') type('image/jpeg')
     );
   background-position:center,center,center,center;
   background-size:auto,auto,auto,cover;
@@ -1987,8 +2009,8 @@ a.show-row[href]{cursor:pointer}
       radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
       linear-gradient(180deg,rgba(5,3,4,.84) 0%,rgba(8,5,6,.8) 46%,rgba(5,3,4,.94) 100%),
       image-set(
-        url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260805-performance') type('image/webp'),
-        url('../assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance') type('image/jpeg')
+        url('../assets/images/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260805-performance') type('image/webp'),
+        url('../assets/images/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance') type('image/jpeg')
       );
     background-position:center,center,center,center;
   }
@@ -2098,10 +2120,10 @@ a.show-row[href]{cursor:pointer}
   padding:clamp(72px,9vw,120px) clamp(28px,6vw,72px);
   overflow:hidden;
   background-color:#0a0705;
-  background-image:url('../assets/images/optimized/back-ep.jpg');
+  background-image:url('../assets/images/back-ep.jpg');
   background-image:image-set(
-    url('../assets/images/optimized/back-ep.webp') type('image/webp'),
-    url('../assets/images/optimized/back-ep.jpg') type('image/jpeg')
+    url('../assets/images/back-ep.webp') type('image/webp'),
+    url('../assets/images/back-ep.jpg') type('image/jpeg')
   );
   background-position:center 50%;
   background-size:cover;
@@ -2342,24 +2364,24 @@ a.show-row[href]{cursor:pointer}
   background-repeat:no-repeat;
 }
 .single-release--modern-nostalgia{
-  background-image:url('../assets/images/optimized/covers/cover_modern_nostalgia.jpg');
+  background-image:url('../assets/images/covers/cover_modern_nostalgia.jpg');
   background-image:image-set(
-    url('../assets/images/optimized/covers/cover_modern_nostalgia.webp') type('image/webp'),
-    url('../assets/images/optimized/covers/cover_modern_nostalgia.jpg') type('image/jpeg')
+    url('../assets/images/covers/cover_modern_nostalgia.webp') type('image/webp'),
+    url('../assets/images/covers/cover_modern_nostalgia.jpg') type('image/jpeg')
   );
 }
 .single-release--back-to-me{
-  background-image:url('../assets/images/optimized/covers/cover_back_to_me.jpg');
+  background-image:url('../assets/images/covers/cover_back_to_me.jpg');
   background-image:image-set(
-    url('../assets/images/optimized/covers/cover_back_to_me.webp') type('image/webp'),
-    url('../assets/images/optimized/covers/cover_back_to_me.jpg') type('image/jpeg')
+    url('../assets/images/covers/cover_back_to_me.webp') type('image/webp'),
+    url('../assets/images/covers/cover_back_to_me.jpg') type('image/jpeg')
   );
 }
 .single-release--irrational{
-  background-image:url('../assets/images/optimized/covers/cover_irrational.jpg');
+  background-image:url('../assets/images/covers/cover_irrational.jpg');
   background-image:image-set(
-    url('../assets/images/optimized/covers/cover_irrational.webp') type('image/webp'),
-    url('../assets/images/optimized/covers/cover_irrational.jpg') type('image/jpeg')
+    url('../assets/images/covers/cover_irrational.webp') type('image/webp'),
+    url('../assets/images/covers/cover_irrational.jpg') type('image/jpeg')
   );
 }
 .single-release .ep-release-bg{
@@ -2885,18 +2907,18 @@ a.show-row[href]{cursor:pointer}
     background-image:
       linear-gradient(180deg,rgba(12,8,6,.9) 0%,rgba(18,12,8,.84) 45%,rgba(8,6,4,.95) 100%),
       image-set(
-        url('../assets/images/optimized/header-mobile.webp') type('image/webp'),
-        url('../assets/images/optimized/header-mobile.jpg') type('image/jpeg')
+        url('../assets/images/header-mobile.webp') type('image/webp'),
+        url('../assets/images/header-mobile.jpg') type('image/jpeg')
       );
   }
   
   .hero{
     height:100vh;
     min-height:100vh;
-    background-image:url('../assets/images/optimized/header-mobile.jpg');
+    background-image:url('../assets/images/header-mobile.jpg');
     background-image:image-set(
-      url('../assets/images/optimized/header-mobile.webp') type('image/webp'),
-      url('../assets/images/optimized/header-mobile.jpg') type('image/jpeg')
+      url('../assets/images/header-mobile.webp') type('image/webp'),
+      url('../assets/images/header-mobile.jpg') type('image/jpeg')
     );
     background-position:center 0%;
     background-size:cover;
@@ -2974,10 +2996,10 @@ a.show-row[href]{cursor:pointer}
 .album-hero{
   height:100svh;
   min-height:640px;
-  background-image:url('../assets/images/optimized/modern-nostalgia-album-bg.jpg');
+  background-image:url('../assets/images/modern-nostalgia-album-bg.jpg');
   background-image:image-set(
-    url('../assets/images/optimized/modern-nostalgia-album-bg.webp') type('image/webp'),
-    url('../assets/images/optimized/modern-nostalgia-album-bg.jpg') type('image/jpeg')
+    url('../assets/images/modern-nostalgia-album-bg.webp') type('image/webp'),
+    url('../assets/images/modern-nostalgia-album-bg.jpg') type('image/jpeg')
   );
   background-position:center 50%;
 }
@@ -3046,10 +3068,10 @@ a.show-row[href]{cursor:pointer}
   padding:clamp(62px,8vh,92px) clamp(24px,5vw,72px);
   overflow:hidden;
   background-color:#080604;
-  background-image:url('../assets/images/optimized/modern-nostalgia-album-bg.jpg');
+  background-image:url('../assets/images/modern-nostalgia-album-bg.jpg');
   background-image:image-set(
-    url('../assets/images/optimized/modern-nostalgia-album-bg.webp') type('image/webp'),
-    url('../assets/images/optimized/modern-nostalgia-album-bg.jpg') type('image/jpeg')
+    url('../assets/images/modern-nostalgia-album-bg.webp') type('image/webp'),
+    url('../assets/images/modern-nostalgia-album-bg.jpg') type('image/jpeg')
   );
   background-position:center 50%;
   background-size:cover;

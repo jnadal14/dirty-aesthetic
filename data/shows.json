@@ -8,10 +8,10 @@
       "time": "Doors at 7 PM",
       "lineup": "Nick Stone & The Gems, Crashout",
       "lineupPrefix": "with",
-      "poster": "assets/images/optimized/posters/modern-nostalgia-album-release-2026.webp",
+      "poster": "assets/images/posters/modern-nostalgia-album-release-2026.webp",
       "posterWidth": 900,
       "posterHeight": 1112,
-      "banner": "assets/images/optimized/posters/modern-nostalgia-album-release-2026-banner.webp",
+      "banner": "assets/images/posters/modern-nostalgia-album-release-2026-banner.webp",
       "bannerWidth": 1600,
       "bannerHeight": 800,
       "link": "https://admitone.com/events/vancouver/community/music/modern-nostalgia-album-release-party/MYCD1T"
@@ -23,7 +23,7 @@
       "city": "Vancouver",
       "venue": "The Roxy Cabaret",
       "lineup": "Jesse and the Black Sheep",
-      "poster": "assets/images/posters/ROXY_08:01:26.jpeg",
+      "poster": "_source/posters/ROXY_08:01:26.jpeg",
       "link": "https://www.showpass.com/sataug1/"
     },
     {
@@ -31,7 +31,7 @@
       "city": "Vancouver",
       "venue": "Red Gate",
       "lineup": "Rhyan Reign & The Miss Behavors, Cris Cirin, Prah7ad",
-      "poster": "assets/images/posters/REDGATE_07:30:26.JPG",
+      "poster": "_source/posters/REDGATE_07:30:26.JPG",
       "link": "https://redgate.tv/tickets/#Rhyan%20Reign%20&%20The%20Miss%20Behavors"
     },
     {
@@ -39,14 +39,14 @@
       "city": "Vancouver",
       "venue": "Pangea",
       "lineup": "Arthur Valley",
-      "poster": "assets/images/posters/PANGEA_06:27:26.PNG"
+      "poster": "_source/posters/PANGEA_06:27:26.PNG"
     },
     {
       "date": "May 29, 2026",
       "city": "Vancouver",
       "venue": "The Biltmore Cabaret",
       "lineup": "Matty Miller & The Barge Boys, Jez Dylan Bonham",
-      "poster": "assets/images/posters/05:29:26_BILTMORE_BARGE BOYS.jpg",
+      "poster": "_source/posters/05:29:26_BILTMORE_BARGE BOYS.jpg",
       "link": "https://admitone.com/events/vancouver/community/music/matty-miller-the-barge-boys-what-a-loser-single-release-party/R3GANQ"
     },
     {
@@ -54,7 +54,7 @@
       "city": "Vancouver",
       "venue": "Green Auto",
       "lineup": "The Zummers, Nick Stone & the Gems",
-      "poster": "assets/images/posters/04:18:26_GREEN AUTO_THE ZUMMERS.JPG",
+      "poster": "_source/posters/04:18:26_GREEN AUTO_THE ZUMMERS.JPG",
       "link": "https://gigpit.ca/shows/event:bhs8mrkzaQo?region=1"
     },
     {
@@ -62,7 +62,7 @@
       "city": "Vancouver",
       "venue": "Green Auto",
       "lineup": "King of Foxes, Avery Sloane",
-      "poster": "assets/images/posters/GREEN AUTO_KING OF FOXES_03:04:26.JPG",
+      "poster": "_source/posters/GREEN AUTO_KING OF FOXES_03:04:26.JPG",
       "link": "https://gigpit.ca/shows/event:MFXLx2rdrj4?region=1"
     },
     {
@@ -70,7 +70,7 @@
       "city": "Vancouver",
       "venue": "Red Gate",
       "lineup": "MATH CLUB, Carmine, Ynes",
-      "poster": "assets/images/posters/REDGATE_04:03:26.JPG",
+      "poster": "_source/posters/REDGATE_04:03:26.JPG",
       "link": "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5X7CPA269WSGW"
     },
     {
@@ -78,7 +78,7 @@
       "city": "Vancouver",
       "venue": "Leo's Clothing Supply",
       "lineup": "Hotel Decor, Bry Luvjoy & The Fantomes, Rae & The Moonbeams, Coastal Shivers",
-      "poster": "assets/images/posters/03:27:26_MOMS.JPG",
+      "poster": "_source/posters/03:27:26_MOMS.JPG",
       "link": "https://www.currentevents.online/products/live-music-at-leos-clothing-supply-upstairs-hotel-decor-the-fantones-rae-the-moonbeams-coastal-shivers-dirty-aesthetic",
       "notes": "Cancelled"
     },
@@ -94,14 +94,14 @@
       "city": "Vancouver",
       "venue": "Red Gate",
       "lineup": "Peanut Patrol, Drew Storey, Transient, Fridge",
-      "poster": "assets/images/posters/redgate_mar1.jpg"
+      "poster": "_source/posters/redgate_mar1.jpg"
     },
     {
       "date": "Feb 22, 2026",
       "city": "Vancouver",
-      "venue": "Green Auto — New and Known",
+      "venue": "Green Auto \u2014 New and Known",
       "lineup": "Hell Crimes, Hot Mars, Tamis, Alien Child",
-      "poster": "assets/images/posters/GREEN AUTO_NEW AND KNOWN_POSTER.jpeg",
+      "poster": "_source/posters/GREEN AUTO_NEW AND KNOWN_POSTER.jpeg",
       "link": "https://gigpit.ca/shows/event:vhIPyz2zli8"
     },
     {
@@ -112,9 +112,9 @@
     {
       "date": "Jan 16, 2026",
       "city": "Vancouver",
-      "venue": "The Biltmore Cabaret — Sugar on the Rocks EP Release",
+      "venue": "The Biltmore Cabaret \u2014 Sugar on the Rocks EP Release",
       "lineup": "Blue Rivera, DAWN",
-      "poster": "assets/images/posters/SOTR_SHOW_POSTER.JPG",
+      "poster": "_source/posters/SOTR_SHOW_POSTER.JPG",
       "link": "https://admitone.com/events/vancouver/community/performance/dirty-aesthetic-presents-sugar-on-the-rocks-ep-release-show/SRWWLY"
     },
     {

@@ -19,8 +19,11 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "assets" / "images"
-OUT = SRC / "optimized"
+# Full-resolution masters live in _source/ and are never committed; assets/
+# holds only what the site actually serves. Keeping the two apart is what stops
+# camera originals from ending up in git history again.
+SRC = ROOT / "_source"
+OUT = ROOT / "assets" / "images"
 OUT_COVERS = OUT / "covers"
 OUT_LINEUP = OUT / "lineup"
 OUT_GALLERY = OUT / "gallery"
@@ -268,7 +271,7 @@ def process_cover(src_name, out_name=None, target=1200, jpeg_q=85, webp_q=82, li
 
 
 def discover_gallery_sources():
-    gallery_dir = SRC / "GALLERY"
+    gallery_dir = SRC / "gallery"
     numbered = []
     for path in gallery_dir.iterdir():
         if not path.is_file():
@@ -282,21 +285,21 @@ def discover_gallery_sources():
 
 print("Hero / background images")
 for r in [
-    process("HEADER.jpg", "header-desktop.jpg", 1920, jpeg_q=82, webp_q=78),
-    process("HEADER_MOBILE.jpg", "header-mobile.jpg", 1080, jpeg_q=82, webp_q=78),
-    process("FULL_PROFILE.jpg", "full-profile.jpg", 900, jpeg_q=82, webp_q=80),
+    process("misc/HEADER.jpg", "header-desktop.jpg", 1920, jpeg_q=82, webp_q=78),
+    process("misc/HEADER_MOBILE.jpg", "header-mobile.jpg", 1080, jpeg_q=82, webp_q=78),
+    process("misc/FULL_PROFILE.jpg", "full-profile.jpg", 900, jpeg_q=82, webp_q=80),
 ]:
     if r:
         report(ROOT / r["src"])
         report(ROOT / r["webp"])
 
 print("Section background")
-r = process("BACKGROUND/BACK_EP.jpg", "back-ep.jpg", 1600, jpeg_q=80, webp_q=78)
+r = process("backgrounds/BACK_EP.jpg", "back-ep.jpg", 1600, jpeg_q=80, webp_q=78)
 if r:
     report(ROOT / r["src"])
     report(ROOT / r["webp"])
 r = process(
-    "BACKGROUND/modern nostalgia full cover no text.png",
+    "backgrounds/modern nostalgia full cover no text.png",
     "modern-nostalgia-album-bg",
     1920,
     jpeg_q=84,
@@ -329,7 +332,7 @@ print("Page backgrounds")
 # These were being served straight from assets/images/BACKGROUND/ as full-size
 # JPEGs with no WebP variant — 500 KB and 672 KB on every EPK and Watch load.
 for src_name, out_base in [("2.jpg", "epk-bg"), ("3.jpg", "watch-bg")]:
-    src = SRC / "BACKGROUND" / src_name
+    src = SRC / "backgrounds" / src_name
     if not src.exists():
         print(f"  SKIP BACKGROUND/{src_name} (missing)")
         continue
@@ -349,7 +352,7 @@ for rel_src, out_base, width in [
     ("DA_SPLAT/DA-OFF_WHITE.png", "da-splat", 240),
     ("FULL_NAME/FULL-OFF_WHITE.png", "da-wordmark", 1400),
 ]:
-    src = ROOT / "assets" / "logos" / rel_src
+    src = SRC / "logos" / rel_src
     if not src.exists():
         print(f"  SKIP logos/{rel_src} (missing)")
         continue
@@ -386,7 +389,7 @@ for src_name in [
 print("Lineup portraits")
 lineup_manifest = {}
 for slug, names in LINEUP_SOURCES.items():
-    src = find_source("LINEUP", names)
+    src = find_source("lineup", names)
     if not src:
         print(f"  SKIP lineup/{slug} (missing source for {names})")
         continue
@@ -437,10 +440,10 @@ for src in discover_gallery_sources():
     report(OUT_GALLERY_FULL / Path(meta["fullWebp"]).name)
 
 print("Merch")
-merch_src = find_source("MERCH", ["MERCH_1", "merch-1", "MERCH_1.JPG"])
+merch_src = find_source("merch", ["MERCH_1", "merch-1", "MERCH_1.JPG"])
 if merch_src:
     process_raster(merch_src, OUT_MERCH, "merch-1", 1400, jpeg_q=85, webp_q=82)
-ldean_bg = SRC / "MERCH" / "LDEAN_MERCH.jpg"
+ldean_bg = SRC / "merch" / "LDEAN_MERCH.jpg"
 if ldean_bg.exists():
     meta = process_raster(ldean_bg, OUT_MERCH, "ldean-merch-bg", 1920, jpeg_q=82, webp_q=78)
     report(OUT_MERCH / Path(meta["src"]).name)

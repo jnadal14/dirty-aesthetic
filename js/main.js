@@ -1015,7 +1015,11 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     }
 
     archivedShows.forEach((show, index) => {
-      const optimized = posterImages[show.poster] || {}
+      // shows.json points at the master under _source/, which is a build input
+      // and never published. Only the generated variants may be shown, so a
+      // poster with no manifest entry is skipped rather than 404ing.
+      const optimized = posterImages[show.poster]
+      if(!optimized || !(optimized.webp || optimized.src)) return
       const title = show.title || show.venue
       const card = document.createElement('article')
       card.className = 'poster-archive-card reveal-scale'
@@ -1026,12 +1030,12 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       artwork.type = 'button'
       // Prefer the lightbox-sized derivative; the raw poster scans run several
       // megabytes each and were being handed straight to the overlay.
-      artwork.dataset.fullSrc = optimized.full || show.poster
+      artwork.dataset.fullSrc = optimized.full || optimized.src
       if(optimized.fullWebp) artwork.dataset.fullWebp = optimized.fullWebp
       artwork.setAttribute('aria-label', `View ${title} poster from ${show.date}`)
 
       const image = document.createElement('img')
-      image.src = optimized.webp || optimized.src || show.poster
+      image.src = optimized.webp || optimized.src
       image.alt = `${title} show poster — ${show.date}`
       image.loading = index < 3 ? 'eager' : 'lazy'
       image.decoding = 'async'
@@ -1160,7 +1164,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     if (!fullSrc) return
 
     function openLightbox() {
-      lbImg.src = fullSrc
+      lbImg.src = el.dataset.lightboxWebp || fullSrc
       lbImg.alt = (img && img.alt) || 'Preview'
       overlay.classList.add('active')
       document.body.style.overflow = 'hidden'

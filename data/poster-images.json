@@ -1,122 +1,122 @@
 {
-  "assets/images/posters/ROXY_08:01:26.jpeg": {
-    "webp": "assets/images/optimized/posters/archive/aug-1-2026-the-roxy-cabaret.webp",
-    "src": "assets/images/optimized/posters/archive/aug-1-2026-the-roxy-cabaret.jpg",
-    "full": "assets/images/optimized/posters/archive/full/aug-1-2026-the-roxy-cabaret.jpg",
+  "_source/posters/ROXY_08:01:26.jpeg": {
+    "webp": "assets/images/posters/archive/aug-1-2026-the-roxy-cabaret.webp",
+    "src": "assets/images/posters/archive/aug-1-2026-the-roxy-cabaret.jpg",
+    "full": "assets/images/posters/archive/full/aug-1-2026-the-roxy-cabaret.jpg",
     "type": "jpeg",
     "width": 900,
     "height": 1125,
-    "fullWebp": "assets/images/optimized/posters/archive/full/aug-1-2026-the-roxy-cabaret.webp",
+    "fullWebp": "assets/images/posters/archive/full/aug-1-2026-the-roxy-cabaret.webp",
     "fullWidth": 960,
     "fullHeight": 1200
   },
-  "assets/images/posters/REDGATE_07:30:26.JPG": {
-    "webp": "assets/images/optimized/posters/archive/jul-30-2026-red-gate.webp",
-    "src": "assets/images/optimized/posters/archive/jul-30-2026-red-gate.jpg",
-    "full": "assets/images/optimized/posters/archive/full/jul-30-2026-red-gate.jpg",
+  "_source/posters/REDGATE_07:30:26.JPG": {
+    "webp": "assets/images/posters/archive/jul-30-2026-red-gate.webp",
+    "src": "assets/images/posters/archive/jul-30-2026-red-gate.jpg",
+    "full": "assets/images/posters/archive/full/jul-30-2026-red-gate.jpg",
     "type": "jpeg",
     "width": 900,
     "height": 1260,
-    "fullWebp": "assets/images/optimized/posters/archive/full/jul-30-2026-red-gate.webp",
+    "fullWebp": "assets/images/posters/archive/full/jul-30-2026-red-gate.webp",
     "fullWidth": 1089,
     "fullHeight": 1525
   },
-  "assets/images/posters/PANGEA_06:27:26.PNG": {
-    "webp": "assets/images/optimized/posters/archive/jun-27-2026-pangea.webp",
-    "src": "assets/images/optimized/posters/archive/jun-27-2026-pangea.jpg",
-    "full": "assets/images/optimized/posters/archive/full/jun-27-2026-pangea.jpg",
+  "_source/posters/PANGEA_06:27:26.PNG": {
+    "webp": "assets/images/posters/archive/jun-27-2026-pangea.webp",
+    "src": "assets/images/posters/archive/jun-27-2026-pangea.jpg",
+    "full": "assets/images/posters/archive/full/jun-27-2026-pangea.jpg",
     "type": "jpeg",
     "width": 900,
     "height": 1120,
-    "fullWebp": "assets/images/optimized/posters/archive/full/jun-27-2026-pangea.webp",
+    "fullWebp": "assets/images/posters/archive/full/jun-27-2026-pangea.webp",
     "fullWidth": 926,
     "fullHeight": 1152
   },
-  "assets/images/posters/05:29:26_BILTMORE_BARGE BOYS.jpg": {
-    "webp": "assets/images/optimized/posters/archive/may-29-2026-the-biltmore-cabaret.webp",
-    "src": "assets/images/optimized/posters/archive/may-29-2026-the-biltmore-cabaret.jpg",
-    "full": "assets/images/optimized/posters/archive/full/may-29-2026-the-biltmore-cabaret.jpg",
+  "_source/posters/05:29:26_BILTMORE_BARGE BOYS.jpg": {
+    "webp": "assets/images/posters/archive/may-29-2026-the-biltmore-cabaret.webp",
+    "src": "assets/images/posters/archive/may-29-2026-the-biltmore-cabaret.jpg",
+    "full": "assets/images/posters/archive/full/may-29-2026-the-biltmore-cabaret.jpg",
     "type": "jpeg",
     "width": 900,
     "height": 1200,
-    "fullWebp": "assets/images/optimized/posters/archive/full/may-29-2026-the-biltmore-cabaret.webp",
+    "fullWebp": "assets/images/posters/archive/full/may-29-2026-the-biltmore-cabaret.webp",
     "fullWidth": 1600,
     "fullHeight": 2133
   },
-  "assets/images/posters/04:18:26_GREEN AUTO_THE ZUMMERS.JPG": {
-    "webp": "assets/images/optimized/posters/archive/apr-18-2026-green-auto.webp",
-    "src": "assets/images/optimized/posters/archive/apr-18-2026-green-auto.jpg",
-    "full": "assets/images/optimized/posters/archive/full/apr-18-2026-green-auto.jpg",
+  "_source/posters/04:18:26_GREEN AUTO_THE ZUMMERS.JPG": {
+    "webp": "assets/images/posters/archive/apr-18-2026-green-auto.webp",
+    "src": "assets/images/posters/archive/apr-18-2026-green-auto.jpg",
+    "full": "assets/images/posters/archive/full/apr-18-2026-green-auto.jpg",
     "type": "jpeg",
     "width": 900,
     "height": 1125,
-    "fullWebp": "assets/images/optimized/posters/archive/full/apr-18-2026-green-auto.webp",
+    "fullWebp": "assets/images/posters/archive/full/apr-18-2026-green-auto.webp",
     "fullWidth": 1080,
     "fullHeight": 1350
   },
-  "assets/images/posters/GREEN AUTO_KING OF FOXES_03:04:26.JPG": {
-    "webp": "assets/images/optimized/posters/archive/apr-4-2026-green-auto.webp",
-    "src": "assets/images/optimized/posters/archive/apr-4-2026-green-auto.jpg",
-    "full": "assets/images/optimized/posters/archive/full/apr-4-2026-green-auto.jpg",
+  "_source/posters/GREEN AUTO_KING OF FOXES_03:04:26.JPG": {
+    "webp": "assets/images/posters/archive/apr-4-2026-green-auto.webp",
+    "src": "assets/images/posters/archive/apr-4-2026-green-auto.jpg",
+    "full": "assets/images/posters/archive/full/apr-4-2026-green-auto.jpg",
     "type": "jpeg",
     "width": 900,
     "height": 1200,
-    "fullWebp": "assets/images/optimized/posters/archive/full/apr-4-2026-green-auto.webp",
+    "fullWebp": "assets/images/posters/archive/full/apr-4-2026-green-auto.webp",
     "fullWidth": 900,
     "fullHeight": 1200
   },
-  "assets/images/posters/REDGATE_04:03:26.JPG": {
-    "webp": "assets/images/optimized/posters/archive/apr-3-2026-red-gate.webp",
-    "src": "assets/images/optimized/posters/archive/apr-3-2026-red-gate.jpg",
-    "full": "assets/images/optimized/posters/archive/full/apr-3-2026-red-gate.jpg",
+  "_source/posters/REDGATE_04:03:26.JPG": {
+    "webp": "assets/images/posters/archive/apr-3-2026-red-gate.webp",
+    "src": "assets/images/posters/archive/apr-3-2026-red-gate.jpg",
+    "full": "assets/images/posters/archive/full/apr-3-2026-red-gate.jpg",
     "type": "jpeg",
     "width": 750,
     "height": 1000,
-    "fullWebp": "assets/images/optimized/posters/archive/full/apr-3-2026-red-gate.webp",
+    "fullWebp": "assets/images/posters/archive/full/apr-3-2026-red-gate.webp",
     "fullWidth": 750,
     "fullHeight": 1000
   },
-  "assets/images/posters/03:27:26_MOMS.JPG": {
-    "webp": "assets/images/optimized/posters/archive/mar-27-2026-leo-s-clothing-supply.webp",
-    "src": "assets/images/optimized/posters/archive/mar-27-2026-leo-s-clothing-supply.jpg",
-    "full": "assets/images/optimized/posters/archive/full/mar-27-2026-leo-s-clothing-supply.jpg",
+  "_source/posters/03:27:26_MOMS.JPG": {
+    "webp": "assets/images/posters/archive/mar-27-2026-leo-s-clothing-supply.webp",
+    "src": "assets/images/posters/archive/mar-27-2026-leo-s-clothing-supply.jpg",
+    "full": "assets/images/posters/archive/full/mar-27-2026-leo-s-clothing-supply.jpg",
     "type": "jpeg",
     "width": 900,
     "height": 1125,
-    "fullWebp": "assets/images/optimized/posters/archive/full/mar-27-2026-leo-s-clothing-supply.webp",
+    "fullWebp": "assets/images/posters/archive/full/mar-27-2026-leo-s-clothing-supply.webp",
     "fullWidth": 1080,
     "fullHeight": 1350
   },
-  "assets/images/posters/redgate_mar1.jpg": {
-    "webp": "assets/images/optimized/posters/archive/mar-1-2026-red-gate.webp",
-    "src": "assets/images/optimized/posters/archive/mar-1-2026-red-gate.jpg",
-    "full": "assets/images/optimized/posters/archive/full/mar-1-2026-red-gate.jpg",
+  "_source/posters/redgate_mar1.jpg": {
+    "webp": "assets/images/posters/archive/mar-1-2026-red-gate.webp",
+    "src": "assets/images/posters/archive/mar-1-2026-red-gate.jpg",
+    "full": "assets/images/posters/archive/full/mar-1-2026-red-gate.jpg",
     "type": "jpeg",
     "width": 900,
     "height": 1125,
-    "fullWebp": "assets/images/optimized/posters/archive/full/mar-1-2026-red-gate.webp",
+    "fullWebp": "assets/images/posters/archive/full/mar-1-2026-red-gate.webp",
     "fullWidth": 1080,
     "fullHeight": 1350
   },
-  "assets/images/posters/GREEN AUTO_NEW AND KNOWN_POSTER.jpeg": {
-    "webp": "assets/images/optimized/posters/archive/feb-22-2026-green-auto-new-and-known.webp",
-    "src": "assets/images/optimized/posters/archive/feb-22-2026-green-auto-new-and-known.jpg",
-    "full": "assets/images/optimized/posters/archive/full/feb-22-2026-green-auto-new-and-known.jpg",
+  "_source/posters/GREEN AUTO_NEW AND KNOWN_POSTER.jpeg": {
+    "webp": "assets/images/posters/archive/feb-22-2026-green-auto-new-and-known.webp",
+    "src": "assets/images/posters/archive/feb-22-2026-green-auto-new-and-known.jpg",
+    "full": "assets/images/posters/archive/full/feb-22-2026-green-auto-new-and-known.jpg",
     "type": "jpeg",
     "width": 900,
     "height": 1137,
-    "fullWebp": "assets/images/optimized/posters/archive/full/feb-22-2026-green-auto-new-and-known.webp",
+    "fullWebp": "assets/images/posters/archive/full/feb-22-2026-green-auto-new-and-known.webp",
     "fullWidth": 950,
     "fullHeight": 1200
   },
-  "assets/images/posters/SOTR_SHOW_POSTER.JPG": {
-    "webp": "assets/images/optimized/posters/archive/jan-16-2026-the-biltmore-cabaret-sugar-on-the-rocks-ep-release.webp",
-    "src": "assets/images/optimized/posters/archive/jan-16-2026-the-biltmore-cabaret-sugar-on-the-rocks-ep-release.jpg",
-    "full": "assets/images/optimized/posters/archive/full/jan-16-2026-the-biltmore-cabaret-sugar-on-the-rocks-ep-release.jpg",
+  "_source/posters/SOTR_SHOW_POSTER.JPG": {
+    "webp": "assets/images/posters/archive/jan-16-2026-the-biltmore-cabaret-sugar-on-the-rocks-ep-release.webp",
+    "src": "assets/images/posters/archive/jan-16-2026-the-biltmore-cabaret-sugar-on-the-rocks-ep-release.jpg",
+    "full": "assets/images/posters/archive/full/jan-16-2026-the-biltmore-cabaret-sugar-on-the-rocks-ep-release.jpg",
     "type": "jpeg",
     "width": 900,
     "height": 1125,
-    "fullWebp": "assets/images/optimized/posters/archive/full/jan-16-2026-the-biltmore-cabaret-sugar-on-the-rocks-ep-release.webp",
+    "fullWebp": "assets/images/posters/archive/full/jan-16-2026-the-biltmore-cabaret-sugar-on-the-rocks-ep-release.webp",
     "fullWidth": 960,
     "fullHeight": 1200
   }
