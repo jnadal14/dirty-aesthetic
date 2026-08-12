@@ -4,14 +4,31 @@
 <meta charset="utf-8">
 <title>Dirty Aesthetic — Modern Nostalgia</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Modern Nostalgia, the debut full-length album from Dirty Aesthetic, arrives August 12, 2026. Pre-save the album now.">
+
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window,document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1503298771840666');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1503298771840666&ev=PageView&noscript=1" alt=""></noscript>
+<!-- End Meta Pixel -->
+<meta name="description" content="Modern Nostalgia, the debut full-length album from Dirty Aesthetic, is out now. Stream it everywhere and watch the official music video.">
 <link rel="canonical" href="https://www.dirtyaesthetic.com/">
 
 <!-- Open Graph / Social Sharing -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.dirtyaesthetic.com/">
 <meta property="og:title" content="Dirty Aesthetic — Modern Nostalgia">
-<meta property="og:description" content="The debut full-length album from Dirty Aesthetic arrives August 12, 2026. Pre-save Modern Nostalgia now.">
+<meta property="og:description" content="The debut full-length album from Dirty Aesthetic is out now. Stream Modern Nostalgia everywhere.">
 <meta property="og:image" content="https://www.dirtyaesthetic.com/assets/images/covers/cover_LP_modern_nostalgia.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="1200">
@@ -19,7 +36,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Dirty Aesthetic — Modern Nostalgia">
-<meta name="twitter:description" content="The debut full-length album from Dirty Aesthetic arrives August 12, 2026. Pre-save Modern Nostalgia now.">
+<meta name="twitter:description" content="The debut full-length album from Dirty Aesthetic is out now. Stream Modern Nostalgia everywhere.">
 <meta name="twitter:image" content="https://www.dirtyaesthetic.com/assets/images/covers/cover_LP_modern_nostalgia.jpg">
 <link rel="icon" type="image/png" href="assets/images/favicon.png">
 
@@ -61,12 +78,19 @@
     <div class="hero-overlay"></div>
     <div class="hero-inner">
       <h1><img src="assets/images/logos/da-wordmark.png" alt="Dirty Aesthetic" class="hero-logo" decoding="async" fetchpriority="high"></h1>
-      <p class="album-hero-caption"><span>New Album</span> Modern Nostalgia <span>August 12, 2026</span></p>
+      <p class="album-hero-caption"><span>Out Now</span> Modern Nostalgia <span>Debut Album</span></p>
       <div class="hero-ctas">
-        <a class="btn album-presave-btn" href="https://distrokid.com/hyperfollow/dirtyaesthetic/modern-nostalgia-2?ref=release" target="_blank" rel="noopener">Pre-Save</a>
-        <a class="btn ghost" href="music.html">Listen</a>
+        <a class="btn album-presave-btn" href="https://distrokid.com/hyperfollow/dirtyaesthetic/modern-nostalgia-2?ref=release" target="_blank" rel="noopener">Listen Now</a>
+        <a class="btn ghost" href="#modern-nostalgia-video-section">Watch the Video</a>
+        <a class="btn ghost" href="#modern-nostalgia-album-section">Tracklist</a>
       </div>
     </div>
+      <button class="scroll-cue" type="button" aria-label="Scroll to the next section">
+        <span class="scroll-cue-text">Scroll</span>
+        <svg class="scroll-cue-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M12 4v13M6 12l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
   </section>
 
   <section class="album-tracklist-section" id="modern-nostalgia-album-section" data-scroll-chapter data-chapter-label="Modern Nostalgia">
@@ -80,10 +104,19 @@
         </picture>
       </div>
         <div class="album-tracklist-copy reveal" style="--reveal-delay:.12s">
-          <span class="album-tracklist-kicker">Debut Album</span>
+          <span class="album-tracklist-kicker">Out Now</span>
           <h2>Modern Nostalgia</h2>
-          <p>August 12, 2026 &bull; 11 tracks</p>
-          <a class="btn album-presave-btn" href="https://distrokid.com/hyperfollow/dirtyaesthetic/modern-nostalgia-2?ref=release" target="_blank" rel="noopener">Pre-Save</a>
+          <p>Debut Album &bull; 11 Tracks &bull; 43:29</p>
+          <a class="btn album-presave-btn" href="https://distrokid.com/hyperfollow/dirtyaesthetic/modern-nostalgia-2?ref=release" target="_blank" rel="noopener">Listen Now</a>
+          <!-- Hidden until data/release.json carries a URL for each platform;
+               anything still empty is removed rather than shipped dead. -->
+          <div class="album-stream-links">
+            <a class="album-stream-link" data-stream="spotify" href="#" target="_blank" rel="noopener" hidden>Spotify</a>
+            <a class="album-stream-link" data-stream="apple" href="#" target="_blank" rel="noopener" hidden>Apple Music</a>
+            <a class="album-stream-link" data-stream="bandcamp" href="#" target="_blank" rel="noopener" hidden>Bandcamp</a>
+            <a class="album-stream-link" data-stream="youtube" href="#" target="_blank" rel="noopener" hidden>YouTube Music</a>
+            <a class="album-stream-link" data-stream="soundcloud" href="#" target="_blank" rel="noopener" hidden>SoundCloud</a>
+          </div>
         </div>
       </div>
       <div class="album-tracklist-panel">
@@ -91,27 +124,28 @@
           <span>Tracklist</span>
         </div>
         <ol class="album-tracklist reveal-stagger">
-          <li class="album-track reveal"><span class="album-track-num">01</span><span class="album-track-title">In a Haze</span></li>
-          <li class="album-track reveal"><span class="album-track-num">02</span><span class="album-track-title">Maybe</span></li>
-          <li class="album-track reveal"><span class="album-track-num">03</span><span class="album-track-title">Chariot</span></li>
-          <li class="album-track reveal"><span class="album-track-num">04</span><span class="album-track-title">Defiant</span></li>
-          <li class="album-track album-track--released reveal">
-            <span class="album-track-num">05</span><span class="album-track-title">Modern Nostalgia</span><span class="album-track-time">4:06</span>
-            <span class="album-track-streams"><a href="https://open.spotify.com/album/3QDhfee3YZ7DVJ2jWgfAsk?si=I5QxEb1pRBmFr5V6IpASeQ" target="_blank" rel="noopener">Spotify</a><a href="https://music.apple.com/us/song/modern-nostalgia/6789525648" target="_blank" rel="noopener">Apple</a></span>
-          </li>
-          <li class="album-track reveal"><span class="album-track-num">06</span><span class="album-track-title">Limerence Interlude</span></li>
-          <li class="album-track album-track--released reveal">
-            <span class="album-track-num">07</span><span class="album-track-title">Back to Me</span><span class="album-track-time">4:50</span>
-            <span class="album-track-streams"><a href="https://open.spotify.com/track/60YsvPN7fAjT2XyJgfB6vx" target="_blank" rel="noopener">Spotify</a><a href="https://music.apple.com/us/album/back-to-me-single/6778131247" target="_blank" rel="noopener">Apple</a></span>
-          </li>
-          <li class="album-track reveal"><span class="album-track-num">08</span><span class="album-track-title">Jaded</span></li>
-          <li class="album-track reveal"><span class="album-track-num">09</span><span class="album-track-title">Am I Alone?</span></li>
-          <li class="album-track album-track--released reveal">
-            <span class="album-track-num">10</span><span class="album-track-title">Irrational</span><span class="album-track-time">3:20</span>
-            <span class="album-track-streams"><a href="https://open.spotify.com/album/7xPxKD8fm8jOE2BbpzGw3K" target="_blank" rel="noopener">Spotify</a><a href="https://music.apple.com/us/song/irrational/6768303336" target="_blank" rel="noopener">Apple</a></span>
-          </li>
-          <li class="album-track reveal"><span class="album-track-num">11</span><span class="album-track-title">Used to You</span></li>
+          <li class="album-track reveal"><span class="album-track-num">01</span><span class="album-track-title">In a Haze</span><span class="album-track-time">5:09</span></li>
+          <li class="album-track reveal"><span class="album-track-num">02</span><span class="album-track-title">Maybe</span><span class="album-track-time">3:27</span></li>
+          <li class="album-track reveal"><span class="album-track-num">03</span><span class="album-track-title">Chariot</span><span class="album-track-time">3:27</span></li>
+          <li class="album-track reveal"><span class="album-track-num">04</span><span class="album-track-title">Defiant</span><span class="album-track-time">4:40</span></li>
+          <li class="album-track reveal"><span class="album-track-num">05</span><span class="album-track-title">Modern Nostalgia</span><span class="album-track-time">4:06</span></li>
+          <li class="album-track reveal"><span class="album-track-num">06</span><span class="album-track-title">Limerence Interlude</span><span class="album-track-time">1:23</span></li>
+          <li class="album-track reveal"><span class="album-track-num">07</span><span class="album-track-title">Back to Me</span><span class="album-track-time">4:49</span></li>
+          <li class="album-track reveal"><span class="album-track-num">08</span><span class="album-track-title">Jaded</span><span class="album-track-time">4:04</span></li>
+          <li class="album-track reveal"><span class="album-track-num">09</span><span class="album-track-title">Am I Alone?</span><span class="album-track-time">4:56</span></li>
+          <li class="album-track reveal"><span class="album-track-num">10</span><span class="album-track-title">Irrational</span><span class="album-track-time">3:19</span></li>
+          <li class="album-track reveal"><span class="album-track-num">11</span><span class="album-track-title">Used to You</span><span class="album-track-time">4:04</span></li>
         </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="video-feature" id="modern-nostalgia-video-section" data-scroll-chapter data-chapter-label="Video">
+    <div class="video-feature-inner">
+      <span class="video-feature-kicker reveal">Official Music Video</span>
+      <h2 class="video-feature-title reveal" style="--reveal-delay:.08s">Modern Nostalgia</h2>
+      <div class="video-embed-large reveal-scale" style="--reveal-delay:.14s">
+        <iframe src="https://www.youtube-nocookie.com/embed/WUQRlII35Ow?rel=0&modestbranding=1" title="Dirty Aesthetic — Modern Nostalgia (Official Music Video)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
     </div>
   </section>
@@ -284,20 +318,6 @@
         <button class="btn ghost" type="submit">Send Message</button>
       </form>
     </div>
-  <footer class="site-footer">
-    <div class="social">
-      <a href="https://instagram.com/dirtyaestheticband" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://tiktok.com/@dirty_aesthetic" target="_blank" rel="noopener">TikTok</a>
-      <a href="https://open.spotify.com/artist/6LJB3zSDmtQ3NxA6GjUwlt" target="_blank" rel="noopener">Spotify</a>
-      <a href="https://music.apple.com/ca/artist/dirty-aesthetic/1773260865" target="_blank" rel="noopener">Apple Music</a>
-      <a href="https://dirtyaesthetic.bandcamp.com/" target="_blank" rel="noopener">Bandcamp</a>
-      <a href="https://www.youtube.com/@dirtyaesthetic" target="_blank" rel="noopener">YouTube</a>
-    </div>
-    <div class="legal">
-      <a href="privacy.html">Privacy</a>
-      <span class="footer-logo">© <img src="assets/images/logos/da-wordmark.png" alt="Dirty Aesthetic" loading="lazy" decoding="async"></span>
-    </div>
-  </footer>
   </section>
 
   <div class="lightbox-overlay" id="lightbox">
@@ -307,6 +327,21 @@
     <button class="lightbox-nav lightbox-next" aria-label="Next" style="display:none">&#8250;</button>
   </div>
 </main>
+
+<footer class="site-footer">
+  <div class="social">
+    <a href="https://instagram.com/dirtyaestheticband" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://tiktok.com/@dirty_aesthetic" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://open.spotify.com/artist/6LJB3zSDmtQ3NxA6GjUwlt" target="_blank" rel="noopener">Spotify</a>
+    <a href="https://music.apple.com/ca/artist/dirty-aesthetic/1773260865" target="_blank" rel="noopener">Apple Music</a>
+    <a href="https://dirtyaesthetic.bandcamp.com/" target="_blank" rel="noopener">Bandcamp</a>
+    <a href="https://www.youtube.com/@dirtyaesthetic" target="_blank" rel="noopener">YouTube</a>
+  </div>
+  <div class="legal">
+    <a href="privacy.html">Privacy</a>
+    <span class="footer-logo">© <img src="assets/images/logos/da-wordmark.png" alt="Dirty Aesthetic" loading="lazy" decoding="async"></span>
+  </div>
+</footer>
 
 
 <script src="js/main.js" defer></script>

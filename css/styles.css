@@ -492,6 +492,8 @@ body.contact-page-bg{
   .watch-clips-grid{grid-template-columns:1fr;gap:16px}
 }
 
+
+
 .clips-section{padding:clamp(32px,5vw,56px) clamp(16px,4vw,32px);background:rgba(0,0,0,.15);margin-top:24px}
 .clips-section h2{text-align:center;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin:0 0 24px}
 
@@ -507,6 +509,172 @@ body.contact-page-bg{
 
 /* footer */
 .site-footer{display:flex;flex-direction:column;align-items:center;gap:16px;padding:32px clamp(16px,4vw,32px);border-top:1px solid rgba(255,255,255,.06);animation:fadeIn .6s ease .2s both;text-align:center}
+
+/* ===== Music page — featured release ===== */
+/* The current album leads the page at a size the catalog grid below cannot
+   compete with, so it reads first without anyone having to scan for it. */
+.music-feature{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  align-items:center;
+  gap:clamp(24px,4vw,64px);
+  max-width:1100px;
+  margin:0 auto clamp(40px,6vw,72px);
+  padding:0 clamp(16px,4vw,32px);
+}
+.music-feature-art{
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.07);
+}
+.music-feature-art img{width:100%;height:auto;display:block}
+.music-feature-copy{display:flex;flex-direction:column;align-items:flex-start}
+/* Matches .album-tracklist-kicker rather than sitting in a pill — the plain
+   lettering is the house style for these labels. */
+.music-feature-flag{
+  display:inline-block;
+  color:#e0b78e;
+  font-size:.68em;
+  font-weight:700;
+  letter-spacing:3px;
+  text-transform:uppercase;
+}
+.music-feature-title{
+  margin:clamp(12px,2vw,20px) 0 0;
+  font-size:clamp(2em,5.5vw,3.6em);
+  line-height:1.02;
+}
+.music-feature-meta{
+  margin:clamp(6px,1vw,10px) 0 0;
+  color:var(--muted);
+  font-size:clamp(.85em,1.5vw,1.05em);
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+.music-feature-actions{margin-top:clamp(16px,2.5vw,26px)}
+.music-feature-actions .album-stream-links{margin-top:12px}
+.music-catalog-heading{
+  max-width:1100px;
+  margin:0 auto clamp(18px,3vw,28px);
+  padding:0 clamp(16px,4vw,32px);
+  color:var(--muted);
+  font-size:clamp(.9em,1.7vw,1.1em);
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+@media (max-width:760px){
+  .music-feature{
+    grid-template-columns:minmax(0,1fr);
+    justify-items:center;
+    text-align:center;
+  }
+  .music-feature-art{width:min(100%,320px)}
+  .music-feature-copy{align-items:center}
+  .music-catalog-heading{text-align:center}
+}
+
+/* ===== Album stream links ===== */
+/* Rendered hidden and revealed by main.js once data/release.json has a URL for
+   the platform, so nothing ships pointing at a dead link. */
+.album-stream-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 10px;
+  margin-top:14px;
+}
+.album-stream-link{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 13px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  font-size:.72em;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  opacity:.82;
+  transition:opacity .2s ease,border-color .2s ease,transform .2s ease;
+}
+.album-stream-link:hover,
+.album-stream-link:focus-visible{
+  opacity:1;
+  border-color:rgba(248,143,158,.55);
+  transform:translateY(-1px);
+}
+.album-stream-links:empty{display:none}
+
+/* ===== Homepage music video slide ===== */
+.video-feature{
+  position:relative;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(56px,8vw,96px) clamp(20px,5vw,64px);
+  background:#000;
+}
+.video-feature-inner{
+  width:min(100%,1040px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:clamp(6px,1.4vw,10px);
+}
+.video-feature-kicker{
+  font-size:.72em;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  opacity:.62;
+}
+.video-feature-title{
+  margin:0 0 clamp(10px,2vw,18px);
+  font-size:clamp(1.6em,5vw,2.8em);
+  line-height:1.05;
+}
+.video-feature .video-embed-large{width:100%}
+
+/* ===== Scroll cue (homepage hero only) ===== */
+/* Sits above the pinned footer and says "there is more below". It scrolls away
+   with the hero, so it never competes with the rest of the page. */
+.home-page{--home-footer-h:78px}
+.scroll-cue{
+  position:absolute;
+  left:50%;
+  bottom:calc(var(--home-footer-h) + 10px);
+  transform:translateX(-50%);
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  padding:6px 10px;
+  background:none;
+  border:0;
+  color:var(--ink);
+  cursor:pointer;
+  font:inherit;
+  font-size:10px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  opacity:.72;
+  transition:opacity .25s ease;
+}
+.home-page:not(.spatial-scroll-active) .scroll-cue{bottom:18px}
+.scroll-cue-text{opacity:.8}
+.scroll-cue-arrow{width:20px;height:20px;display:block}
+.scroll-cue:hover,
+.scroll-cue:focus-visible{opacity:1}
+.scroll-cue:focus-visible{outline:1px solid var(--ink);outline-offset:4px;border-radius:4px}
+/* "Lightly" is the point — a slow breath, not a blink. Only the arrow moves so
+   the label stays readable. */
+@keyframes scrollCueBreathe{
+  0%,100%{opacity:.35;transform:translateY(0)}
+  50%    {opacity:1;transform:translateY(5px)}
+}
+.scroll-cue-arrow{animation:scrollCueBreathe 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){
+  .scroll-cue-arrow{animation:none}
+}
 .social{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(12px,3vw,20px)}
 .social a{color:var(--muted);position:relative;transition:color .2s ease;padding:4px 0;letter-spacing:.5px}
 .social a:hover{color:var(--ink)}
@@ -1296,27 +1464,51 @@ body.privacy-page .privacy-page-main p{
     justify-content:center;
   }
   .spatial-scroll-active .ep-release > .chapter-scene,
-  .spatial-scroll-active .shows-feature > .chapter-scene{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  /* Contact carries the footer, so its scene is a column: the form centres in
-     the space above and the footer sits on the floor of the same slide. That
-     keeps the footer part of this section instead of an extra scroll stop. */
+  .spatial-scroll-active .shows-feature > .chapter-scene,
+  .spatial-scroll-active .video-feature > .chapter-scene,
   .spatial-scroll-active .home-contact > .chapter-scene{
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
   }
-  .spatial-scroll-active .home-contact-inner{
-    margin:auto 0;
+  /* The video is 16:9, so on a slide it has to be capped by HEIGHT — sized by
+     width it would run past the bottom of the viewport on shorter screens.
+     Width follows from the aspect ratio. */
+  .spatial-scroll-active .video-feature{
+    padding:clamp(32px,4vh,60px) clamp(20px,5vw,64px);
   }
-  .spatial-scroll-active .home-contact > .chapter-scene > .site-footer{
-    margin-top:auto;
-    width:100%;
-    flex-shrink:0;
+  .spatial-scroll-active .video-feature .video-embed-large{
+    /* Not min(100%, ...) — the flex parent's height is auto, so the 100% is
+       indefinite and the box collapses. The calc alone is definite. */
+    height:calc(100svh - var(--home-footer-h,110px) - 210px);
+    width:auto;
+    max-width:100%;
+  }
+
+  /* The footer is pinned to the viewport rather than living in one section, so
+     every slide carries it and the links are always one click away. Fixed also
+     keeps it out of flow, so the page stays exactly five viewports tall and no
+     extra scroll stop appears past the last slide. */
+  .spatial-scroll-active .site-footer{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:880;
+    border-top:0;
+    animation:none;
+    padding:14px clamp(16px,4vw,32px) 16px;
+    gap:8px;
+    /* A scrim rather than a solid bar: the footer has to stay legible over five
+       very different backgrounds without stamping a black band across them. */
+    background:linear-gradient(180deg,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,.55) 45%,
+      rgba(0,0,0,.88) 100%);
+  }
+  /* Keep slide content clear of the pinned footer. */
+  .spatial-scroll-active main > [data-scroll-chapter] > .chapter-scene{
+    padding-bottom:var(--home-footer-h);
   }
   .spatial-scroll-active .shows-feature::before{
     animation:none;
@@ -1351,14 +1543,8 @@ body.privacy-page .privacy-page-main p{
 
   /* The final form condenses into two columns so Contact remains a reveal
      scene, while the regular one-column form is preserved everywhere else. */
-  /* Less bottom padding than top: the footer now occupies the lower edge, so
-     the form lifts slightly rather than sitting dead centre. */
   .spatial-scroll-active .home-contact{
-    padding:clamp(68px,8vh,92px) clamp(48px,7vw,96px) 0;
-  }
-  .spatial-scroll-active .home-contact .site-footer{
-    padding:18px clamp(16px,4vw,32px);
-    gap:10px;
+    padding:clamp(68px,8vh,92px) clamp(48px,7vw,96px);
   }
   .spatial-scroll-active .home-contact-inner{
     width:min(100%,1040px);
@@ -1377,7 +1563,6 @@ body.privacy-page .privacy-page-main p{
   }
   .spatial-scroll-active .home-contact .contact-form textarea{min-height:96px;resize:none}
   .spatial-scroll-active .home-contact .contact-form .btn{grid-column:1/-1;margin-top:3px}
-  .spatial-scroll-active .site-footer{position:relative;z-index:30;background:#000}
 }
 
 @media (max-width:1080px){.chapter-nav{display:none}}
@@ -1979,6 +2164,8 @@ a.show-row[href]{cursor:pointer}
   .shows-archive-link-arrow{grid-column:2;grid-row:1 / 3}
 }
 
+
+
 @media (min-width:1081px) and (max-height:940px) and (hover:hover) and (pointer:fine){
   .spatial-scroll-active .shows-feature{padding:38px 0 24px}
   .spatial-scroll-active .shows-feature-kicker{font-size:.68em}
@@ -2054,6 +2241,108 @@ a.show-row[href]{cursor:pointer}
     width:clamp(58px,16vw,82px);
   }
 }
+
+/* Phone: the featured show has to read as one card on one screen. At iPhone
+   sizes it was running 1022px tall against an 844px screen, with the poster
+   alone taking 385px.
+   Heights are in svh, the viewport *with* Safari's chrome showing. vh measures
+   the taller chrome-hidden viewport, so a card that "fits" in vh still spills
+   over on first paint, which is exactly when it matters. */
+@media (max-width:720px){
+  /* Top padding clears the fixed 50px header — without it the kicker and
+     heading sit underneath once the card is short enough to fill the screen. */
+  .shows-feature{
+    padding:clamp(58px,9vw,72px) 0 clamp(12px,3vw,20px);
+  }
+  /* The archive link is the last thing in the section; its default margin and
+     padding were pushing its bottom edge past the fold. */
+  .shows-archive-link{margin-top:10px;padding:11px 14px}
+  .shows-feature-heading{
+    font-size:clamp(1.05em,4.6vw,1.5em);
+    margin-bottom:clamp(6px,1.6vw,12px);
+    padding-bottom:5px;
+  }
+  .shows-feature-kicker{font-size:.66em}
+  .shows-editorial--solo .show-row--solo{
+    padding:clamp(14px,3.5vw,24px);
+    gap:clamp(10px,2.5vw,16px);
+  }
+  /* The poster is the flexible element — it gives up the height the rest of the
+     card needs. The cap has to be on the container: its box is width x the
+     image's aspect ratio, so a max-height on the <img> only letterboxes it
+     inside a box that never shrinks. vh first as a fallback for older engines. */
+  .shows-editorial--solo .show-row--solo .show-row-poster{
+    width:auto;
+    max-width:min(100%,320px);
+    aspect-ratio:900 / 1112;
+    height:min(30vh,280px);
+    height:min(30svh,280px);
+  }
+  .shows-editorial--solo .show-row--solo .show-row-poster img{
+    min-height:0;
+    max-height:none;
+    height:100%;
+    width:100%;
+    object-fit:contain;
+  }
+  .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
+    font-size:clamp(1em,4.6vw,1.45em);
+    line-height:1.18;
+  }
+  .shows-editorial--solo .show-row--solo .show-row-lineup{font-size:.78em}
+  .shows-editorial--solo .show-row--solo .show-row-city{font-size:.74em}
+  .shows-editorial--solo .show-row--featured.show-row--solo .show-row-arrow{
+    font-size:.66em;
+  }
+}
+
+/* Short phone screens — and every iPhone is one once Safari's chrome is showing.
+   The poster gives up the most height because the same artwork is already
+   behind the card as the section background. */
+@media (max-width:720px) and (max-height:760px){
+  .shows-feature{
+    padding:56px 0 clamp(12px,3vw,20px);
+  }
+  .shows-feature-heading{
+    font-size:clamp(1em,4.4vw,1.35em);
+    margin-bottom:6px;
+    padding-bottom:4px;
+  }
+  .shows-feature-kicker{font-size:.6em}
+  .shows-editorial--solo .show-row--solo{
+    padding:clamp(10px,2.5vw,16px);
+    gap:clamp(7px,1.8vw,11px);
+  }
+  .shows-editorial--solo .show-row--solo .show-row-poster{
+    height:min(24vh,210px);
+    height:min(24svh,210px);
+  }
+  .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
+    font-size:clamp(.92em,4vw,1.2em);
+    line-height:1.12;
+  }
+  .shows-editorial--solo .show-row--solo .show-row-date{padding-bottom:0}
+  .shows-editorial--solo .show-row--solo .show-row-lineup{font-size:.72em;line-height:1.25}
+  .shows-editorial--solo .show-row--solo .show-row-city{font-size:.68em}
+}
+
+/* 320px-class phones (SE 1st gen, iPhone 5). Everything wraps harder at this
+   width, so the last of the slack comes out of the poster and the archive link. */
+@media (max-width:360px){
+  .shows-feature-heading{font-size:clamp(.92em,4.2vw,1.15em)}
+  .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
+    font-size:clamp(.86em,3.8vw,1.05em);
+  }
+  .shows-archive-link{padding:10px 12px;gap:2px}
+  .shows-archive-link strong{font-size:.86em}
+  .shows-feature{padding-bottom:10px}
+  .shows-editorial--solo .show-row--solo .show-row-poster{
+    height:min(19vh,150px);
+    height:min(19svh,150px);
+  }
+}
+
+
 
 /* Homepage video feature */
 /* Homepage contact section */
@@ -3034,29 +3323,62 @@ a.show-row[href]{cursor:pointer}
   gap:5px 12px;
   margin:10px 0 0;
   color:var(--ink);
-  font-size:.78em;
+  font-size:clamp(.86em,1.25vw,1.05em);
   letter-spacing:1.4px;
   line-height:1.25;
   text-transform:uppercase;
   text-shadow:0 2px 14px rgba(0,0,0,.9);
 }
 .album-hero-caption span{color:#e0b78e;font-size:.78em;letter-spacing:2px}
+
+/* The whole release line breathes in and out. This page is the destination for
+   a paid campaign, so the announcement has to catch the eye before anything
+   else and push toward Listen Now. Slow — a ~2.6s cycle reads as deliberate,
+   and anything faster strays into strobe territory.
+   Two classes deep because `.hero p` already sets a fadeUp animation and would
+   otherwise win on specificity. */
+.album-hero .album-hero-caption{
+  animation:heroCaptionPulse 2.6s ease-in-out infinite;
+  will-change:opacity,transform;
+}
+/* Bright is the 0%/100% frame deliberately: that is also the resting state if
+   animations never run (reduced motion, a backgrounded tab, an engine that
+   drops the animation), and a headline stuck at a third opacity would be the
+   worst possible failure for an ad landing page. */
+@keyframes heroCaptionPulse{
+  0%,100%{
+    opacity:1;
+    transform:scale(1.025);
+    text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 28px rgba(248,143,158,.42);
+  }
+  50%{
+    opacity:.38;
+    transform:scale(.988);
+    text-shadow:0 2px 14px rgba(0,0,0,.9);
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .album-hero .album-hero-caption{animation:none;opacity:1;transform:none}
+}
 .album-hero .hero-ctas{
   display:flex;
   flex-flow:row wrap;
   justify-content:center;
   align-items:center;
-  gap:7px;
-  margin-top:12px;
+  gap:clamp(10px,1.3vw,16px);
+  margin-top:clamp(18px,3vh,32px);
 }
 .album-hero .hero-ctas > .cta-row{display:contents}
+/* These are the primary calls to action on the whole site — sized to read as
+   such rather than as captions under the wordmark. */
 .album-hero .hero-ctas .btn{
   min-width:0;
-  padding:6px 10px 5px;
-  font-size:.62em;
-  letter-spacing:.5px;
+  padding:clamp(14px,1.7vh,21px) clamp(24px,2.8vw,42px) clamp(13px,1.6vh,20px);
+  font-size:clamp(.88em,1.4vw,1.2em);
+  letter-spacing:1.2px;
 }
-.album-hero .hero-ctas .btn::after{width:9px}
+.album-hero .hero-ctas .btn::after{width:15px}
+.album-hero .hero-ctas .btn:hover::after{width:30px}
 .album-presave-btn{background:var(--ink);color:#120c07;border-color:var(--ink)}
 
 /* Modern Nostalgia album tracklist */
@@ -3220,9 +3542,32 @@ a.show-row[href]{cursor:pointer}
   .album-hero .hero-inner{padding:68px 10px 28px}
   .album-hero h1{margin-bottom:12px}
   .album-hero .hero-logo{width:min(82vw,360px)}
-  .album-hero-caption{max-width:320px;margin-top:8px;font-size:.68em}
-  .album-hero .hero-ctas{margin-top:10px;gap:5px}
-  .album-hero .hero-ctas .btn{padding:5px 8px 4px;font-size:.56em}
+  .album-hero-caption{max-width:340px;margin-top:10px;font-size:.78em}
+  /* Paid traffic lands here from a music-video clip, so the reflex is to tap
+     "Watch the Video" — which was rendering wider than "Listen Now" and
+     winning the eye. Listen Now takes its own full-width row above the other
+     two, which drop to a secondary size beneath it. */
+  .album-hero .hero-ctas{
+    margin-top:16px;
+    gap:9px;
+    width:min(100%,330px);
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .album-hero .hero-ctas .btn{padding:12px 19px 11px;font-size:.85em;letter-spacing:1px}
+  .album-hero .hero-ctas .album-presave-btn{
+    flex:0 0 100%;
+    padding:16px 22px 15px;
+    font-size:1.05em;
+    letter-spacing:1.6px;
+  }
+  .album-hero .hero-ctas .btn.ghost{
+    flex:1 1 0;
+    min-width:0;
+    padding:10px 10px 9px;
+    font-size:.74em;
+    letter-spacing:.8px;
+  }
   .album-tracklist-intro{grid-template-columns:120px minmax(0,1fr);gap:16px}
   .album-tracklist-copy h2{font-size:clamp(1.75em,8vw,2.35em)}
   .album-tracklist-panel{padding:10px 8px 8px}
@@ -3235,7 +3580,9 @@ a.show-row[href]{cursor:pointer}
     font-size:.76em;
   }
   .album-track-state{grid-column:3}
-  .album-track-time{display:none}
+  /* Every track carries a duration now, so the column is worth its width —
+     it was hidden back when only the three released singles had one. */
+  .album-track-time{font-size:.78em;opacity:.72}
   .album-track-streams{gap:6px}
 }
 @media (max-height:500px) and (orientation:landscape){

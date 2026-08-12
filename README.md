@@ -62,6 +62,27 @@ It writes every web variant into `assets/images/` and regenerates
 `data/epk-images.json` and `data/poster-images.json`. Commit `assets/` and the
 manifests; `_source/` stays local.
 
+## Release links
+
+Every streaming URL for the current release lives in `data/release.json`. That is
+the only file to touch when platform links arrive:
+
+```json
+"links": {
+  "spotify": "https://open.spotify.com/album/...",
+  "apple":   "https://music.apple.com/...",
+  "bandcamp": "https://dirtyaesthetic.bandcamp.com/",
+  "youtube": "",
+  "soundcloud": ""
+}
+```
+
+A URL that is filled in renders its button on the homepage and the music page.
+One left empty has its button removed rather than shipped pointing nowhere, so
+partial link sets are safe to deploy. The `smartLink` (DistroKid HyperFollow) is
+the always-present "Listen Now" button and needs no change — it resolves to
+streaming services once the release is live.
+
 ## Shows
 
 Upcoming shows live in `data/shows.json` under `upcoming`. The homepage only renders `upcoming` (via `js/main.js`).

@@ -359,6 +359,15 @@ window.addEventListener('beforeprint', () => {
     goToSection(currentSectionIndex() + (forward ? 1 : -1))
   }
 
+  // The hero's scroll cue advances one section, same as a wheel gesture.
+  const scrollCue = document.querySelector('.scroll-cue')
+  if (scrollCue) {
+    scrollCue.addEventListener('click', () => {
+      if (spatialEnabled) goToSection(currentSectionIndex() + 1)
+      else scrollToChapter(1)
+    })
+  }
+
   function scrollToChapter(index){
     if (spatialEnabled) {
       goToSection(clamp(index, 0, sectionTargets.length - 1))
@@ -387,6 +396,14 @@ window.addEventListener('beforeprint', () => {
         parallaxTargets.push({ node, speed, top: rect.top + scrollY, height: rect.height })
       })
     })
+
+    // The pinned footer's height varies with viewport width (the links wrap),
+    // so the space each slide reserves for it is measured rather than guessed.
+    const footer = document.querySelector('.site-footer')
+    if (footer && chapters.length) {
+      document.body.style.setProperty('--home-footer-h',
+        spatialEnabled ? `${Math.round(footer.offsetHeight)}px` : '')
+    }
 
     chapterMetrics = chapters.map(section => ({
       top: section.offsetTop,
@@ -799,6 +816,31 @@ bindIrrationalScrollLinks()
 
   observeReveal()
   window.__observeReveal = observeReveal
+})()
+
+// ===== Release streaming links =====
+// Every platform URL for the current release lives in data/release.json, so
+// adding one the day it goes live is a single-file edit with no markup change.
+// A button whose URL is still empty is removed rather than shipped pointing
+// nowhere, and the buttons start hidden so none of them flash in first.
+;(function releaseLinks(){
+  const buttons = document.querySelectorAll('[data-stream]')
+  if(!buttons.length) return
+
+  const drop = () => buttons.forEach(button => button.remove())
+
+  fetch('data/release.json', { cache: 'no-store' })
+    .then(response => response.ok ? response.json() : Promise.reject())
+    .then(data => {
+      const links = (data.album && data.album.links) || {}
+      buttons.forEach(button => {
+        const url = links[button.dataset.stream]
+        if(!url){ button.remove(); return }
+        button.href = url
+        button.hidden = false
+      })
+    })
+    .catch(drop)
 })()
 
 // Music service toggle
