@@ -49,6 +49,31 @@ picture{display:contents}
 /* header */
 .site-header{display:flex;justify-content:space-between;align-items:center;padding:16px clamp(16px,4vw,32px);border-bottom:1px solid rgba(255,255,255,.06);position:absolute;top:0;left:0;right:0;z-index:1000;background:transparent}
 .home-page .site-header{position:fixed}
+/* Content scrolls underneath the fixed bar, so the nav needs its own ground to
+   stay readable — a scrim that fades out at the bottom edge rather than a
+   solid band, matching how the pinned footer handles the same problem. */
+.site-header::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(6,4,3,.86) 0%,rgba(6,4,3,.66) 55%,rgba(6,4,3,0) 100%);
+  -webkit-backdrop-filter:blur(9px) saturate(.85);
+  backdrop-filter:blur(9px) saturate(.85);
+  /* The blur has to stop where the scrim does, or a hard rectangular edge
+     shows against whatever is passing under it. */
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 58%,transparent 100%);
+}
+/* The open mobile drawer supplies its own solid panel. */
+.nav-collapsed:has(.nav.active)::before{display:none}
+.site-header .brand-container,
+.site-header .nav,
+.site-header .hamburger{position:relative;z-index:1}
+/* Type over moving artwork: a light shadow keeps the links legible on the
+   frames where the scrim alone is not enough. */
+.site-header .nav a{text-shadow:0 1px 10px rgba(0,0,0,.65)}
 .brand-container{display:flex;flex-direction:row;align-items:center;gap:12px}
 .brand{display:flex;align-items:center;transition:opacity .2s ease}
 .brand img{height:clamp(36px,7vw,48px);width:auto;display:block}
@@ -509,6 +534,99 @@ body.contact-page-bg{
 
 /* footer */
 .site-footer{display:flex;flex-direction:column;align-items:center;gap:16px;padding:32px clamp(16px,4vw,32px);border-top:1px solid rgba(255,255,255,.06);animation:fadeIn .6s ease .2s both;text-align:center}
+
+
+
+/* ===== iOS / touch refinements ===== */
+/* Most of this traffic is iPhone, so these target real Safari behaviours
+   rather than being generic mobile polish. */
+html{
+  /* Safari inflates text in landscape without this. */
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+body{
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+/* Kills the grey flash on tap and the legacy 300ms double-tap delay. */
+a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+/* The header is fixed on phones, so it has to clear the notch. env() is 0 on
+   hardware without one, so this costs nothing elsewhere. */
+.site-header{
+  padding-top:calc(16px + env(safe-area-inset-top));
+  padding-left:calc(clamp(16px,4vw,32px) + env(safe-area-inset-left));
+  padding-right:calc(clamp(16px,4vw,32px) + env(safe-area-inset-right));
+}
+.site-footer{
+  padding-bottom:calc(32px + env(safe-area-inset-bottom));
+}
+
+@media (pointer:coarse){
+  /* Apple's 44px minimum. Added as padding so the hit area grows without the
+     type or layout changing size. */
+  .nav a{padding-top:10px;padding-bottom:10px}
+  .site-footer .social a{padding:7px 3px}
+  .site-footer .legal a{padding:7px 4px}
+  .album-hero .hero-ctas .btn.ghost{min-height:44px}
+  .album-cta-row .btn{min-height:44px}
+  .album-stream-link{min-height:40px;align-items:center}
+  .scroll-cue{padding:10px 16px}
+  /* Momentum scrolling stays native; no interpolator on touch. */
+  .lightbox-overlay{-webkit-overflow-scrolling:touch}
+}
+
+/* ===== Brand streaming buttons ===== */
+/* Same chunky .btn shape as the old Listen Now — the shape is what carries the
+   design, the colour is what makes the platform obvious at a glance. */
+.btn-spotify,
+.btn-apple{
+  border-color:transparent;
+}
+.btn-spotify{background:#1DB954;color:#08130c}
+.btn-spotify:hover,
+.btn-spotify:focus-visible{background:#1ed760;color:#08130c}
+.btn-apple{background:linear-gradient(135deg,#fc3c44 0%,#d93036 100%);color:#fff}
+.btn-apple:hover,
+.btn-apple:focus-visible{background:linear-gradient(135deg,#ff5058 0%,#fc3c44 100%);color:#fff}
+.btn-brand-icon{
+  width:1.15em;
+  height:1.15em;
+  flex-shrink:0;
+  margin-right:.1em;
+}
+/* The arrow flourish on .btn would crowd the platform icon. */
+.btn-spotify::after,
+.btn-apple::after{display:none}
+
+.album-cta-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:14px;
+}
+
+/* Spotify player inside the album slide */
+.album-player{margin-top:16px;width:100%}
+/* Same frame and drop shadow as the tracklist panel above it, so the embed
+   reads as part of the slide instead of a bright card pasted over it. */
+.album-player iframe{
+  display:block;
+  width:100%;
+  border:1px solid rgba(240,230,216,.11);
+  box-shadow:0 24px 70px rgba(0,0,0,.42);
+}
+/* It rides under the tracklist in the wide column rather than spanning the
+   grid: full width it read as a grey slab across the slide, and the row it
+   added was the height that pushed the whole composition off-centre. */
+.album-tracklist-layout > .album-player{
+  grid-column:2;
+  grid-row:2;
+  margin-top:clamp(12px,1.6vh,20px);
+}
 
 /* ===== Music page — featured release ===== */
 /* The current album leads the page at a size the catalog grid below cannot
@@ -1475,12 +1593,18 @@ body.privacy-page .privacy-page-main p{
      width it would run past the bottom of the viewport on shorter screens.
      Width follows from the aspect ratio. */
   .spatial-scroll-active .video-feature{
-    padding:clamp(32px,4vh,60px) clamp(20px,5vw,64px);
+    padding:0 clamp(20px,5vw,64px);
+  }
+  /* Centred in the clear band, not the whole slide — otherwise the kicker
+     sits under the header scrim. */
+  .spatial-scroll-active .video-feature > .chapter-scene{
+    padding-top:calc(var(--home-header-h,81px) + clamp(18px,3.4vh,44px));
+    padding-bottom:calc(var(--home-footer-h,110px) + clamp(18px,3.4vh,44px));
   }
   .spatial-scroll-active .video-feature .video-embed-large{
     /* Not min(100%, ...) — the flex parent's height is auto, so the 100% is
        indefinite and the box collapses. The calc alone is definite. */
-    height:calc(100svh - var(--home-footer-h,110px) - 210px);
+    height:calc(100svh - var(--home-header-h,81px) - var(--home-footer-h,110px) - 195px);
     width:auto;
     max-width:100%;
   }
@@ -1545,6 +1669,37 @@ body.privacy-page .privacy-page-main p{
      scene, while the regular one-column form is preserved everywhere else. */
   .spatial-scroll-active .home-contact{
     padding:clamp(68px,8vh,92px) clamp(48px,7vw,96px);
+  }
+  /* The album slide is a fixed 100svh carrying cover, copy, eleven tracks and
+     the player. Rather than hard-compressing every part to survive the
+     shortest supported screen — which left a 260px hole under the content on
+     everything taller — the slide centres itself in the band between the two
+     fixed bars and sizes its parts off that band with vh clamps. */
+  .spatial-scroll-active .album-tracklist-section{
+    padding-top:0;
+    padding-bottom:0;
+  }
+  .spatial-scroll-active .album-tracklist-section > .chapter-scene{
+    justify-content:center;
+    padding-top:calc(var(--home-header-h,81px) + clamp(12px,2.4vh,30px));
+    padding-bottom:calc(var(--home-footer-h,110px) + clamp(12px,2.4vh,30px));
+  }
+  /* The scene is a centring flex column; without this the layout is allowed to
+     shrink below its content and the player spills past the footer. */
+  .spatial-scroll-active .album-tracklist-layout{flex-shrink:0;row-gap:0}
+  .spatial-scroll-active .album-tracklist-layout > .album-player{margin-top:clamp(12px,2.2vh,26px)}
+  .spatial-scroll-active .album-tracklist-cover{width:min(100%,clamp(190px,30vh,320px))}
+  /* Spotify's single-row player. Its taller embeds re-list tracks the panel
+     above already shows, and at slide widths they pad themselves out with
+     empty grey — so the bar is both tidier and cheaper in height. */
+  .spatial-scroll-active .album-player iframe{height:80px}
+  .spatial-scroll-active .album-tracklist-copy{margin-top:clamp(12px,2vh,22px)}
+  .spatial-scroll-active .album-tracklist-panel{padding:clamp(10px,1.6vh,18px) clamp(14px,1.4vw,22px)}
+  .spatial-scroll-active .album-tracklist-heading{padding-bottom:clamp(6px,1vh,12px)}
+  .spatial-scroll-active .album-track{
+    min-height:0;
+    padding:clamp(3px,.7vh,9px) 12px;
+    font-size:clamp(.8em,1.05vh,.92em);
   }
   .spatial-scroll-active .home-contact-inner{
     width:min(100%,1040px);
@@ -3398,6 +3553,11 @@ a.show-row[href]{cursor:pointer}
   background-position:center 50%;
   background-size:cover;
 }
+/* Free-scroll homepage: the header is still fixed, so the slide's own padding
+   has to be at least tall enough to keep the cover out from under it. */
+.home-page:not(.spatial-scroll-active) .album-tracklist-section{
+  padding-top:max(clamp(62px,8vh,92px),calc(var(--home-header-h,81px) + clamp(20px,3vh,40px)));
+}
 .album-tracklist-overlay{
   position:absolute;
   inset:0;
@@ -3410,13 +3570,19 @@ a.show-row[href]{cursor:pointer}
   position:relative;
   z-index:1;
   display:grid;
-  grid-template-columns:minmax(230px,300px) minmax(0,1fr);
-  gap:clamp(32px,5vw,72px);
+  grid-template-columns:minmax(230px,320px) minmax(0,1fr);
+  grid-template-rows:auto auto;
+  gap:0 clamp(32px,5vw,72px);
   width:min(100%,1180px);
   margin:0 auto;
-  align-items:center;
+  /* Cover and tracklist start on the same line — centred, the cover floated at
+     a height that matched nothing else on the slide. */
+  align-items:start;
 }
-.album-tracklist-intro{min-width:0}
+/* The cover column runs the full height of the tracklist-plus-player stack so
+   the two sides read as one block instead of two loose piles. */
+.album-tracklist-intro{min-width:0;grid-column:1;grid-row:1/span 2}
+.album-tracklist-panel{grid-column:2;grid-row:1}
 .album-tracklist-cover{width:min(100%,265px);cursor:zoom-in}
 .album-tracklist-cover:focus-visible{outline:2px solid var(--ink);outline-offset:5px}
 .album-tracklist-cover img{
@@ -3522,7 +3688,11 @@ a.show-row[href]{cursor:pointer}
   }
   .album-hero .hero-logo{width:min(78vw,440px)}
   .album-tracklist-section{min-height:0;padding:64px 18px}
-  .album-tracklist-layout{grid-template-columns:1fr;gap:28px}
+  .album-tracklist-layout{grid-template-columns:1fr;grid-template-rows:none;gap:28px}
+  /* One column, so the two-column placement has to be handed back to flow. */
+  .album-tracklist-intro,
+  .album-tracklist-panel,
+  .album-tracklist-layout > .album-player{grid-column:1;grid-row:auto;margin-top:0}
   .album-tracklist-intro{
     display:grid;
     grid-template-columns:minmax(120px,180px) minmax(0,1fr);
@@ -3555,18 +3725,25 @@ a.show-row[href]{cursor:pointer}
     margin-right:auto;
   }
   .album-hero .hero-ctas .btn{padding:12px 19px 11px;font-size:.85em;letter-spacing:1px}
-  .album-hero .hero-ctas .album-presave-btn{
-    flex:0 0 100%;
-    padding:16px 22px 15px;
-    font-size:1.05em;
-    letter-spacing:1.6px;
+  /* Two streaming buttons share the top row and stay the biggest thing here;
+     the three secondary links pair off beneath them. Sized off a 50% basis so
+     nothing gets flex-squeezed into an unreadable sliver. */
+  .album-hero .hero-ctas .btn-spotify,
+  .album-hero .hero-ctas .btn-apple{
+    flex:1 1 calc(50% - 5px);
+    min-width:0;
+    min-height:50px;
+    padding:14px 12px 13px;
+    font-size:.98em;
+    letter-spacing:1.2px;
   }
   .album-hero .hero-ctas .btn.ghost{
-    flex:1 1 0;
+    flex:1 1 calc(50% - 5px);
     min-width:0;
-    padding:10px 10px 9px;
-    font-size:.74em;
-    letter-spacing:.8px;
+    min-height:44px;
+    padding:10px 8px 9px;
+    font-size:.72em;
+    letter-spacing:.7px;
   }
   .album-tracklist-intro{grid-template-columns:120px minmax(0,1fr);gap:16px}
   .album-tracklist-copy h2{font-size:clamp(1.75em,8vw,2.35em)}
@@ -3607,9 +3784,8 @@ a.show-row[href]{cursor:pointer}
     radial-gradient(circle at 88% 28%,rgba(122,54,0,.12),transparent 34rem),
     #050403;
 }
-.poster-archive-page .site-header{
-  background:linear-gradient(180deg,rgba(0,0,0,.72),rgba(0,0,0,.08));
-}
+/* The shared header scrim covers what this gradient used to; stacking both
+   just made the top of the archive read as a black bar. */
 .poster-archive-main{
   width:min(100%,1440px);
   min-height:100vh;

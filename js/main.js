@@ -359,6 +359,23 @@ window.addEventListener('beforeprint', () => {
     goToSection(currentSectionIndex() + (forward ? 1 : -1))
   }
 
+  // In-page links that point at a chapter (Watch the Video, Tracklist, Album
+  // Release Show) move through the section engine, so targetIndex stays honest
+  // and the next wheel gesture continues from where the click landed.
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    if (link.classList.contains('chapter-nav-link')) return
+    const id = (link.getAttribute('href') || '').slice(1)
+    if (!id) return
+    const index = chapters.findIndex(section => section.id === id)
+    if (index < 0) return
+    link.addEventListener('click', (event) => {
+      if (!spatialEnabled) return
+      event.preventDefault()
+      goToSection(index)
+      window.history.replaceState(null, '', `#${id}`)
+    })
+  })
+
   // The hero's scroll cue advances one section, same as a wheel gesture.
   const scrollCue = document.querySelector('.scroll-cue')
   if (scrollCue) {
@@ -403,6 +420,14 @@ window.addEventListener('beforeprint', () => {
     if (footer && chapters.length) {
       document.body.style.setProperty('--home-footer-h',
         spatialEnabled ? `${Math.round(footer.offsetHeight)}px` : '')
+    }
+
+    // Same reasoning for the fixed header, minus the spatial condition — it is
+    // fixed on the homepage in every mode, so whatever has to clear it needs
+    // the real number either way.
+    const headerEl = document.querySelector('.site-header')
+    if (headerEl && chapters.length) {
+      document.body.style.setProperty('--home-header-h', `${Math.round(headerEl.offsetHeight)}px`)
     }
 
     chapterMetrics = chapters.map(section => ({
@@ -693,6 +718,9 @@ bindIrrationalScrollLinks()
       link.addEventListener('click', (e) => {
         const target = document.querySelector(href)
         if (!target) return
+        // Chapter sections are driven by the section engine so the wheel knows
+        // where it ended up; two interpolators on one click fight each other.
+        if (target.hasAttribute('data-scroll-chapter')) return
         e.preventDefault()
         lenis.scrollTo(target, { offset: 0, duration: 1.45 })
       })
@@ -843,29 +871,6 @@ bindIrrationalScrollLinks()
     .catch(drop)
 })()
 
-// Music service toggle
-const toggleButtons = document.querySelectorAll('.toggle-btn')
-const releaseLinks = document.querySelectorAll('.release-link')
-
-if (toggleButtons.length > 0 && releaseLinks.length > 0) {
-  toggleButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const service = btn.getAttribute('data-service')
-      
-      // Update active state
-      toggleButtons.forEach(b => b.classList.remove('active'))
-      btn.classList.add('active')
-      
-      // Update all release links
-      releaseLinks.forEach(link => {
-        const url = link.getAttribute(`data-${service}`)
-        if (url) {
-          link.setAttribute('href', url)
-        }
-      })
-    })
-  })
-}
 
 // Add ordinal suffix to dates
 function addOrdinal(dateStr) {

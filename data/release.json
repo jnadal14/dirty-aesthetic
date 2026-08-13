@@ -1,17 +1,17 @@
 {
-  "_readme": "Streaming links for the current release. Fill in a URL and it appears on the site; leave it empty and that button is removed rather than shipped dead. This is the only file that needs editing when the platform links arrive.",
+  "_readme": "Streaming links for the current release. Fill in a URL and it appears on the site; leave it empty and that button is removed rather than shipped dead.",
   "album": {
     "title": "Modern Nostalgia",
     "releaseDate": "2026-08-12",
     "trackCount": 11,
-    "smartLink": "https://distrokid.com/hyperfollow/dirtyaesthetic/modern-nostalgia-2?ref=release",
     "links": {
-      "spotify": "",
-      "apple": "",
+      "spotify": "https://open.spotify.com/album/1aw7AnRJyuuTQPMpLaX0J0",
+      "apple": "https://music.apple.com/us/album/modern-nostalgia/6796626416",
       "bandcamp": "https://dirtyaesthetic.bandcamp.com/album/modern-nostalgia",
       "youtube": "",
       "soundcloud": ""
-    }
+    },
+    "spotifyEmbed": "https://open.spotify.com/embed/album/1aw7AnRJyuuTQPMpLaX0J0?utm_source=generator&theme=0"
   },
   "video": {
     "title": "Modern Nostalgia",
