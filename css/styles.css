@@ -618,6 +618,13 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
   width:100%;
   border:1px solid rgba(240,230,216,.11);
   box-shadow:0 24px 70px rgba(0,0,0,.42);
+  /* Spotify's own layout switches to a single-row player below roughly 500px
+     of embed width — and it does that regardless of the height it is given,
+     clipping its track rows and padding the remainder out with empty grey.
+     The full 352px embed only ever rendered properly on the widest screens,
+     so every layout here gets the row instead. The panel beside it already
+     lists all eleven tracks. */
+  height:100px;
 }
 /* It rides under the tracklist in the wide column rather than spanning the
    grid: full width it read as a grey slab across the slide, and the row it
@@ -1689,9 +1696,7 @@ body.privacy-page .privacy-page-main p{
   .spatial-scroll-active .album-tracklist-layout{flex-shrink:0;row-gap:0}
   .spatial-scroll-active .album-tracklist-layout > .album-player{margin-top:clamp(12px,2.2vh,26px)}
   .spatial-scroll-active .album-tracklist-cover{width:min(100%,clamp(190px,30vh,320px))}
-  /* Spotify's single-row player. Its taller embeds re-list tracks the panel
-     above already shows, and at slide widths they pad themselves out with
-     empty grey — so the bar is both tidier and cheaper in height. */
+  /* The row packs tighter at slide width than it does on a phone. */
   .spatial-scroll-active .album-player iframe{height:80px}
   .spatial-scroll-active .album-tracklist-copy{margin-top:clamp(12px,2vh,22px)}
   .spatial-scroll-active .album-tracklist-panel{padding:clamp(10px,1.6vh,18px) clamp(14px,1.4vw,22px)}
