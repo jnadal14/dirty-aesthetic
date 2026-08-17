@@ -217,6 +217,8 @@ window.addEventListener('beforeprint', () => {
   const GESTURE_GAP = 90          // ms of quiet that marks a genuinely new gesture
   const CONTINUOUS_ADVANCE = 950  // ms; unbroken input still steps at this rate
   const SUSTAIN_RATIO = .5        // vs the gesture's peak: sustained, not decaying
+  const SNAP_EPSILON = 4          // px; this close to a target counts as on it
+  const SETTLE_DELAY = 140        // ms of scroll quiet before rescuing a stranded page
 
   const easeInOutCubic = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 
@@ -229,7 +231,11 @@ window.addEventListener('beforeprint', () => {
   let lastAdvanceAt = 0
   let sawGapSinceAdvance = true
   let gesturePeak = 0
+  let settleTimer = 0
 
+  // Which section the page is closest to. This is the right question for "where
+  // am I" — the chapter nav, Home/End — but the wrong one for "where does one
+  // step go", see stepIndex.
   function currentSectionIndex(){
     const y = window.scrollY
     let nearest = 0
@@ -239,13 +245,62 @@ window.addEventListener('beforeprint', () => {
     return nearest
   }
 
-  function tweenTo(top){
+  // The section one step along from where the page ACTUALLY is, rather than
+  // from whichever section it is nearest.
+  //
+  // Stepping from the nearest section is what let a gesture skip a whole slide.
+  // Anything that scrolls the page without going through this engine leaves it
+  // off-target — and the page has such a thing: the video chapter is covered by
+  // a cross-origin YouTube iframe, so a wheel with the pointer over it is
+  // dispatched inside that frame, never reaches handleWheel, is never
+  // preventDefault'ed, and chains natively to the page. Once that drift passed
+  // half a viewport the nearest section was already the NEXT one, so
+  // nearest + 1 jumped clean over it: measured landing on Sugar on the Rocks
+  // from 451px past the video, with Shows never appearing at all.
+  //
+  // Asking for the first target beyond the current position instead means a
+  // gesture lands on the adjacent section no matter how the page got here.
+  function stepIndex(direction){
+    const y = window.scrollY
+    if (direction > 0) {
+      for (let i = 0; i < sectionTargets.length; i++) {
+        if (sectionTargets[i] > y + SNAP_EPSILON) return i
+      }
+      return sectionTargets.length - 1
+    }
+    for (let i = sectionTargets.length - 1; i >= 0; i--) {
+      if (sectionTargets[i] < y - SNAP_EPSILON) return i
+    }
+    return 0
+  }
+
+  // Belt and braces for the same class of problem: if the page ends up resting
+  // between sections — an iframe chaining its scroll, a focus jump, a trackpad
+  // edge case — settle it onto the nearest one rather than leaving it stranded.
+  function scheduleSettle(){
+    if (!spatialEnabled || reduceMotion.matches) return
+    clearTimeout(settleTimer)
+    settleTimer = setTimeout(() => {
+      if (tweenFrame || performance.now() < animatingUntil) return
+      const index = currentSectionIndex()
+      const top = sectionTargets[index]
+      if (top === undefined || Math.abs(top - window.scrollY) <= SNAP_EPSILON) return
+      targetIndex = index
+      tweenTo(top, false)
+    }, SETTLE_DELAY)
+  }
+
+  // `arm` decides whether this counts as a transition the wheel has to respect.
+  // A user-initiated move does; the settle rescue below must NOT, or the next
+  // notch takes the mid-transition branch and steps off a targetIndex the page
+  // has never actually reached — which is a two-section jump by another route.
+  function tweenTo(top, arm = true){
     if (tweenFrame) cancelAnimationFrame(tweenFrame)
     const from = window.scrollY
     const distance = top - from
     if (!distance) return
     const start = performance.now()
-    animatingUntil = start + SECTION_DURATION
+    if (arm) animatingUntil = start + SECTION_DURATION
 
     const step = (now) => {
       const t = Math.min(1, (now - start) / SECTION_DURATION)
@@ -294,7 +349,14 @@ window.addEventListener('beforeprint', () => {
         gesturePeak = magnitude
         sawGapSinceAdvance = false
         lastAdvanceAt = now
-        goToSection(targetIndex + Math.sign(delta))
+        // Chain from the transition's destination so notches during an
+        // animation queue up smoothly — but never name a section further than
+        // one step from where the page physically is, or a stale targetIndex
+        // turns one notch into a two-section jump.
+        const chained = targetIndex + Math.sign(delta)
+        goToSection(delta > 0
+          ? Math.min(chained, stepIndex(1))
+          : Math.max(chained, stepIndex(-1)))
       }
       return
     }
@@ -343,7 +405,7 @@ window.addEventListener('beforeprint', () => {
     wheelAccum = 0
     sawGapSinceAdvance = false
     lastAdvanceAt = now
-    goToSection(currentSectionIndex() + direction)
+    goToSection(stepIndex(direction))
   }
 
   function handleKey(event){
@@ -356,11 +418,11 @@ window.addEventListener('beforeprint', () => {
     event.preventDefault()
     if (event.key === 'Home') return goToSection(0)
     if (event.key === 'End') return goToSection(sectionTargets.length - 1)
-    goToSection(currentSectionIndex() + (forward ? 1 : -1))
+    goToSection(stepIndex(forward ? 1 : -1))
   }
 
-  // In-page links that point at a chapter (Watch the Video, Tracklist, Album
-  // Release Show) move through the section engine, so targetIndex stays honest
+  // In-page links that point at a chapter (Watch the Video, Tracklist, Name
+  // It Yourself Fest) move through the section engine, so targetIndex stays honest
   // and the next wheel gesture continues from where the click landed.
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     if (link.classList.contains('chapter-nav-link')) return
@@ -376,11 +438,30 @@ window.addEventListener('beforeprint', () => {
     })
   })
 
+  // Dismiss the embed shield on the click that starts the video, so arming the
+  // player costs the same one click it always did. See .embed-scroll-shield in
+  // the stylesheet for why the shield is there at all.
+  document.querySelectorAll('.embed-scroll-shield').forEach(shield => {
+    shield.addEventListener('click', () => {
+      const box = shield.closest('.video-embed-large')
+      const frame = box && box.querySelector('iframe')
+      if (box) box.classList.add('is-embed-live')
+      // Spend the arming click on playback rather than wasting it. If the
+      // browser declines — the gesture happened in this frame, not YouTube's —
+      // the shield is gone either way and its own play button is right there.
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.postMessage(
+          '{"event":"command","func":"playVideo","args":""}',
+          'https://www.youtube-nocookie.com')
+      }
+    })
+  })
+
   // The hero's scroll cue advances one section, same as a wheel gesture.
   const scrollCue = document.querySelector('.scroll-cue')
   if (scrollCue) {
     scrollCue.addEventListener('click', () => {
-      if (spatialEnabled) goToSection(currentSectionIndex() + 1)
+      if (spatialEnabled) goToSection(stepIndex(1))
       else scrollToChapter(1)
     })
   }
@@ -586,6 +667,7 @@ window.addEventListener('beforeprint', () => {
     if (!spatialEnabled) {
       animatingUntil = 0
       wheelAccum = 0
+      clearTimeout(settleTimer)
       if (tweenFrame) { cancelAnimationFrame(tweenFrame); tweenFrame = 0 }
     }
 
@@ -601,11 +683,28 @@ window.addEventListener('beforeprint', () => {
     schedule()
   }
 
-  window.addEventListener('scroll', schedule, { passive: true })
+  window.addEventListener('scroll', () => { schedule(); scheduleSettle() }, { passive: true })
   window.addEventListener('wheel', handleWheel, { passive: false })
   window.addEventListener('keydown', handleKey)
   window.addEventListener('resize', refreshState, { passive: true })
   window.addEventListener('load', refreshState)
+
+  // Arriving from another page with a chapter hash — the nav's festival button
+  // is "/#upcoming-section" everywhere but the homepage. The browser's own
+  // anchor jump happens before the spatial layout exists, so it lands short;
+  // re-place it against the measured targets. Registered after refreshState so
+  // the targets are already measured when this runs.
+  window.addEventListener('load', () => {
+    const id = (window.location.hash || '').slice(1)
+    if (!id) return
+    const index = chapters.findIndex(section => section.id === id)
+    if (index < 0) return
+    const top = sectionTargets[index]
+    if (top === undefined) return
+    targetIndex = index
+    window.scrollTo(0, top)
+    schedule()
+  })
   if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', refreshState)
   if (spatialMotion.addEventListener) spatialMotion.addEventListener('change', refreshState)
 
@@ -706,6 +805,17 @@ bindIrrationalScrollLinks()
       syncTouch: false
     })
 
+    // refreshState() is what normally decides this, but it first runs before
+    // this script has loaded — window.__lenis is still undefined then, so the
+    // assignment there is skipped and Lenis stays on smoothWheel until `load`.
+    // On a first visit `load` waits on the hero image and the eager shows
+    // banner, so for those seconds Lenis and the section tween were both
+    // writing scroll every frame and whichever wrote last won. Publish and
+    // sync here, at the only moment that is guaranteed to be after both the
+    // instance and the mode exist.
+    window.__lenis = lenis
+    lenis.options.smoothWheel = !document.body.classList.contains('spatial-scroll-active')
+
     function raf(time){
       lenis.raf(time)
       requestAnimationFrame(raf)
@@ -728,7 +838,6 @@ bindIrrationalScrollLinks()
 
     bindCenteredSectionScrollLinks()
     bindIrrationalScrollLinks()
-    window.__lenis = lenis
   }
   document.head.appendChild(script)
 })()
@@ -897,10 +1006,11 @@ function parseDateParts(dateStr) {
 
 // Load shows
 const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><span class="show-row-venue">TBA</span></div>`
-const featuredShowAssetVersion = '20260805-performance'
+const featuredShowSlug = 'name-it-yourself-fest-2026'
+const featuredShowAssetVersion = '20260816-nameityourself'
 
 function showMediaUrl(path){
-  if(!path || !path.includes('modern-nostalgia-album-release-2026')) return path
+  if(!path || !path.includes(featuredShowSlug)) return path
   return `${path}${path.includes('?') ? '&' : '?'}v=${featuredShowAssetVersion}`
 }
 
@@ -912,7 +1022,10 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   if(featuredSingle && showsHeading){
     showsHeading.textContent = data.upcoming[0].title
     if(showsKicker){
-      showsKicker.textContent = `One Night Only · ${data.upcoming[0].date}`
+      // A festival slot is not "one night only", so the lead-in comes from the
+      // show itself and only falls back for a headline date of our own.
+      const kicker = data.upcoming[0].kicker || 'One Night Only'
+      showsKicker.textContent = `${kicker} · ${data.upcoming[0].date}`
       showsKicker.hidden = false
     }
   } else {
@@ -960,9 +1073,11 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       } else {
         row.removeAttribute('href')
       }
-      const linkLabel = s.link ? (s.link.includes('cjsf') ? 'Stream Live' : 'Tickets') : ''
+      const linkLabel = s.link ? (s.linkLabel || (s.link.includes('cjsf') ? 'Stream Live' : 'Tickets')) : ''
       const arrowHtml = s.link ? `<span class="show-row-arrow">${linkLabel} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>` : ''
       const lineupHtml = s.lineup ? `<span class="show-row-lineup">${s.lineupPrefix || 'w/'} ${s.lineup}</span>` : ''
+      // Where the show itself has not been fully announced yet.
+      const noteHtml = s.note ? `<span class="show-row-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>${s.note}</span>` : ''
       const title = s.title || s.venue
       const location = s.title
         ? [s.venue, s.city, s.time].filter(Boolean).join(' · ')
@@ -984,6 +1099,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
           <span class="show-row-venue">${title} ${arrowHtml}</span>
           ${lineupHtml}
           <span class="show-row-city">${location}</span>
+          ${noteHtml}
         </div>
         ${posterHtml}`
       container.appendChild(row)

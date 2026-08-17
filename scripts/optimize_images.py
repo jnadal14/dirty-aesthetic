@@ -310,23 +310,45 @@ if r:
     report(ROOT / r["webp"])
 
 print("Featured show artwork")
-for src_name, out_name, width, jpeg_fallback in [
-    ("MODERN NOSTALGIA ALBUM RELEASE_08:14:26.PNG", "modern-nostalgia-album-release-2026.webp", 900, None),
-    ("MODERN NOSTALGIA ALBUM RELEASE_08:14:26_BANNER.PNG", "modern-nostalgia-album-release-2026-banner.webp", 1600, "modern-nostalgia-album-release-2026-banner.jpg"),
-]:
-    src = SRC / "posters" / src_name
-    if not src.exists():
-        print(f"  SKIP posters/{src_name} (missing)")
-        continue
-    dest = OUT_POSTERS_ROOT / out_name
-    save_resized_webp(src, dest, width, quality=82)
-    report(dest)
-    if jpeg_fallback:
-        with Image.open(src) as image:
-            resized = resize_to_width(ImageOps.exif_transpose(image), width)
-            jpeg_dest = OUT_POSTERS_ROOT / jpeg_fallback
-            save_jpeg(resized, jpeg_dest, quality=82)
-            report(jpeg_dest)
+# The show poster hangs in the upcoming-shows card. The banner is the same
+# artwork cropped wide: it sits behind that card and tiles the whole section
+# background, both of which crop to `cover` anyway, so the crop is chosen for
+# what survives — the centre band, clear of the title and the lineup panel.
+# Fractions rather than pixels so a re-export at another resolution still lands
+# on the same part of the picture.
+FEATURED_SHOW_POSTER = "NAME IT YOURSELF FEST_08:22:26.jpg"
+FEATURED_SHOW_SLUG = "name-it-yourself-fest-2026"
+FEATURED_BANNER_BAND = (0.225, 0.625)
+
+featured_src = SRC / "posters" / FEATURED_SHOW_POSTER
+if not featured_src.exists():
+    print(f"  SKIP posters/{FEATURED_SHOW_POSTER} (missing)")
+else:
+    with Image.open(featured_src) as image:
+        art = ImageOps.exif_transpose(image).convert("RGB")
+
+        poster = resize_to_width(art, 900)
+        poster_webp = OUT_POSTERS_ROOT / f"{FEATURED_SHOW_SLUG}.webp"
+        poster_jpeg = OUT_POSTERS_ROOT / f"{FEATURED_SHOW_SLUG}.jpg"
+        # The card renders it around 420px wide, so 900px of q78 is already
+        # generous — q82 cost another 60 KB on artwork this grainy for nothing.
+        save_webp_from_image(poster, poster_webp, quality=78)
+        save_jpeg(poster, poster_jpeg, quality=80)
+        print(f"  {FEATURED_SHOW_SLUG} {poster.width}x{poster.height}")
+        report(poster_webp)
+        report(poster_jpeg)
+
+        top = round(art.height * FEATURED_BANNER_BAND[0])
+        bottom = round(art.height * FEATURED_BANNER_BAND[1])
+        banner = resize_to_width(art.crop((0, top, art.width, bottom)), 1600)
+        banner_webp = OUT_POSTERS_ROOT / f"{FEATURED_SHOW_SLUG}-banner.webp"
+        banner_jpeg = OUT_POSTERS_ROOT / f"{FEATURED_SHOW_SLUG}-banner.jpg"
+        # Only ever seen through a scrim, behind text.
+        save_webp_from_image(banner, banner_webp, quality=72)
+        save_jpeg(banner, banner_jpeg, quality=74)
+        print(f"  {FEATURED_SHOW_SLUG}-banner {banner.width}x{banner.height}")
+        report(banner_webp)
+        report(banner_jpeg)
 
 print("Page backgrounds")
 # These were being served straight from assets/images/BACKGROUND/ as full-size

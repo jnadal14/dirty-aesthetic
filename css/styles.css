@@ -6,6 +6,13 @@
   --card:#0a0a0a;
   --highlight:#7a3600;
   --glow:rgba(176,122,63,.15);
+  /* Sampled off the Name It Yourself poster: the sun, the mushroom caps, and
+     the marigold field behind them. These carry the current show campaign —
+     the nav button and the whole upcoming-shows section — so retiring a show
+     is a matter of resampling these three, not hunting hex codes. */
+  --fest-sun:#efa937;
+  --fest-flame:#e85f1b;
+  --fest-marigold:#e08b16;
 }
 *{box-sizing:border-box}
 /* woff2 only: 37 KB against 81 KB for the same outlines, and it loads on every
@@ -84,9 +91,9 @@ picture{display:contents}
   display:inline-flex;
   align-items:center;
   padding:6px 10px 5px;
-  border:1px solid rgba(248,143,158,.48);
+  border:1px solid rgba(239,169,55,.5);
   border-radius:999px;
-  background:rgba(12,6,8,.7);
+  background:rgba(12,7,3,.72);
   color:#fff1ed;
   font-size:clamp(.68rem,1vw,.82rem);
   font-weight:700;
@@ -96,7 +103,7 @@ picture{display:contents}
   white-space:nowrap;
   box-shadow:0 6px 18px rgba(0,0,0,.28);
 }
-.brand-ticket:hover{border-color:#f88f9e;background:#f88f9e;color:#16090b}
+.brand-ticket:hover{border-color:var(--fest-sun);background:var(--fest-sun);color:#1a0d02}
 .brand-ticket-short{display:none}
 .nav{display:flex;align-items:center;gap:clamp(12px,2.5vw,20px)}
 .nav a{opacity:.9;position:relative;padding-bottom:4px;transition:opacity .2s ease;white-space:nowrap;letter-spacing:.5px;font-size:clamp(1.05rem,1.2vw,1.2rem)}
@@ -498,9 +505,37 @@ body.contact-page-bg{
 .featured-videos{display:flex;flex-direction:column;gap:clamp(24px,4vw,40px);padding:0 clamp(16px,4vw,48px) clamp(32px,5vw,56px);max-width:1000px;margin:0 auto}
 .featured-video{animation:fadeUp .6s ease both}
 .featured-video:nth-child(2){animation-delay:.15s}
-.video-embed-large{aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--card);box-shadow:0 8px 40px rgba(0,0,0,.4);transition:transform .3s ease,box-shadow .3s ease}
+.video-embed-large{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--card);box-shadow:0 8px 40px rgba(0,0,0,.4);transition:transform .3s ease,box-shadow .3s ease}
 .video-embed-large:hover{transform:translateY(-4px);box-shadow:0 16px 56px rgba(0,0,0,.5)}
 .video-embed-large iframe{width:100%;height:100%;border:none}
+/* A wheel whose pointer is over a cross-origin iframe is dispatched inside that
+   frame. It never enters this document's event path, so the section engine's
+   handler never runs, nothing calls preventDefault, and the browser chains the
+   scroll into the page at a raw delta the engine did not author. On the video
+   slide that iframe is the middle of the screen — exactly where the cursor is
+   when you scroll away from it.
+
+   This shield lives in OUR document, so the gesture reaches the engine. It only
+   exists where the engine actually owns the wheel, and the first click both
+   dismisses it and starts the video, so playback costs no extra click. The
+   YouTube poster and its own play button show straight through it. */
+.embed-scroll-shield{display:none}
+.spatial-scroll-active .embed-scroll-shield{
+  display:block;
+  position:absolute;
+  inset:0;
+  z-index:2;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  cursor:pointer;
+}
+.spatial-scroll-active .embed-scroll-shield:focus-visible{
+  outline:2px solid var(--fest-sun);
+  outline-offset:-4px;
+}
+.spatial-scroll-active .video-embed-large.is-embed-live .embed-scroll-shield{display:none}
 
 /* Watch — featured music video */
 .watch-feature{max-width:1000px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
@@ -575,6 +610,19 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
   .album-cta-row .btn{min-height:44px}
   .album-stream-link{min-height:40px;align-items:center}
   .scroll-cue{padding:10px 16px}
+  /* The show button is the header's main call to action but only renders about
+     19px tall on a phone. Growing the pill itself would push the header down,
+     so the hit area is extended past it instead — same look, thumb-sized. */
+  .brand-ticket{position:relative}
+  .brand-ticket::after{
+    content:'';
+    position:absolute;
+    left:0;
+    right:0;
+    top:50%;
+    height:44px;
+    transform:translateY(-50%);
+  }
   /* Momentum scrolling stays native; no interpolator on touch. */
   .lightbox-overlay{-webkit-overflow-scrolling:touch}
 }
@@ -1644,6 +1692,16 @@ body.privacy-page .privacy-page-main p{
   .spatial-scroll-active .shows-feature::before{
     animation:none;
   }
+  .spatial-scroll-active .shows-feature{padding:88px 0 32px}
+  /* The featured poster is portrait, and on a tall window its column width
+     alone would size it past 500px and push the heading under the header. On a
+     fixed-height slide it has to be capped by height, like the video. */
+  .spatial-scroll-active .shows-editorial--solo .show-row--solo{
+    padding:clamp(20px,3vw,34px);
+  }
+  .spatial-scroll-active .shows-editorial--solo .show-row--solo .show-row-poster img{
+    max-height:40vh;
+  }
 
   /* The camera now moves the whole scene, so the smaller content drift from
      the fallback experience is neutralized. Element reveals still run. */
@@ -1824,19 +1882,22 @@ blockquote.tiktok-embed section{margin:0!important}
 .shows-feature{
   position:relative;
   padding:clamp(48px,8vw,80px) 0 clamp(40px,6vw,64px);
-  background-color:#0a0705;
+  /* The section wears the featured show's artwork. The scrim is warm rather
+     than neutral black so the marigold underneath reads as the poster's own
+     light instead of a photo someone dimmed. */
+  background-color:#100802;
   background-image:
-    radial-gradient(ellipse 70% 60% at 20% 28%,rgba(248,143,158,.12) 0%,transparent 62%),
-    radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
-    linear-gradient(180deg,rgba(5,3,4,.76) 0%,rgba(8,5,6,.72) 40%,rgba(5,3,4,.9) 100%),
-    url('../assets/images/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance');
+    radial-gradient(ellipse 72% 62% at 22% 26%,rgba(239,169,55,.16) 0%,transparent 62%),
+    radial-gradient(ellipse 56% 48% at 82% 74%,rgba(232,95,27,.14) 0%,transparent 64%),
+    linear-gradient(180deg,rgba(12,6,1,.91) 0%,rgba(22,11,2,.85) 42%,rgba(7,4,1,.96) 100%),
+    url('../assets/images/posters/name-it-yourself-fest-2026-banner.jpg?v=20260816-nameityourself');
   background-image:
-    radial-gradient(ellipse 70% 60% at 20% 28%,rgba(248,143,158,.12) 0%,transparent 62%),
-    radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
-    linear-gradient(180deg,rgba(5,3,4,.76) 0%,rgba(8,5,6,.72) 40%,rgba(5,3,4,.9) 100%),
+    radial-gradient(ellipse 72% 62% at 22% 26%,rgba(239,169,55,.16) 0%,transparent 62%),
+    radial-gradient(ellipse 56% 48% at 82% 74%,rgba(232,95,27,.14) 0%,transparent 64%),
+    linear-gradient(180deg,rgba(12,6,1,.91) 0%,rgba(22,11,2,.85) 42%,rgba(7,4,1,.96) 100%),
     image-set(
-      url('../assets/images/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260805-performance') type('image/webp'),
-      url('../assets/images/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance') type('image/jpeg')
+      url('../assets/images/posters/name-it-yourself-fest-2026-banner.webp?v=20260816-nameityourself') type('image/webp'),
+      url('../assets/images/posters/name-it-yourself-fest-2026-banner.jpg?v=20260816-nameityourself') type('image/jpeg')
     );
   background-position:center,center,center,center;
   background-size:auto,auto,auto,cover;
@@ -1857,7 +1918,7 @@ blockquote.tiktok-embed section{margin:0!important}
   position:absolute;
   top:0;left:0;right:0;
   height:1px;
-  background:linear-gradient(90deg, transparent 5%, rgba(176,122,63,.4) 30%, rgba(176,122,63,.4) 70%, transparent 95%);
+  background:linear-gradient(90deg, transparent 5%, rgba(239,169,55,.5) 30%, rgba(232,95,27,.5) 70%, transparent 95%);
 }
 .shows-feature-inner{
   max-width:1000px;
@@ -1875,6 +1936,7 @@ blockquote.tiktok-embed section{margin:0!important}
   text-align:left;
   position:relative;
   padding-bottom:20px;
+  text-shadow:0 2px 16px rgba(0,0,0,.82),0 1px 3px rgba(0,0,0,.7);
 }
 .shows-feature-heading::after{
   content:'';
@@ -1888,12 +1950,13 @@ blockquote.tiktok-embed section{margin:0!important}
 }
 .shows-feature-kicker{
   margin:0 0 4px;
-  color:#f88f9e;
+  color:var(--fest-sun);
   font-size:clamp(.74em,1.3vw,.9em);
   font-weight:700;
   letter-spacing:3px;
   line-height:1.2;
   text-transform:uppercase;
+  text-shadow:0 2px 12px rgba(0,0,0,.85),0 1px 3px rgba(0,0,0,.75);
 }
 .shows-feature-kicker:not([hidden]) + .shows-feature-heading{
   margin-top:0;
@@ -2033,17 +2096,17 @@ a.show-row[href]{cursor:pointer}
   box-shadow:0 6px 24px rgba(0,0,0,.45);
 }
 
-/* Album-release show — uses its landscape art as a cinematic row backdrop. */
+/* Featured show — uses its landscape art as a cinematic row backdrop. */
 .show-row--featured{
   min-height:clamp(140px,16vw,186px);
   margin-top:10px;
   margin-bottom:10px;
   overflow:hidden;
   isolation:isolate;
-  border:1px solid rgba(248,143,158,.24);
-  background:#080707;
+  border:1px solid rgba(239,169,55,.26);
+  background:#0a0705;
 }
-.show-row--featured:first-child{border-top-color:rgba(248,143,158,.24)}
+.show-row--featured:first-child{border-top-color:rgba(239,169,55,.26)}
 .show-row--featured::before{
   z-index:1;
   opacity:1;
@@ -2072,14 +2135,14 @@ a.show-row[href]{cursor:pointer}
   opacity:.72;
 }
 .show-row--featured .show-row-month{
-  color:#f88f9e;
+  color:var(--fest-sun);
 }
 .show-row--featured .show-row-venue{
   color:#fff1ed;
 }
 .show-row--featured .show-row-poster{
   width:clamp(74px,11vw,104px);
-  box-shadow:0 8px 28px rgba(0,0,0,.55),0 0 0 1px rgba(248,143,158,.2);
+  box-shadow:0 8px 28px rgba(0,0,0,.55),0 0 0 1px rgba(239,169,55,.22);
 }
 
 /* Single upcoming show — hero card, large poster */
@@ -2193,25 +2256,25 @@ a.show-row[href]{cursor:pointer}
   align-self:center;
 }
 
-/* The sole album-release date is treated as the section's headline event. */
+/* A single upcoming date is treated as the section's headline event. */
 .shows-editorial--solo .show-row--featured.show-row--solo{
-  border-color:rgba(248,143,158,.42);
-  background:#080506;
+  border-color:rgba(239,169,55,.44);
+  background:#0a0603;
   box-shadow:
     0 24px 74px rgba(0,0,0,.58),
-    0 0 54px rgba(248,143,158,.09),
+    0 0 54px rgba(232,95,27,.12),
     inset 0 1px 0 rgba(255,255,255,.1);
 }
 .shows-editorial--solo .show-row--featured.show-row--solo:hover{
-  border-color:rgba(248,143,158,.68);
+  border-color:rgba(239,169,55,.72);
   box-shadow:
     0 30px 82px rgba(0,0,0,.64),
-    0 0 66px rgba(248,143,158,.14),
+    0 0 66px rgba(232,95,27,.18),
     inset 0 1px 0 rgba(255,255,255,.12);
 }
 .shows-editorial--solo .show-row--featured.show-row--solo::before{
   background:
-    linear-gradient(100deg,rgba(6,4,5,.97) 0%,rgba(6,4,5,.88) 42%,rgba(6,4,5,.52) 74%,rgba(6,4,5,.34) 100%),
+    linear-gradient(100deg,rgba(8,5,2,.97) 0%,rgba(8,5,2,.92) 42%,rgba(8,5,2,.68) 74%,rgba(8,5,2,.46) 100%),
     linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.66));
 }
 .shows-editorial--solo .show-row--featured.show-row--solo .show-row-banner img{
@@ -2222,7 +2285,7 @@ a.show-row[href]{cursor:pointer}
   flex-wrap:wrap;
   align-items:center;
   gap:10px 14px;
-  color:#fff4f1;
+  color:#fff6ea;
   font-size:clamp(1.45em,3vw,2.1em);
   line-height:1.06;
 }
@@ -2232,18 +2295,46 @@ a.show-row[href]{cursor:pointer}
   justify-content:center;
   margin:0;
   padding:9px 15px 8px;
-  border:1px solid rgba(248,143,158,.62);
+  border:1px solid rgba(239,169,55,.66);
   border-radius:999px;
-  background:#f88f9e;
-  color:#16090b;
+  background:var(--fest-sun);
+  color:#1a0d02;
   font-size:.42em;
   font-style:normal;
   font-weight:700;
   letter-spacing:2px;
 }
 .shows-editorial--solo .show-row--featured.show-row--solo:hover .show-row-arrow{
-  background:#fff1ed;
-  color:#16090b;
+  background:#fff3e2;
+  color:#1a0d02;
+}
+
+/* Where the show is real but the details are not announced yet. Reads as an
+   instruction, not a caption, so it gets the campaign colour and an icon. */
+.show-row-note{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  align-self:flex-start;
+  margin-top:4px;
+  padding:6px 12px 5px;
+  border:1px solid rgba(239,169,55,.34);
+  border-radius:999px;
+  background:rgba(232,95,27,.1);
+  color:var(--fest-sun);
+  font-size:clamp(.72em,1.3vw,.84em);
+  letter-spacing:.6px;
+  line-height:1.35;
+  text-transform:none;
+}
+.show-row-note svg{
+  flex-shrink:0;
+  width:15px;
+  height:15px;
+}
+.show-row:hover .show-row-note{
+  border-color:rgba(239,169,55,.6);
+  background:rgba(232,95,27,.16);
 }
 
 .shows-archive-link{
@@ -2326,25 +2417,49 @@ a.show-row[href]{cursor:pointer}
 
 
 
+/* The shows slide is a fixed 100svh carrying a heading, a poster, the billing,
+   the set time and the archive link. Against the 81px fixed header and the
+   pinned footer, a 720px-tall window leaves about 530px for roughly 590px of
+   content — so these scale with the viewport's own height rather than sitting
+   at one size, and the slide fits from 700px up without looking squeezed on a
+   tall screen. Widths are unaffected. */
 @media (min-width:1081px) and (max-height:940px) and (hover:hover) and (pointer:fine){
-  .spatial-scroll-active .shows-feature{padding:38px 0 24px}
+  .spatial-scroll-active .shows-feature{padding-bottom:clamp(16px,3.4vh,24px)}
   .spatial-scroll-active .shows-feature-kicker{font-size:.68em}
   .spatial-scroll-active .shows-feature-heading{
-    margin-bottom:14px;
-    padding-bottom:10px;
-    font-size:clamp(1.65em,3.7vw,2.55em);
+    margin-bottom:clamp(8px,1.9vh,14px);
+    padding-bottom:clamp(6px,1.4vh,10px);
+    font-size:clamp(1.4em,min(3.7vw,5vh),2.55em);
   }
   .spatial-scroll-active .shows-editorial--solo .show-row--solo{
     grid-template-columns:minmax(190px,min(30vw,300px)) 1fr;
-    padding:18px;
+    padding:clamp(12px,2.4vh,18px);
+    row-gap:clamp(8px,1.4vh,20px);
   }
   .spatial-scroll-active .shows-editorial--solo .show-row--solo .show-row-poster img{
-    min-height:230px;
-    max-height:42vh;
+    min-height:200px;
+    max-height:36vh;
+  }
+  .spatial-scroll-active .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
+    gap:clamp(6px,1.1vh,10px) 14px;
+    font-size:clamp(1.2em,3.7vh,2.1em);
+  }
+  .spatial-scroll-active .show-row-month{font-size:clamp(1.5em,4.4vh,2.6em)}
+  .spatial-scroll-active .show-row-day{font-size:clamp(1em,2.4vh,1.7em)}
+  .spatial-scroll-active .show-row-info{gap:clamp(3px,.8vh,6px)}
+  .spatial-scroll-active .show-row-lineup{
+    font-size:clamp(.74em,1.6vh,.92em);
+    line-height:1.32;
+  }
+  .spatial-scroll-active .show-row-city{font-size:clamp(.78em,1.6vh,1em)}
+  .spatial-scroll-active .show-row-note{
+    margin-top:2px;
+    padding:clamp(3px,.7vh,6px) 11px clamp(2px,.6vh,5px);
+    font-size:clamp(.68em,1.5vh,.84em);
   }
   .spatial-scroll-active .shows-archive-link{
-    margin-top:12px;
-    padding:10px 16px;
+    margin-top:clamp(8px,1.6vh,12px);
+    padding:clamp(7px,1.4vh,10px) 16px;
   }
 }
 
@@ -2352,12 +2467,12 @@ a.show-row[href]{cursor:pointer}
   .shows-feature{
     padding:clamp(40px,8vw,64px) 0 clamp(32px,6vw,48px);
     background-image:
-      radial-gradient(ellipse 70% 60% at 20% 28%,rgba(248,143,158,.12) 0%,transparent 62%),
-      radial-gradient(ellipse 54% 46% at 84% 72%,rgba(176,122,63,.09) 0%,transparent 64%),
-      linear-gradient(180deg,rgba(5,3,4,.84) 0%,rgba(8,5,6,.8) 46%,rgba(5,3,4,.94) 100%),
+      radial-gradient(ellipse 70% 60% at 20% 28%,rgba(239,169,55,.2) 0%,transparent 62%),
+      radial-gradient(ellipse 54% 46% at 84% 72%,rgba(232,95,27,.16) 0%,transparent 64%),
+      linear-gradient(180deg,rgba(12,6,1,.92) 0%,rgba(22,11,2,.88) 46%,rgba(7,4,1,.97) 100%),
       image-set(
-        url('../assets/images/posters/modern-nostalgia-album-release-2026-banner.webp?v=20260805-performance') type('image/webp'),
-        url('../assets/images/posters/modern-nostalgia-album-release-2026-banner.jpg?v=20260805-performance') type('image/jpeg')
+        url('../assets/images/posters/name-it-yourself-fest-2026-banner.webp?v=20260816-nameityourself') type('image/webp'),
+        url('../assets/images/posters/name-it-yourself-fest-2026-banner.jpg?v=20260816-nameityourself') type('image/jpeg')
       );
     background-position:center,center,center,center;
   }
@@ -3522,13 +3637,24 @@ a.show-row[href]{cursor:pointer}
 }
 .album-hero .hero-ctas{
   display:flex;
-  flex-flow:row wrap;
-  justify-content:center;
+  flex-direction:column;
   align-items:center;
   gap:clamp(10px,1.3vw,16px);
   margin-top:clamp(18px,3vh,32px);
 }
-.album-hero .hero-ctas > .cta-row{display:contents}
+.album-hero .hero-ctas .cta-row{
+  display:flex;
+  flex-flow:row wrap;
+  justify-content:center;
+  align-items:center;
+  gap:clamp(10px,1.3vw,16px);
+}
+/* Streaming is the point of the page, so those two read a size up from the
+   three links beneath them. */
+.album-hero .hero-ctas .cta-row--secondary .btn{
+  padding:clamp(11px,1.35vh,16px) clamp(19px,2.2vw,32px) clamp(10px,1.25vh,15px);
+  font-size:clamp(.79em,1.15vw,1em);
+}
 /* These are the primary calls to action on the whole site — sized to read as
    such rather than as captions under the wordmark. */
 .album-hero .hero-ctas .btn{
@@ -3729,6 +3855,7 @@ a.show-row[href]{cursor:pointer}
     margin-left:auto;
     margin-right:auto;
   }
+  .album-hero .hero-ctas .cta-row{width:100%;gap:9px}
   .album-hero .hero-ctas .btn{padding:12px 19px 11px;font-size:.85em;letter-spacing:1px}
   /* Two streaming buttons share the top row and stay the biggest thing here;
      the three secondary links pair off beneath them. Sized off a 50% basis so
