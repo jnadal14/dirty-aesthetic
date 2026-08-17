@@ -28,7 +28,7 @@ html{scroll-behavior:smooth}
    scroll-snap-type on the root and breaks position:sticky. The `hidden`
    declaration stays first as a fallback for engines without `clip`. */
 html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:17px;line-height:1.65;overflow-x:hidden;overflow-x:clip}
-body{min-height:100vh;position:relative;padding-bottom:env(safe-area-inset-bottom)}
+body{min-height:100svh;position:relative;padding-bottom:env(safe-area-inset-bottom)}
 body::before{content:'';position:fixed;inset:0;background:url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.03"/></svg>');pointer-events:none;z-index:9999}
 a{color:var(--ink);text-decoration:none;transition:color .2s ease}
 img{max-width:100%;display:block;height:auto}
@@ -143,7 +143,7 @@ picture{display:contents}
 /* hero */
 .hero{
   position:relative;
-  height:100vh;
+  height:100svh;
   overflow:hidden;
   background-color:#0a0705;
   background-image:url('../assets/images/header-desktop.jpg');
@@ -345,7 +345,7 @@ body:not(.music-page-bg) .page{
 .card-body{padding:16px}
 
 /* inner pages */
-.page{padding:clamp(24px,5vw,48px) clamp(16px,4vw,32px);padding-top:calc(clamp(24px,5vw,48px) + 80px);max-width:980px;margin:0 auto;text-align:center;animation:fadeIn .6s ease both}
+.page{padding:clamp(24px,5vw,48px) calc(clamp(16px,4vw,32px) + env(safe-area-inset-right)) clamp(24px,5vw,48px) calc(clamp(16px,4vw,32px) + env(safe-area-inset-left));padding-top:calc(clamp(24px,5vw,48px) + 80px);max-width:980px;margin:0 auto;text-align:center;animation:fadeIn .6s ease both}
 main>.page{max-width:none}
 .page h1{letter-spacing:1px;margin-bottom:16px;font-size:clamp(32px,6vw,48px)}
 .page h2{color:var(--accent);letter-spacing:1px;margin-top:16px;margin-bottom:12px;text-transform:uppercase;font-size:clamp(1.1em,3vw,1.4em)}
@@ -740,10 +740,25 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
     grid-template-columns:minmax(0,1fr);
     justify-items:center;
     text-align:center;
+    gap:clamp(16px,3vw,24px);
+    margin-bottom:clamp(28px,5vw,48px);
   }
-  .music-feature-art{width:min(100%,320px)}
+  .music-feature-art{width:min(62vw,32svh,260px)}
   .music-feature-copy{align-items:center}
   .music-catalog-heading{text-align:center}
+  /* The page title repeats what the nav already says is active, so it gives up
+     its margin first. */
+  .music-header{margin-bottom:20px}
+  .music-page-bg .page{padding-top:82px}
+}
+
+/* Short handsets in an in-app browser have barely 550px to work with. */
+@media (max-width:760px) and (max-height:720px){
+  .music-feature-art{width:min(54vw,28svh,220px)}
+  .music-header{margin-bottom:14px}
+  .music-header h1{font-size:28px}
+  .music-feature-title{font-size:clamp(1.7em,7vw,2.2em)}
+  .music-feature-actions{margin-top:12px}
 }
 
 /* ===== Album stream links ===== */
@@ -2663,7 +2678,7 @@ a.show-row[href]{cursor:pointer}
 .btn-sm{padding:10px 16px;font-size:0.95em}
 
 /* centered page blocks */
-.center-page{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 80px)}
+.center-page{display:flex;align-items:center;justify-content:center;min-height:calc(100svh - 80px)}
 .center-box{text-align:center;padding:20px}
 .center-box .coming{font-size:clamp(24px,5vw,32px);color:var(--muted);animation:pulse 2s ease infinite}
 
@@ -3477,8 +3492,8 @@ a.show-row[href]{cursor:pointer}
   }
   
   .hero{
-    height:100vh;
-    min-height:100vh;
+    height:100svh;
+    min-height:100svh;
     background-image:url('../assets/images/header-mobile.jpg');
     background-image:image-set(
       url('../assets/images/header-mobile.webp') type('image/webp'),
@@ -3910,7 +3925,7 @@ a.show-row[href]{cursor:pointer}
 
 /* ===== SHOW POSTER ARCHIVE ===== */
 .poster-archive-page{
-  min-height:100vh;
+  min-height:100svh;
   background:
     radial-gradient(circle at 14% 5%,rgba(176,122,63,.15),transparent 28rem),
     radial-gradient(circle at 88% 28%,rgba(122,54,0,.12),transparent 34rem),
