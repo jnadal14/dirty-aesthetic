@@ -1411,6 +1411,31 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   })
 })()
 
+// The Spotify embed loads only where the stylesheet is actually showing it.
+//
+// Hiding it in CSS is not enough on its own: Chrome exempts hidden iframes from
+// loading="lazy" — a display:none frame is the shape of an analytics beacon, so
+// it is fetched immediately — and a phone was paying for an embed it never got
+// to see. Withholding the src until the element is displayed is the only thing
+// that actually stops the request.
+//
+// Reading the computed display rather than restating the breakpoints means the
+// rule lives in exactly one place, the stylesheet.
+;(function albumPlayer(){
+  const holder = document.querySelector('.album-player')
+  const frame = holder && holder.querySelector('iframe[data-src]')
+  if (!frame) return
+
+  function sync(){
+    if (frame.src) return
+    if (getComputedStyle(holder).display === 'none') return
+    frame.src = frame.dataset.src
+  }
+
+  sync()
+  window.addEventListener('resize', sync, { passive: true })
+})()
+
 // EPK — lineup + gallery from data/epk-images.json (supports jpg/png sources)
 ;(function(){
   const galleryRoot = document.getElementById('epk-gallery')
