@@ -3,19 +3,16 @@
     {
       "date": "Aug 22, 2026",
       "title": "Name It Yourself Music Festival",
-      "kicker": "Festival Set",
-      "city": "Location TBA",
+      "kicker": "Next Show",
       "venue": "Main Stage",
       "time": "10 PM",
-      "lineup": "Mississippi AC, Couch Surfers, Flex'n'Groove, JIHO, The Zummers, Dishwater Blond, Jean Jacket, Sleeping Bee's, Crashout and more",
-      "lineupPrefix": "with",
+      "note": "Location TBA — DM @dirtyaestheticband on Instagram",
       "poster": "assets/images/posters/name-it-yourself-fest-2026.webp",
       "posterWidth": 900,
       "posterHeight": 1125,
       "banner": "assets/images/posters/name-it-yourself-fest-2026-banner.webp",
       "bannerWidth": 1280,
       "bannerHeight": 640,
-      "note": "DM @dirtyaestheticband on Instagram for the location",
       "link": "https://www.eventbrite.com/e/name-it-yourself-festival-2026-donations-and-info-tickets-1997396563891",
       "linkLabel": "Donations & Info"
     }
@@ -110,7 +107,7 @@
     {
       "date": "Feb 22, 2026",
       "city": "Vancouver",
-      "venue": "Green Auto \u2014 New and Known",
+      "venue": "Green Auto — New and Known",
       "lineup": "Hell Crimes, Hot Mars, Tamis, Alien Child",
       "poster": "_source/posters/GREEN AUTO_NEW AND KNOWN_POSTER.jpeg",
       "link": "https://gigpit.ca/shows/event:vhIPyz2zli8"
@@ -123,7 +120,7 @@
     {
       "date": "Jan 16, 2026",
       "city": "Vancouver",
-      "venue": "The Biltmore Cabaret \u2014 Sugar on the Rocks EP Release",
+      "venue": "The Biltmore Cabaret — Sugar on the Rocks EP Release",
       "lineup": "Blue Rivera, DAWN",
       "poster": "_source/posters/SOTR_SHOW_POSTER.JPG",
       "link": "https://admitone.com/events/vancouver/community/performance/dirty-aesthetic-presents-sugar-on-the-rocks-ep-release-show/SRWWLY"

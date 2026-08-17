@@ -1023,9 +1023,10 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     showsHeading.textContent = data.upcoming[0].title
     if(showsKicker){
       // A festival slot is not "one night only", so the lead-in comes from the
-      // show itself and only falls back for a headline date of our own.
-      const kicker = data.upcoming[0].kicker || 'One Night Only'
-      showsKicker.textContent = `${kicker} · ${data.upcoming[0].date}`
+      // show itself. Only the fallback carries the date, because the card
+      // prints it in 40px type a few lines below.
+      showsKicker.textContent = data.upcoming[0].kicker
+        || `One Night Only · ${data.upcoming[0].date}`
       showsKicker.hidden = false
     }
   } else {
@@ -1078,16 +1079,19 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const lineupHtml = s.lineup ? `<span class="show-row-lineup">${s.lineupPrefix || 'w/'} ${s.lineup}</span>` : ''
       // Where the show itself has not been fully announced yet.
       const noteHtml = s.note ? `<span class="show-row-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>${s.note}</span>` : ''
-      const title = s.title || s.venue
+      const title = s.title
+        ? [s.venue, s.time].filter(Boolean).join(' · ')
+        : s.venue
       const location = s.title
-        ? [s.venue, s.city, s.time].filter(Boolean).join(' · ')
+        ? s.city
         : [s.city, s.time].filter(Boolean).join(' · ')
       const posterSrc = showMediaUrl(s.poster)
       const bannerSrc = showMediaUrl(s.banner)
       const posterDimensions = s.posterWidth && s.posterHeight ? ` width="${s.posterWidth}" height="${s.posterHeight}"` : ''
       const bannerDimensions = s.bannerWidth && s.bannerHeight ? ` width="${s.bannerWidth}" height="${s.bannerHeight}"` : ''
       const mediaLoading = i === 0 ? 'eager' : 'lazy'
-      const posterHtml = posterSrc ? `<div class="show-row-poster" data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${title} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>` : ''
+      const posterName = s.title || s.venue
+      const posterHtml = posterSrc ? `<div class="show-row-poster" data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${posterName} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>` : ''
       const bannerHtml = bannerSrc ? `<div class="show-row-banner" aria-hidden="true"><img src="${bannerSrc}" alt="" loading="${mediaLoading}" decoding="async"${bannerDimensions}></div>` : ''
       row.innerHTML = `
         ${bannerHtml}
@@ -1098,7 +1102,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
         <div class="show-row-info">
           <span class="show-row-venue">${title} ${arrowHtml}</span>
           ${lineupHtml}
-          <span class="show-row-city">${location}</span>
+          ${location ? `<span class="show-row-city">${location}</span>` : ''}
           ${noteHtml}
         </div>
         ${posterHtml}`

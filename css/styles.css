@@ -2256,6 +2256,23 @@ a.show-row[href]{cursor:pointer}
 .shows-editorial--solo .show-row--solo .show-row-arrow{
   font-size:.72em;
 }
+/* With the billing trimmed off, the date and details are a short block sitting
+   beside a tall poster, and top-aligning them left a hole under the text. Two
+   flexible spacer rows centre the pair against the artwork. Only where the card
+   is actually two columns — the stacked phone layout wants none of this. */
+@media (min-width:721px){
+  .shows-editorial--solo .show-row--solo{
+    grid-template-rows:1fr auto auto 1fr;
+    row-gap:0;
+  }
+  .shows-editorial--solo .show-row--solo .show-row-poster{grid-row:1 / -1}
+  .shows-editorial--solo .show-row--solo .show-row-date{grid-row:2}
+  .shows-editorial--solo .show-row--solo .show-row-info{
+    grid-row:3;
+    margin-top:clamp(10px,1.6vw,16px);
+  }
+}
+
 .shows-editorial--solo .show-row--solo:not(:has(.show-row-poster)){
   grid-template-columns:1fr;
   justify-items:center;
