@@ -657,6 +657,22 @@ window.addEventListener('beforeprint', () => {
 
     document.body.classList.toggle('spatial-scroll-active', spatialEnabled)
 
+    // The root element's scroll-behavior has to be auto while the engine owns
+    // the wheel. The two-argument window.scrollTo() the tween calls every frame
+    // resolves to the computed scroll-behavior, so with `smooth` in effect each
+    // frame cancels the browser's own animation and starts a new one toward a
+    // new target — the position never converges and the page does not move.
+    //
+    // The stylesheet tries to handle this with html:has(.spatial-scroll-active),
+    // but :has() is Safari 15.4+ / Chrome 105+. An older engine drops that rule,
+    // keeps html{scroll-behavior:smooth} and deadlocks: measured on this page,
+    // 0 of 5 section steps land instead of 5 of 5. The sibling rule on
+    // .spatial-scroll-active cannot help either — that class is on <body>, and
+    // scrolling the viewport reads the value off the document element.
+    //
+    // Setting it here needs no :has() and works on every engine.
+    document.documentElement.style.scrollBehavior = spatialEnabled ? 'auto' : ''
+
     // The section tween owns the wheel in spatial mode; Lenis interpolating the
     // same gesture would fight it. It still drives ordinary scrolling on every
     // other layout and page.
@@ -684,8 +700,13 @@ window.addEventListener('beforeprint', () => {
   }
 
   window.addEventListener('scroll', () => { schedule(); scheduleSettle() }, { passive: true })
-  window.addEventListener('wheel', handleWheel, { passive: false })
-  window.addEventListener('keydown', handleKey)
+  // Only the homepage has chapters for these to drive, and a non-passive wheel
+  // listener makes the browser wait for JS before it can scroll — on all eight
+  // pages it was doing that for a handler whose first line returns immediately.
+  if (chapters.length) {
+    window.addEventListener('wheel', handleWheel, { passive: false })
+    window.addEventListener('keydown', handleKey)
+  }
   window.addEventListener('resize', refreshState, { passive: true })
   window.addEventListener('load', refreshState)
 
@@ -1411,25 +1432,29 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   })
 })()
 
-// The Spotify embed loads only where the stylesheet is actually showing it.
+// Embeds load only where they are actually displayed.
 //
-// Hiding it in CSS is not enough on its own: Chrome exempts hidden iframes from
-// loading="lazy" — a display:none frame is the shape of an analytics beacon, so
-// it is fetched immediately — and a phone was paying for an embed it never got
-// to see. Withholding the src until the element is displayed is the only thing
-// that actually stops the request.
+// Chrome exempts hidden iframes from loading="lazy" — a display:none frame is
+// the shape of an analytics beacon, so it is fetched straight away. Two embeds
+// on this site were paying that toll for nothing: the Spotify player, which the
+// stylesheet hides below 768px, and a full YouTube player inside
+// #recent-singles-section, a section that is `hidden` and that nothing ever
+// unhides — measured, it downloaded a player on every single homepage visit.
 //
-// Reading the computed display rather than restating the breakpoints means the
-// rule lives in exactly one place, the stylesheet.
-;(function albumPlayer(){
-  const holder = document.querySelector('.album-player')
-  const frame = holder && holder.querySelector('iframe[data-src]')
-  if (!frame) return
+// Holding the URL in data-src is the only thing that actually stops the
+// request. Asking the computed style rather than restating any breakpoints
+// means the rule lives in one place, the stylesheet, and an embed that becomes
+// visible later — a section un-hidden, a window widened — loads by itself.
+;(function deferredEmbeds(){
+  const frames = [...document.querySelectorAll('iframe[data-src]')]
+  if (!frames.length) return
 
   function sync(){
-    if (frame.src) return
-    if (getComputedStyle(holder).display === 'none') return
-    frame.src = frame.dataset.src
+    for (const frame of frames) {
+      if (frame.src) continue
+      if (!frame.getClientRects().length) continue
+      frame.src = frame.dataset.src
+    }
   }
 
   sync()

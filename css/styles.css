@@ -28,6 +28,7 @@ html{scroll-behavior:smooth}
    scroll-snap-type on the root and breaks position:sticky. The `hidden`
    declaration stays first as a fallback for engines without `clip`. */
 html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Nafta',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:17px;line-height:1.65;overflow-x:hidden;overflow-x:clip}
+body{min-height:100vh;position:relative;padding-bottom:env(safe-area-inset-bottom)}
 body{min-height:100svh;position:relative;padding-bottom:env(safe-area-inset-bottom)}
 body::before{content:'';position:fixed;inset:0;background:url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.03"/></svg>');pointer-events:none;z-index:9999}
 a{color:var(--ink);text-decoration:none;transition:color .2s ease}
@@ -143,6 +144,7 @@ picture{display:contents}
 /* hero */
 .hero{
   position:relative;
+  height:100vh;
   height:100svh;
   overflow:hidden;
   background-color:#0a0705;
@@ -192,7 +194,14 @@ body:not(.music-page-bg) .page{
     opacity 1s cubic-bezier(.2,.7,.2,1) var(--reveal-delay,0s),
     transform 1s cubic-bezier(.2,.7,.2,1) var(--reveal-delay,0s),
     filter 1s cubic-bezier(.2,.7,.2,1) var(--reveal-delay,0s);
-  will-change:opacity, transform;
+  /* No will-change here. It was promoting every revealable element to its own
+     compositor layer and never letting go: measured on the homepage, 66 elements
+     holding 7.16 viewports of layer between them — around 37 MB of GPU texture,
+     permanently, on a machine that may only have shared memory to give. The
+     property is meant to be set just before an animation and dropped after, and
+     a browser already promotes an element for the duration of a transform or
+     opacity transition without being asked. Keeping it bought a first-frame that
+     was imperceptibly smoother and cost every frame after it. */
 }
 .reveal{
   transform:translate3d(0, 56px, 0);
@@ -492,6 +501,7 @@ body.store-page-bg{
   background-attachment:fixed;
   display:flex;
   flex-direction:column;
+  min-height:100vh;
   min-height:100dvh;
 }
 body.contact-page-bg{
@@ -742,6 +752,7 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
     gap:clamp(16px,3vw,24px);
     margin-bottom:clamp(28px,5vw,48px);
   }
+  .music-feature-art{width:min(62vw,32vh,260px)}
   .music-feature-art{width:min(62vw,32svh,260px)}
   .music-feature-copy{align-items:center}
   .music-catalog-heading{text-align:center}
@@ -753,6 +764,7 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
 
 /* Short handsets in an in-app browser have barely 550px to work with. */
 @media (max-width:760px) and (max-height:720px){
+  .music-feature-art{width:min(54vw,28vh,220px)}
   .music-feature-art{width:min(54vw,28svh,220px)}
   .music-header{margin-bottom:14px}
   .music-header h1{font-size:28px}
@@ -1562,11 +1574,13 @@ body.privacy-page .privacy-page-main p{
 
 @media (min-width:769px) and (prefers-reduced-motion:no-preference){
   .home-experience .ep-release:not(#irrational-section){
+    min-height:100vh;
     min-height:100svh;
     display:flex;
     flex-direction:column;
     justify-content:center;
   }
+  .home-experience .shows-feature{min-height:72vh;display:flex;align-items:center}
   .home-experience .shows-feature{min-height:72svh;display:flex;align-items:center}
   .home-experience .ep-release-content,
   .home-experience .album-tracklist-layout,
@@ -1618,8 +1632,11 @@ body.privacy-page .privacy-page-main p{
   .spatial-scroll-active main > [data-scroll-chapter]{
     position:relative;
     width:100%;
+    height:100vh;
     height:100svh;
+    min-height:100vh;
     min-height:100svh;
+    max-height:100vh;
     max-height:100svh;
     overflow:hidden;
     box-shadow:0 -30px 90px rgba(0,0,0,.62),0 30px 90px rgba(0,0,0,.5);
@@ -1639,7 +1656,12 @@ body.privacy-page .privacy-page-main p{
     will-change:transform,opacity;
   }
   .spatial-scroll-active main > .hero,
+  .spatial-scroll-active main > .hero > .chapter-scene{height:100vh}
   .spatial-scroll-active main > .hero > .chapter-scene{height:100svh}
+  /* Page-level parallax is off in spatial mode — the camera moves the whole
+     scene instead — so the hero was holding a full-viewport layer for a
+     transform that never changes. */
+  .spatial-scroll-active .hero-inner{will-change:auto}
   .spatial-scroll-active .chapter-wipe{display:none}
   .spatial-scroll-active .hero > .chapter-scene{
     position:relative;
@@ -1673,6 +1695,7 @@ body.privacy-page .privacy-page-main p{
   .spatial-scroll-active .video-feature .video-embed-large{
     /* Not min(100%, ...) — the flex parent's height is auto, so the 100% is
        indefinite and the box collapses. The calc alone is definite. */
+    height:calc(100vh - var(--home-header-h,81px) - var(--home-footer-h,110px) - 195px);
     height:calc(100svh - var(--home-header-h,81px) - var(--home-footer-h,110px) - 195px);
     width:auto;
     max-width:100%;
@@ -1726,9 +1749,14 @@ body.privacy-page .privacy-page-main p{
     opacity:1;
     filter:none;
     transform:none;
+    /* The fallback experience animates these, and body carries .home-experience
+       in both modes — so they were holding a compositor layer each in spatial
+       mode too, where the camera moves the whole scene and these never move at
+       all. Nothing to promote, so hand the layer back. */
+    will-change:auto;
   }
   .spatial-scroll-active .ep-release-info,
-  .spatial-scroll-active .album-tracklist-panel{transform:none}
+  .spatial-scroll-active .album-tracklist-panel{transform:none;will-change:auto}
   .spatial-scroll-active .ep-release-cover.reveal-scale,
   .spatial-scroll-active .album-tracklist-cover.reveal-scale{
     transform:translate3d(0,24px,0) scale(.94);
@@ -2702,6 +2730,7 @@ a.show-row[href]{cursor:pointer}
 .btn-sm{padding:10px 16px;font-size:0.95em}
 
 /* centered page blocks */
+.center-page{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 80px)}
 .center-page{display:flex;align-items:center;justify-content:center;min-height:calc(100svh - 80px)}
 .center-box{text-align:center;padding:20px}
 .center-box .coming{font-size:clamp(24px,5vw,32px);color:var(--muted);animation:pulse 2s ease infinite}
@@ -3030,6 +3059,7 @@ a.show-row[href]{cursor:pointer}
   position:relative;
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
+  min-height:100vh;
   min-height:100svh;
   overflow:hidden;
   background:#000;
@@ -3052,6 +3082,7 @@ a.show-row[href]{cursor:pointer}
   flex-direction:column;
   justify-content:center;
   min-width:0;
+  min-height:100vh;
   min-height:100svh;
   padding:clamp(72px,8vh,96px) clamp(22px,3vw,46px);
 }
@@ -3082,6 +3113,7 @@ a.show-row[href]{cursor:pointer}
   font-size:.94em;
 }
 .paired-releases #irrational-section{
+  min-height:100vh;
   min-height:100svh;
   padding-bottom:clamp(72px,8vh,96px);
 }
@@ -3102,6 +3134,7 @@ a.show-row[href]{cursor:pointer}
   }
   .paired-releases::after{display:none}
   .paired-releases .paired-release{
+    min-height:100vh;
     min-height:100svh;
     padding-left:clamp(28px,6vw,72px);
     padding-right:clamp(28px,6vw,72px);
@@ -3165,6 +3198,7 @@ a.show-row[href]{cursor:pointer}
 #irrational-section{
   scroll-margin-top:24px;
   box-sizing:border-box;
+  min-height:100vh;
   min-height:100dvh;
   padding-bottom:clamp(120px,14vh,180px);
 }
@@ -3516,7 +3550,9 @@ a.show-row[href]{cursor:pointer}
   }
   
   .hero{
+    height:100vh;
     height:100svh;
+    min-height:100vh;
     min-height:100svh;
     background-image:url('../assets/images/header-mobile.jpg');
     background-image:image-set(
@@ -3597,6 +3633,7 @@ a.show-row[href]{cursor:pointer}
 /* Compact album announcement — the wordmark remains primary over the album artwork. */
 [hidden]{display:none!important}
 .album-hero{
+  height:100vh;
   height:100svh;
   min-height:640px;
   background-image:url('../assets/images/modern-nostalgia-album-bg.jpg');
@@ -3711,6 +3748,7 @@ a.show-row[href]{cursor:pointer}
   position:relative;
   display:flex;
   align-items:center;
+  min-height:100vh;
   min-height:100svh;
   padding:clamp(62px,8vh,92px) clamp(24px,5vw,72px);
   overflow:hidden;
@@ -3846,6 +3884,7 @@ a.show-row[href]{cursor:pointer}
 
 @media (max-width:768px){
   .album-hero{
+    height:100vh;
     height:100svh;
     min-height:640px;
   }
@@ -3941,6 +3980,7 @@ a.show-row[href]{cursor:pointer}
   .album-track-streams{gap:6px}
 }
 @media (max-height:500px) and (orientation:landscape){
+  .album-hero{height:100vh;min-height:500px}
   .album-hero{height:100svh;min-height:500px}
   .album-hero .hero-inner{
     display:flex;
@@ -3956,6 +3996,7 @@ a.show-row[href]{cursor:pointer}
 
 /* ===== SHOW POSTER ARCHIVE ===== */
 .poster-archive-page{
+  min-height:100vh;
   min-height:100svh;
   background:
     radial-gradient(circle at 14% 5%,rgba(176,122,63,.15),transparent 28rem),
