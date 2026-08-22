@@ -667,30 +667,6 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
   margin-top:14px;
 }
 
-/* Spotify player inside the album slide */
-.album-player{margin-top:16px;width:100%}
-/* Same frame and drop shadow as the tracklist panel above it, so the embed
-   reads as part of the slide instead of a bright card pasted over it. */
-.album-player iframe{
-  display:block;
-  width:100%;
-  border:1px solid rgba(240,230,216,.11);
-  box-shadow:0 24px 70px rgba(0,0,0,.42);
-  /* Spotify ships two embed heights: 352 carries its own tracklist, 152 is the
-     compact player. Anything between is not a shorter player, it is the compact
-     one clipped — which is what 100px was doing. The panel beside it already
-     lists all eleven tracks, so compact is the right choice, at its real size. */
-  height:152px;
-  border-radius:12px;
-}
-/* It rides under the tracklist in the wide column rather than spanning the
-   grid: full width it read as a grey slab across the slide, and the row it
-   added was the height that pushed the whole composition off-centre. */
-.album-tracklist-layout > .album-player{
-  grid-column:2;
-  grid-row:2;
-  margin-top:clamp(12px,1.6vh,20px);
-}
 
 /* ===== Music page — featured release ===== */
 /* The current album leads the page at a size the catalog grid below cannot
@@ -1777,11 +1753,12 @@ body.privacy-page .privacy-page-main p{
   .spatial-scroll-active .home-contact{
     padding:clamp(68px,8vh,92px) clamp(48px,7vw,96px);
   }
-  /* The album slide is a fixed 100svh carrying cover, copy, eleven tracks and
-     the player. Rather than hard-compressing every part to survive the
-     shortest supported screen — which left a 260px hole under the content on
-     everything taller — the slide centres itself in the band between the two
-     fixed bars and sizes its parts off that band with vh clamps. */
+  /* The album slide is a fixed 100svh carrying the cover, its copy and eleven
+     tracks. The slide centres itself in the band between the two fixed bars and
+     sizes its parts off that band with vh clamps, so a taller window gets a
+     bigger cover and roomier rows rather than the same layout with a hole under
+     it. The values below were tight when a Spotify embed also had to fit; with
+     that gone they are back to what the type actually wants. */
   .spatial-scroll-active .album-tracklist-section{
     padding-top:0;
     padding-bottom:0;
@@ -1793,17 +1770,23 @@ body.privacy-page .privacy-page-main p{
   }
   /* The scene is a centring flex column; without this the layout is allowed to
      shrink below its content and the player spills past the footer. */
-  .spatial-scroll-active .album-tracklist-layout{flex-shrink:0;row-gap:0}
-  .spatial-scroll-active .album-tracklist-layout > .album-player{margin-top:clamp(10px,1.6vh,22px)}
-  .spatial-scroll-active .album-tracklist-cover{width:min(100%,clamp(190px,30vh,320px))}
-  .spatial-scroll-active .album-player iframe{height:152px}
-  .spatial-scroll-active .album-tracklist-copy{margin-top:clamp(12px,2vh,22px)}
-  .spatial-scroll-active .album-tracklist-panel{padding:clamp(8px,1.2vh,16px) clamp(14px,1.4vw,22px)}
-  .spatial-scroll-active .album-tracklist-heading{padding-bottom:clamp(5px,.8vh,11px)}
+  .spatial-scroll-active .album-tracklist-layout{flex-shrink:0;align-items:stretch}
+  /* The cover column and the tracklist are two different natural heights, which
+     left the card stopping short of the cover with a ragged edge between them.
+     Letting the panel stretch and the eleven rows share whatever height that
+     gives resolves both columns to the same bottom line at every viewport, and
+     spends the difference on row spacing rather than on a gap. */
+  .spatial-scroll-active .album-tracklist-panel{display:flex;flex-direction:column}
+  .spatial-scroll-active .album-tracklist{flex:1;display:flex;flex-direction:column}
+  .spatial-scroll-active .album-track{flex:1}
+  .spatial-scroll-active .album-tracklist-cover{width:min(100%,clamp(210px,34vh,340px))}
+  .spatial-scroll-active .album-tracklist-copy{margin-top:clamp(16px,2.6vh,28px)}
+  .spatial-scroll-active .album-tracklist-panel{padding:clamp(13px,1.9vh,22px) clamp(16px,1.6vw,26px)}
+  .spatial-scroll-active .album-tracklist-heading{padding-bottom:clamp(9px,1.3vh,15px)}
   .spatial-scroll-active .album-track{
     min-height:0;
-    padding:clamp(2px,.55vh,8px) 12px;
-    font-size:clamp(.8em,1.05vh,.92em);
+    padding:clamp(4px,.95vh,11px) 12px;
+    font-size:clamp(.84em,1.12vh,.98em);
   }
   .spatial-scroll-active .home-contact-inner{
     width:min(100%,1040px);
@@ -2481,15 +2464,6 @@ a.show-row[href]{cursor:pointer}
    content — so these scale with the viewport's own height rather than sitting
    at one size, and the slide fits from 700px up without looking squeezed on a
    tall screen. Widths are unaffected. */
-/* The album slide is a fixed 100svh carrying a cover, eleven tracks and the
-   player. Below about 700px of window there is no honest way to fit all three —
-   the compression needed starts costing legibility. The player is the part that
-   goes: the Spotify and Apple buttons sit in the column beside it doing the same
-   job, and the panel already lists every track. */
-@media (min-width:1081px) and (max-height:699px) and (hover:hover) and (pointer:fine){
-  .spatial-scroll-active .album-player{display:none}
-}
-
 @media (min-width:1081px) and (max-height:940px) and (hover:hover) and (pointer:fine){
   .spatial-scroll-active .shows-feature{padding-bottom:clamp(16px,3.4vh,24px)}
   .spatial-scroll-active .shows-feature-kicker{font-size:.68em}
@@ -3779,7 +3753,6 @@ a.show-row[href]{cursor:pointer}
   z-index:1;
   display:grid;
   grid-template-columns:minmax(230px,320px) minmax(0,1fr);
-  grid-template-rows:auto auto;
   gap:0 clamp(32px,5vw,72px);
   width:min(100%,1180px);
   margin:0 auto;
@@ -3787,10 +3760,10 @@ a.show-row[href]{cursor:pointer}
      a height that matched nothing else on the slide. */
   align-items:start;
 }
-/* The cover column runs the full height of the tracklist-plus-player stack so
-   the two sides read as one block instead of two loose piles. */
-.album-tracklist-intro{min-width:0;grid-column:1;grid-row:1/span 2}
-.album-tracklist-panel{grid-column:2;grid-row:1}
+/* Two columns, one row: the cover and its copy on the left, the tracklist on
+   the right. */
+.album-tracklist-intro{min-width:0;grid-column:1}
+.album-tracklist-panel{grid-column:2}
 .album-tracklist-cover{width:min(100%,265px);cursor:zoom-in}
 .album-tracklist-cover:focus-visible{outline:2px solid var(--ink);outline-offset:5px}
 .album-tracklist-cover img{
@@ -3900,15 +3873,7 @@ a.show-row[href]{cursor:pointer}
   .album-tracklist-layout{grid-template-columns:1fr;grid-template-rows:none;gap:28px}
   /* One column, so the two-column placement has to be handed back to flow. */
   .album-tracklist-intro,
-  .album-tracklist-panel,
-  .album-tracklist-layout > .album-player{grid-column:1;grid-row:auto;margin-top:0}
-  /* The embed has no good size on a phone. Narrower than about 500px Spotify
-     collapses it to a squashed single row, and the slide has no height to spare
-     for it either. The cover, the eleven tracks and the two platform buttons are
-     all already here, so the player is the one thing that can go. Hiding it is
-     only half the job — Chrome exempts hidden iframes from lazy loading and
-     fetches them immediately, so js/main.js withholds the src as well. */
-  .album-player{display:none}
+  .album-tracklist-panel{grid-column:1;grid-row:auto;margin-top:0}
   .album-tracklist-intro{
     display:grid;
     grid-template-columns:minmax(120px,180px) minmax(0,1fr);
