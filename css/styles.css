@@ -6,13 +6,13 @@
   --card:#0a0a0a;
   --highlight:#7a3600;
   --glow:rgba(176,122,63,.15);
-  /* Sampled off the Name It Yourself poster: the sun, the mushroom caps, and
-     the marigold field behind them. These carry the current show campaign —
-     the nav button and the whole upcoming-shows section — so retiring a show
-     is a matter of resampling these three, not hunting hex codes. */
-  --fest-sun:#efa937;
-  --fest-flame:#e85f1b;
-  --fest-marigold:#e08b16;
+  /* Sampled off the current show poster: the Roxy frame's red, the Falling
+     Doves magenta, and a mid tone between them. These carry the show campaign —
+     the nav button and the whole upcoming-shows section — so changing shows is
+     a matter of resampling these three, not hunting hex codes. */
+  --fest-sun:#ea392a;
+  --fest-flame:#e201bf;
+  --fest-marigold:#c41f4e;
 }
 *{box-sizing:border-box}
 /* woff2 only: 37 KB against 81 KB for the same outlines, and it loads on every
@@ -92,7 +92,7 @@ picture{display:contents}
   display:inline-flex;
   align-items:center;
   padding:6px 10px 5px;
-  border:1px solid rgba(239,169,55,.5);
+  border:1px solid rgba(234,57,42,.5);
   border-radius:999px;
   background:rgba(12,7,3,.72);
   color:#fff1ed;
@@ -807,6 +807,35 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
   line-height:1.05;
 }
 .video-feature .video-embed-large{width:100%}
+
+/* Anchor jumps land the section's top edge at the viewport's top edge, which
+   on a phone is underneath the fixed header. The section engine scrolls to
+   explicit offsets on desktop and ignores scroll-margin entirely, so this only
+   ever affects the native jumps. */
+[data-scroll-chapter]{
+  scroll-margin-top:var(--home-header-h,64px);
+}
+
+/* Off the spatial layout this section is the destination of a primary call to
+   action and was a 380px block in an 844px viewport: tapping "Watch the Video"
+   tucked the kicker under the header and left most of a screen of black beneath
+   the player. Filling the viewport and centring in it means the jump lands on a
+   composed screen, the same way it does on desktop. */
+/* Off the spatial layout this reads as the tail of the album section rather
+   than a slide of its own: the album's tracklist, then its video, on one
+   continuous dark field. Giving it a full viewport made a 197px player float
+   in the middle of an empty screen. Landing on it centred is the link's job,
+   not the layout's — see bindVideoScrollLink in js/main.js. */
+body:not(.spatial-scroll-active) .video-feature{
+  padding-top:clamp(14px,3.5vw,28px);
+  padding-bottom:clamp(36px,8vw,64px);
+  background:linear-gradient(180deg,#070503 0%,#000 58%);
+}
+/* The album section hands off to it, so it should not sign off with a full
+   gutter first. */
+body:not(.spatial-scroll-active) .album-tracklist-section{
+  padding-bottom:clamp(20px,5vw,36px);
+}
 
 /* ===== Scroll cue (homepage hero only) ===== */
 /* Sits above the pinned footer and says "there is more below". It scrolls away
@@ -1712,7 +1741,7 @@ body.privacy-page .privacy-page-main p{
   .spatial-scroll-active .shows-editorial--solo .show-row--solo{
     padding:clamp(20px,3vw,34px);
   }
-  .spatial-scroll-active .shows-editorial--solo .show-row--solo .show-row-poster img{
+  .spatial-scroll-active .shows-editorial--solo .show-row--solo .show-row-poster{
     max-height:40vh;
   }
 
@@ -1906,25 +1935,18 @@ blockquote.tiktok-embed section{margin:0!important}
 .shows-feature{
   position:relative;
   padding:clamp(48px,8vw,80px) 0 clamp(40px,6vw,64px);
-  /* The section wears the featured show's artwork. The scrim is warm rather
-     than neutral black so the marigold underneath reads as the poster's own
-     light instead of a photo someone dimmed. */
-  background-color:#100802;
+  /* Colour, not artwork. The card already shows the poster, and the poster is
+     also the card's own backdrop — putting it here as well meant the same
+     wordmark and the same date appeared three times at three scales, and no
+     scrim dark enough to stop that left anything worth looking at. These tints
+     are sampled off the current poster, so the section still belongs to the
+     show without repeating it. */
+  background-color:#0b0406;
   background-image:
-    radial-gradient(ellipse 72% 62% at 22% 26%,rgba(239,169,55,.16) 0%,transparent 62%),
-    radial-gradient(ellipse 56% 48% at 82% 74%,rgba(232,95,27,.14) 0%,transparent 64%),
-    linear-gradient(180deg,rgba(12,6,1,.91) 0%,rgba(22,11,2,.85) 42%,rgba(7,4,1,.96) 100%),
-    url('../assets/images/posters/name-it-yourself-fest-2026-banner.jpg?v=20260816-nameityourself');
-  background-image:
-    radial-gradient(ellipse 72% 62% at 22% 26%,rgba(239,169,55,.16) 0%,transparent 62%),
-    radial-gradient(ellipse 56% 48% at 82% 74%,rgba(232,95,27,.14) 0%,transparent 64%),
-    linear-gradient(180deg,rgba(12,6,1,.91) 0%,rgba(22,11,2,.85) 42%,rgba(7,4,1,.96) 100%),
-    image-set(
-      url('../assets/images/posters/name-it-yourself-fest-2026-banner.webp?v=20260816-nameityourself') type('image/webp'),
-      url('../assets/images/posters/name-it-yourself-fest-2026-banner.jpg?v=20260816-nameityourself') type('image/jpeg')
-    );
-  background-position:center,center,center,center;
-  background-size:auto,auto,auto,cover;
+    radial-gradient(ellipse 70% 60% at 20% 24%,rgba(234,57,42,.2) 0%,transparent 60%),
+    radial-gradient(ellipse 58% 50% at 84% 76%,rgba(226,1,191,.16) 0%,transparent 62%),
+    radial-gradient(ellipse 90% 70% at 50% 50%,rgba(196,31,78,.1) 0%,transparent 70%),
+    linear-gradient(180deg,rgba(10,4,6,.55) 0%,rgba(14,5,8,.3) 45%,rgba(6,2,4,.75) 100%);
   background-repeat:no-repeat;
   overflow:hidden;
 }
@@ -1942,7 +1964,7 @@ blockquote.tiktok-embed section{margin:0!important}
   position:absolute;
   top:0;left:0;right:0;
   height:1px;
-  background:linear-gradient(90deg, transparent 5%, rgba(239,169,55,.5) 30%, rgba(232,95,27,.5) 70%, transparent 95%);
+  background:linear-gradient(90deg, transparent 5%, rgba(234,57,42,.5) 30%, rgba(226,1,191,.5) 70%, transparent 95%);
 }
 .shows-feature-inner{
   max-width:1000px;
@@ -2127,10 +2149,10 @@ a.show-row[href]{cursor:pointer}
   margin-bottom:10px;
   overflow:hidden;
   isolation:isolate;
-  border:1px solid rgba(239,169,55,.26);
+  border:1px solid rgba(234,57,42,.26);
   background:#0a0705;
 }
-.show-row--featured:first-child{border-top-color:rgba(239,169,55,.26)}
+.show-row--featured:first-child{border-top-color:rgba(234,57,42,.26)}
 .show-row--featured::before{
   z-index:1;
   opacity:1;
@@ -2166,7 +2188,7 @@ a.show-row[href]{cursor:pointer}
 }
 .show-row--featured .show-row-poster{
   width:clamp(74px,11vw,104px);
-  box-shadow:0 8px 28px rgba(0,0,0,.55),0 0 0 1px rgba(239,169,55,.22);
+  box-shadow:0 8px 28px rgba(0,0,0,.55),0 0 0 1px rgba(234,57,42,.22);
 }
 
 /* Single upcoming show — hero card, large poster */
@@ -2208,7 +2230,12 @@ a.show-row[href]{cursor:pointer}
   grid-row:1 / -1;
   width:100%;
   max-width:none;
-  align-self:stretch;
+  /* Shaped by the poster rather than stretched to the card. Stretching only
+     worked while every poster was portrait; a 2:1 one was letterboxed into a
+     300x200 box and painted 300x150. Starting from the ratio means the box is
+     the picture, whatever shape the picture is. */
+  aspect-ratio:var(--poster-ar, 900 / 1112);
+  align-self:start;
   border-radius:14px;
   overflow:hidden;
   box-shadow:
@@ -2224,10 +2251,11 @@ a.show-row[href]{cursor:pointer}
 .shows-editorial--solo .show-row--solo .show-row-poster img{
   width:100%;
   height:100%;
-  min-height:min(52vh, 420px);
-  max-height:min(70vh, 520px);
-  object-fit:contain;
-  object-position:center top;
+  /* The box already carries the ratio, so cover fits exactly — it neither
+     crops nor letterboxes, and the min/max heights that used to force a
+     portrait box are what made a wide poster float in empty space. */
+  object-fit:cover;
+  object-position:center;
   background:radial-gradient(ellipse 80% 60% at 50% 20%, rgba(255,255,255,.06), transparent 65%);
 }
 .shows-editorial--solo .show-row--solo .show-row-date{
@@ -2299,18 +2327,18 @@ a.show-row[href]{cursor:pointer}
 
 /* A single upcoming date is treated as the section's headline event. */
 .shows-editorial--solo .show-row--featured.show-row--solo{
-  border-color:rgba(239,169,55,.44);
+  border-color:rgba(234,57,42,.44);
   background:#0a0603;
   box-shadow:
     0 24px 74px rgba(0,0,0,.58),
-    0 0 54px rgba(232,95,27,.12),
+    0 0 54px rgba(226,1,191,.12),
     inset 0 1px 0 rgba(255,255,255,.1);
 }
 .shows-editorial--solo .show-row--featured.show-row--solo:hover{
-  border-color:rgba(239,169,55,.72);
+  border-color:rgba(234,57,42,.72);
   box-shadow:
     0 30px 82px rgba(0,0,0,.64),
-    0 0 66px rgba(232,95,27,.18),
+    0 0 66px rgba(226,1,191,.18),
     inset 0 1px 0 rgba(255,255,255,.12);
 }
 .shows-editorial--solo .show-row--featured.show-row--solo::before{
@@ -2336,7 +2364,7 @@ a.show-row[href]{cursor:pointer}
   justify-content:center;
   margin:0;
   padding:9px 15px 8px;
-  border:1px solid rgba(239,169,55,.66);
+  border:1px solid rgba(234,57,42,.66);
   border-radius:999px;
   background:var(--fest-sun);
   color:#1a0d02;
@@ -2359,9 +2387,9 @@ a.show-row[href]{cursor:pointer}
   align-self:flex-start;
   margin-top:4px;
   padding:6px 12px 5px;
-  border:1px solid rgba(239,169,55,.34);
+  border:1px solid rgba(234,57,42,.34);
   border-radius:999px;
-  background:rgba(232,95,27,.1);
+  background:rgba(226,1,191,.1);
   color:var(--fest-sun);
   font-size:clamp(.72em,1.3vw,.84em);
   letter-spacing:.6px;
@@ -2374,8 +2402,8 @@ a.show-row[href]{cursor:pointer}
   height:15px;
 }
 .show-row:hover .show-row-note{
-  border-color:rgba(239,169,55,.6);
-  background:rgba(232,95,27,.16);
+  border-color:rgba(234,57,42,.6);
+  background:rgba(226,1,191,.16);
 }
 
 .shows-archive-link{
@@ -2430,8 +2458,7 @@ a.show-row[href]{cursor:pointer}
     max-width:100%;
     align-self:center;
   }
-  .shows-editorial--solo .show-row--solo .show-row-poster img{
-    min-height:200px;
+  .shows-editorial--solo .show-row--solo .show-row-poster{
     max-height:min(58vh,480px);
   }
   .shows-editorial--solo .show-row--solo .show-row-date{
@@ -2477,8 +2504,7 @@ a.show-row[href]{cursor:pointer}
     padding:clamp(12px,2.4vh,18px);
     row-gap:clamp(8px,1.4vh,20px);
   }
-  .spatial-scroll-active .shows-editorial--solo .show-row--solo .show-row-poster img{
-    min-height:200px;
+  .spatial-scroll-active .shows-editorial--solo .show-row--solo .show-row-poster{
     max-height:36vh;
   }
   .spatial-scroll-active .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
@@ -2508,14 +2534,10 @@ a.show-row[href]{cursor:pointer}
   .shows-feature{
     padding:clamp(40px,8vw,64px) 0 clamp(32px,6vw,48px);
     background-image:
-      radial-gradient(ellipse 70% 60% at 20% 28%,rgba(239,169,55,.2) 0%,transparent 62%),
-      radial-gradient(ellipse 54% 46% at 84% 72%,rgba(232,95,27,.16) 0%,transparent 64%),
-      linear-gradient(180deg,rgba(12,6,1,.92) 0%,rgba(22,11,2,.88) 46%,rgba(7,4,1,.97) 100%),
-      image-set(
-        url('../assets/images/posters/name-it-yourself-fest-2026-banner.webp?v=20260816-nameityourself') type('image/webp'),
-        url('../assets/images/posters/name-it-yourself-fest-2026-banner.jpg?v=20260816-nameityourself') type('image/jpeg')
-      );
-    background-position:center,center,center,center;
+      radial-gradient(ellipse 74% 58% at 22% 22%,rgba(234,57,42,.18) 0%,transparent 60%),
+      radial-gradient(ellipse 60% 52% at 82% 78%,rgba(226,1,191,.14) 0%,transparent 62%),
+      linear-gradient(180deg,rgba(10,4,6,.6) 0%,rgba(14,5,8,.36) 45%,rgba(6,2,4,.8) 100%);
+    background-position:center;
   }
   .shows-feature-inner{
     padding:0 clamp(16px,4vw,32px);
@@ -2590,9 +2612,14 @@ a.show-row[href]{cursor:pointer}
   .shows-editorial--solo .show-row--solo .show-row-poster{
     width:auto;
     max-width:min(100%,320px);
-    aspect-ratio:900 / 1112;
-    height:min(30vh,280px);
-    height:min(30svh,280px);
+    /* Shaped by whatever poster is up — the fallback is the portrait most of
+       them have been. A fixed 900/1112 here forced a 2:1 poster into a portrait
+       box and left three fifths of it empty. The cap is max-height, not height,
+       so the box takes its size from the ratio and only gives way when tall
+       artwork would not otherwise fit. */
+    aspect-ratio:var(--poster-ar, 900 / 1112);
+    max-height:min(30vh,280px);
+    max-height:min(30svh,280px);
   }
   .shows-editorial--solo .show-row--solo .show-row-poster img{
     min-height:0;
@@ -2630,8 +2657,8 @@ a.show-row[href]{cursor:pointer}
     gap:clamp(7px,1.8vw,11px);
   }
   .shows-editorial--solo .show-row--solo .show-row-poster{
-    height:min(24vh,210px);
-    height:min(24svh,210px);
+    max-height:min(24vh,210px);
+    max-height:min(24svh,210px);
   }
   .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
     font-size:clamp(.92em,4vw,1.2em);
@@ -2653,8 +2680,8 @@ a.show-row[href]{cursor:pointer}
   .shows-archive-link strong{font-size:.86em}
   .shows-feature{padding-bottom:10px}
   .shows-editorial--solo .show-row--solo .show-row-poster{
-    height:min(19vh,150px);
-    height:min(19svh,150px);
+    max-height:min(19vh,150px);
+    max-height:min(19svh,150px);
   }
 }
 

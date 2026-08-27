@@ -316,9 +316,11 @@ print("Featured show artwork")
 # what survives — the centre band, clear of the title and the lineup panel.
 # Fractions rather than pixels so a re-export at another resolution still lands
 # on the same part of the picture.
-FEATURED_SHOW_POSTER = "NAME IT YOURSELF FEST_08:22:26.jpg"
-FEATURED_SHOW_SLUG = "name-it-yourself-fest-2026"
+FEATURED_SHOW_POSTER = "ROXY_FALLING DOVES_09:11:26.webp"
+FEATURED_SHOW_SLUG = "roxy-falling-doves-2026"
+# Only used for portrait artwork — see below.
 FEATURED_BANNER_BAND = (0.225, 0.625)
+FEATURED_BANNER_MIN_ASPECT = 1.6
 
 featured_src = SRC / "posters" / FEATURED_SHOW_POSTER
 if not featured_src.exists():
@@ -338,9 +340,17 @@ else:
         report(poster_webp)
         report(poster_jpeg)
 
-        top = round(art.height * FEATURED_BANNER_BAND[0])
-        bottom = round(art.height * FEATURED_BANNER_BAND[1])
-        banner = resize_to_width(art.crop((0, top, art.width, bottom)), 1600)
+        # Posters come in both shapes. A portrait one has to be cropped to a
+        # band for the wide backdrop — chosen to miss the title and the lineup
+        # panel — but artwork that is already wide IS the banner, and cropping
+        # a band out of the middle of it would just cut the art in half.
+        if art.width / art.height >= FEATURED_BANNER_MIN_ASPECT:
+            banner = resize_to_width(art, 1600)
+            print(f"  (wide source {art.width}x{art.height} — used whole, not cropped)")
+        else:
+            top = round(art.height * FEATURED_BANNER_BAND[0])
+            bottom = round(art.height * FEATURED_BANNER_BAND[1])
+            banner = resize_to_width(art.crop((0, top, art.width, bottom)), 1600)
         banner_webp = OUT_POSTERS_ROOT / f"{FEATURED_SHOW_SLUG}-banner.webp"
         banner_jpeg = OUT_POSTERS_ROOT / f"{FEATURED_SHOW_SLUG}-banner.jpg"
         # Only ever seen through a scrim, behind text.

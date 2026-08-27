@@ -786,6 +786,38 @@ function bindCenteredSectionScrollLinks(){
   })
 }
 
+// Off the spatial layout the video sits inline at the tail of the album section,
+// so "Watch the Video" centres it in the viewport. Aligning its top edge — what
+// a bare anchor jump does — puts a short section against the header with the
+// player low and a screen of nothing under it. On the spatial layout the section
+// engine already owns this link, so the handler stands aside.
+function bindVideoScrollLink(){
+  document.querySelectorAll('a[href="#modern-nostalgia-video-section"]').forEach(link => {
+    if(link.classList.contains('chapter-nav-link')) return
+    if(link.dataset.videoScrollBound) return
+    link.dataset.videoScrollBound = 'true'
+    link.addEventListener('click', (e) => {
+      if(document.body.classList.contains('spatial-scroll-active')) return
+      const section = document.getElementById('modern-nostalgia-video-section')
+      if(!section) return
+      e.preventDefault()
+      // Centre in the band the reader can actually see, not the whole viewport:
+      // the fixed header covers the top of it, so centring on the viewport puts
+      // the player high by half the header.
+      const header = document.querySelector('.site-header')
+      const headerH = header ? header.getBoundingClientRect().height : 0
+      const top = section.getBoundingClientRect().top + window.scrollY
+      const y = Math.max(0, top + section.offsetHeight / 2 - (window.innerHeight + headerH) / 2)
+      if(window.__lenis) window.__lenis.scrollTo(y, { duration: 1.1 })
+      else window.scrollTo({ top: y, behavior: 'smooth' })
+    })
+  })
+}
+
+// Bound here as well as after Lenis loads: the guard above makes it idempotent,
+// and this way the link still centres if the smooth-scroll script never arrives.
+bindVideoScrollLink()
+
 function bindIrrationalScrollLinks(){
   document.querySelectorAll('a[href="#irrational-section"]').forEach(link => {
     if(link.classList.contains('chapter-nav-link')) return
@@ -859,6 +891,7 @@ bindIrrationalScrollLinks()
 
     bindCenteredSectionScrollLinks()
     bindIrrationalScrollLinks()
+    bindVideoScrollLink()
   }
   document.head.appendChild(script)
 })()
@@ -1027,8 +1060,8 @@ function parseDateParts(dateStr) {
 
 // Load shows
 const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><span class="show-row-venue">TBA</span></div>`
-const featuredShowSlug = 'name-it-yourself-fest-2026'
-const featuredShowAssetVersion = '20260816-nameityourself'
+const featuredShowSlug = 'roxy-falling-doves-2026'
+const featuredShowAssetVersion = '20260827-fallingdoves'
 
 function showMediaUrl(path){
   if(!path || !path.includes(featuredShowSlug)) return path
@@ -1053,6 +1086,18 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   } else {
     if(showsHeading) showsHeading.textContent = 'Upcoming Shows'
     if(showsKicker) showsKicker.hidden = true
+  }
+
+  // The header button and the hero link name the same show this section does,
+  // so they read it from the same place. This runs on every page — the early
+  // return below is only for the homepage-only listing — which is what keeps
+  // eight headers in step without eight hand-edits per show.
+  const nextShow = data.upcoming && data.upcoming[0]
+  if (nextShow) {
+    const long = nextShow.ticketLabel || nextShow.title || nextShow.venue
+    const short = nextShow.ticketLabelShort || long
+    document.querySelectorAll('[data-show-label]').forEach(el => { el.textContent = long })
+    document.querySelectorAll('[data-show-label-short]').forEach(el => { el.textContent = short })
   }
 
   const container=document.getElementById('upcoming')
@@ -1112,7 +1157,13 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const bannerDimensions = s.bannerWidth && s.bannerHeight ? ` width="${s.bannerWidth}" height="${s.bannerHeight}"` : ''
       const mediaLoading = i === 0 ? 'eager' : 'lazy'
       const posterName = s.title || s.venue
-      const posterHtml = posterSrc ? `<div class="show-row-poster" data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${posterName} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>` : ''
+      // The box is shaped by the poster, not the other way round. Without this
+      // a landscape poster was letterboxed into a portrait box and painted at
+      // 205x102 inside 205x253 — 60% of it empty.
+      const posterAspect = s.posterWidth && s.posterHeight
+        ? ` style="--poster-ar:${s.posterWidth} / ${s.posterHeight}"`
+        : ''
+      const posterHtml = posterSrc ? `<div class="show-row-poster"${posterAspect} data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${posterName} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>` : ''
       const bannerHtml = bannerSrc ? `<div class="show-row-banner" aria-hidden="true"><img src="${bannerSrc}" alt="" loading="${mediaLoading}" decoding="async"${bannerDimensions}></div>` : ''
       row.innerHTML = `
         ${bannerHtml}
