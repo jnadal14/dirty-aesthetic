@@ -316,29 +316,54 @@ print("Featured show artwork")
 # what survives — the centre band, clear of the title and the lineup panel.
 # Fractions rather than pixels so a re-export at another resolution still lands
 # on the same part of the picture.
-FEATURED_SHOW_POSTER = "ROXY_FALLING DOVES_09:11:26.webp"
-FEATURED_SHOW_SLUG = "roxy-falling-doves-2026"
-# Only used for portrait artwork — see below.
-FEATURED_BANNER_BAND = (0.225, 0.625)
+# Upcoming-show artwork, driven by data/shows.json rather than named here, so
+# adding a show is a data edit. Each entry needs posterSource (a path under
+# _source/) and posterSlug; only the first one — the featured card — needs the
+# wide banner that sits behind it.
+FEATURED_BANNER_BAND = (0.225, 0.625)   # portrait sources only, see below
 FEATURED_BANNER_MIN_ASPECT = 1.6
 
-featured_src = SRC / "posters" / FEATURED_SHOW_POSTER
-if not featured_src.exists():
-    print(f"  SKIP posters/{FEATURED_SHOW_POSTER} (missing)")
-else:
-    with Image.open(featured_src) as image:
+upcoming_shows = []
+_shows_path = DATA / "shows.json"
+if _shows_path.exists():
+    upcoming_shows = json.loads(_shows_path.read_text(encoding="utf-8")).get("upcoming", [])
+
+for index, show in enumerate(upcoming_shows):
+    source = show.get("posterSource")
+    slug = show.get("posterSlug")
+    if not source or not slug:
+        print(f"  SKIP upcoming[{index}] (no posterSource/posterSlug)")
+        continue
+    src_path = ROOT / source
+    if not src_path.exists():
+        print(f"  SKIP {slug} (missing {source})")
+        continue
+
+    with Image.open(src_path) as image:
         art = ImageOps.exif_transpose(image).convert("RGB")
 
-        poster = resize_to_width(art, 900)
-        poster_webp = OUT_POSTERS_ROOT / f"{FEATURED_SHOW_SLUG}.webp"
-        poster_jpeg = OUT_POSTERS_ROOT / f"{FEATURED_SHOW_SLUG}.jpg"
-        # The card renders it around 420px wide, so 900px of q78 is already
-        # generous — q82 cost another 60 KB on artwork this grainy for nothing.
-        save_webp_from_image(poster, poster_webp, quality=78)
-        save_jpeg(poster, poster_jpeg, quality=80)
-        print(f"  {FEATURED_SHOW_SLUG} {poster.width}x{poster.height}")
+        # The featured card renders its poster around 420px wide and opens it in
+        # the lightbox, so 900px of q78 is right. A secondary row shows a 74px
+        # thumbnail and hides it entirely on phones — the only thing asking for
+        # size there is the lightbox, and 700px covers that at half the bytes.
+        if index == 0:
+            poster = resize_to_width(art, 900)
+            poster_q, jpeg_q = 78, 80
+        else:
+            poster = resize_to_width(art, 700)
+            poster_q, jpeg_q = 72, 76
+        poster_webp = OUT_POSTERS_ROOT / f"{slug}.webp"
+        poster_jpeg = OUT_POSTERS_ROOT / f"{slug}.jpg"
+        save_webp_from_image(poster, poster_webp, quality=poster_q)
+        save_jpeg(poster, poster_jpeg, quality=jpeg_q)
+        print(f"  {slug} {poster.width}x{poster.height}")
         report(poster_webp)
         report(poster_jpeg)
+
+        # Only the featured show gets a banner; the rest render as compact rows
+        # with no backdrop of their own.
+        if index > 0:
+            continue
 
         # Posters come in both shapes. A portrait one has to be cropped to a
         # band for the wide backdrop — chosen to miss the title and the lineup
@@ -351,12 +376,12 @@ else:
             top = round(art.height * FEATURED_BANNER_BAND[0])
             bottom = round(art.height * FEATURED_BANNER_BAND[1])
             banner = resize_to_width(art.crop((0, top, art.width, bottom)), 1600)
-        banner_webp = OUT_POSTERS_ROOT / f"{FEATURED_SHOW_SLUG}-banner.webp"
-        banner_jpeg = OUT_POSTERS_ROOT / f"{FEATURED_SHOW_SLUG}-banner.jpg"
+        banner_webp = OUT_POSTERS_ROOT / f"{slug}-banner.webp"
+        banner_jpeg = OUT_POSTERS_ROOT / f"{slug}-banner.jpg"
         # Only ever seen through a scrim, behind text.
         save_webp_from_image(banner, banner_webp, quality=72)
         save_jpeg(banner, banner_jpeg, quality=74)
-        print(f"  {FEATURED_SHOW_SLUG}-banner {banner.width}x{banner.height}")
+        print(f"  {slug}-banner {banner.width}x{banner.height}")
         report(banner_webp)
         report(banner_jpeg)
 

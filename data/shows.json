@@ -5,7 +5,7 @@
       "title": "Opening for Falling Doves",
       "kicker": "Next Show",
       "ticketLabel": "Sept 11 at The Roxy",
-      "ticketLabelShort": "Sep 11 Show",
+      "ticketLabelShort": "Sept 11 Roxy",
       "venue": "The Roxy",
       "time": "Doors 8 PM",
       "poster": "assets/images/posters/roxy-falling-doves-2026.webp",
@@ -15,6 +15,24 @@
       "bannerWidth": 1200,
       "bannerHeight": 600,
       "link": "https://www.showpass.com/falling-doves/",
+      "linkLabel": "Tickets",
+      "posterSource": "_source/posters/ROXY_FALLING DOVES_09:11:26.webp",
+      "posterSlug": "roxy-falling-doves-2026"
+    },
+    {
+      "date": "Sep 30, 2026",
+      "title": "Best in Vancouver — Showcase #2",
+      "venue": "The Roxy Cabaret",
+      "city": "932 Granville St",
+      "time": "19+ · $10 adv / $15 door",
+      "lineup": "Math Club, Lazy Dynamite",
+      "lineupPrefix": "with",
+      "posterSource": "_source/posters/best-in-vancouver-showcase-2026/BIV Show 2-Sept 30, 2026-4x5.jpg",
+      "posterSlug": "best-in-vancouver-showcase-2026",
+      "poster": "assets/images/posters/best-in-vancouver-showcase-2026.webp",
+      "posterWidth": 700,
+      "posterHeight": 875,
+      "link": "https://www.vtix.com/best-in-vancouver-2026-show-2/5945/",
       "linkLabel": "Tickets"
     }
   ],

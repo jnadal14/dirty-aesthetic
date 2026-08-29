@@ -2406,6 +2406,119 @@ a.show-row[href]{cursor:pointer}
   background:rgba(226,1,191,.16);
 }
 
+/* ===== Shows behind the next one =====
+   The featured card is the show that is next. Anything after it is listed
+   compactly beneath, loud enough to be read and quiet enough not to compete —
+   when the show above expires it moves up and inherits the card automatically. */
+.shows-more-label{
+  margin:clamp(18px,2.6vw,28px) 0 clamp(6px,1vw,10px);
+  color:var(--muted);
+  font-size:clamp(.66em,1.1vw,.78em);
+  font-weight:700;
+  letter-spacing:2.4px;
+  text-transform:uppercase;
+}
+.shows-editorial--solo .show-row--secondary{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:clamp(14px,2.4vw,26px);
+  margin:0;
+  padding:clamp(12px,1.8vw,18px) clamp(12px,1.6vw,18px);
+  border:1px solid rgba(176,122,63,.16);
+  border-radius:12px;
+  background:rgba(0,0,0,.26);
+  transition:border-color .3s ease,background .3s ease,transform .3s ease;
+}
+.shows-editorial--solo .show-row--secondary:hover{
+  border-color:rgba(234,57,42,.4);
+  background:rgba(0,0,0,.4);
+  transform:translateY(-2px);
+}
+.shows-editorial--solo .show-row--secondary .show-row-date{
+  grid-column:1;
+  grid-row:auto;
+  min-width:0;
+  align-self:center;
+  padding-bottom:0;
+  text-align:center;
+}
+.shows-editorial--solo .show-row--secondary .show-row-month{
+  font-size:clamp(.86em,1.5vw,1.05em);
+  letter-spacing:1.6px;
+}
+.shows-editorial--solo .show-row--secondary .show-row-day{
+  font-size:clamp(1.05em,1.9vw,1.35em);
+}
+.shows-editorial--solo .show-row--secondary .show-row-info{
+  grid-column:2;
+  grid-row:auto;
+  gap:3px;
+  max-width:none;
+}
+.shows-editorial--solo .show-row--secondary .show-row-venue{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 10px;
+  font-size:clamp(.95em,1.7vw,1.2em);
+  line-height:1.15;
+}
+.shows-editorial--solo .show-row--secondary .show-row-lineup{
+  font-size:clamp(.72em,1.2vw,.84em);
+}
+.shows-editorial--solo .show-row--secondary .show-row-city{
+  font-size:clamp(.68em,1.1vw,.8em);
+  letter-spacing:.8px;
+}
+.shows-editorial--solo .show-row--secondary .show-row-arrow{
+  display:inline-flex;
+  align-items:center;
+  margin:0;
+  padding:5px 11px 4px;
+  border:1px solid rgba(234,57,42,.5);
+  border-radius:999px;
+  color:var(--fest-sun);
+  font-size:.58em;
+  font-weight:700;
+  letter-spacing:1.6px;
+}
+.shows-editorial--solo .show-row--secondary:hover .show-row-arrow{
+  background:var(--fest-sun);
+  color:#1a0d02;
+}
+/* Its own shape, same as the featured one — the thumbnail is just smaller. */
+.shows-editorial--solo .show-row--secondary .show-row-poster{
+  grid-column:3;
+  grid-row:auto;
+  width:clamp(52px,7vw,74px);
+  max-width:none;
+  aspect-ratio:var(--poster-ar, 900 / 1112);
+  max-height:none;
+  align-self:center;
+  border-radius:8px;
+}
+.shows-editorial--solo .show-row--secondary .show-row-poster img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+}
+
+@media (max-width:720px){
+  .shows-editorial--solo .show-row--secondary{
+    grid-template-columns:auto minmax(0,1fr);
+    gap:10px 12px;
+    padding:11px 12px;
+  }
+  /* The thumbnail is the first thing to go when the row has to fit a phone. */
+  .shows-editorial--solo .show-row--secondary .show-row-poster{display:none}
+  .shows-editorial--solo .show-row--secondary .show-row-venue{font-size:clamp(.88em,3.6vw,1.02em)}
+  .shows-editorial--solo .show-row--secondary .show-row-lineup{font-size:.72em}
+  .shows-editorial--solo .show-row--secondary .show-row-city{font-size:.68em}
+  .shows-more-label{margin-top:16px;letter-spacing:1.8px}
+}
+
 .shows-archive-link{
   display:grid;
   grid-template-columns:auto 1fr auto;
@@ -2492,12 +2605,12 @@ a.show-row[href]{cursor:pointer}
    at one size, and the slide fits from 700px up without looking squeezed on a
    tall screen. Widths are unaffected. */
 @media (min-width:1081px) and (max-height:940px) and (hover:hover) and (pointer:fine){
-  .spatial-scroll-active .shows-feature{padding-bottom:clamp(16px,3.4vh,24px)}
+  .spatial-scroll-active .shows-feature{padding-bottom:clamp(10px,2.2vh,20px)}
   .spatial-scroll-active .shows-feature-kicker{font-size:.68em}
   .spatial-scroll-active .shows-feature-heading{
     margin-bottom:clamp(8px,1.9vh,14px);
     padding-bottom:clamp(6px,1.4vh,10px);
-    font-size:clamp(1.4em,min(3.7vw,5vh),2.55em);
+    font-size:clamp(1.32em,min(3.5vw,4.6vh),2.55em);
   }
   .spatial-scroll-active .shows-editorial--solo .show-row--solo{
     grid-template-columns:minmax(190px,min(30vw,300px)) 1fr;
@@ -2524,9 +2637,31 @@ a.show-row[href]{cursor:pointer}
     padding:clamp(3px,.7vh,6px) 11px clamp(2px,.6vh,5px);
     font-size:clamp(.68em,1.5vh,.84em);
   }
+  /* The listed shows behind the featured one have to earn their room on a
+     short slide, so they scale off its height like everything else here. */
+  .spatial-scroll-active .shows-more-label{
+    margin:clamp(8px,1.4vh,20px) 0 clamp(3px,.6vh,8px);
+    font-size:clamp(.6em,.95vh,.74em);
+  }
+  .spatial-scroll-active .shows-editorial--solo .show-row--secondary{
+    padding:clamp(8px,1.3vh,16px) clamp(10px,1.2vw,16px);
+    gap:clamp(10px,1.6vw,22px);
+  }
+  .spatial-scroll-active .shows-editorial--solo .show-row--secondary .show-row-venue{
+    font-size:clamp(.86em,1.7vh,1.15em);
+  }
+  .spatial-scroll-active .shows-editorial--solo .show-row--secondary .show-row-lineup{
+    font-size:clamp(.68em,1.15vh,.82em);
+  }
+  .spatial-scroll-active .shows-editorial--solo .show-row--secondary .show-row-city{
+    font-size:clamp(.64em,1.05vh,.78em);
+  }
+  .spatial-scroll-active .shows-editorial--solo .show-row--secondary .show-row-poster{
+    width:clamp(42px,5.2vw,66px);
+  }
   .spatial-scroll-active .shows-archive-link{
-    margin-top:clamp(8px,1.6vh,12px);
-    padding:clamp(7px,1.4vh,10px) 16px;
+    margin-top:clamp(6px,1.1vh,11px);
+    padding:clamp(5px,1vh,9px) 16px;
   }
 }
 

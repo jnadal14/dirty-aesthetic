@@ -1071,7 +1071,9 @@ function showMediaUrl(path){
 fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const showsHeading = document.getElementById('shows-feature-heading')
   const showsKicker = document.getElementById('shows-feature-kicker')
-  const featuredSingle = data.upcoming && data.upcoming.length === 1 && data.upcoming[0].title
+  // Index 0 is the next show and always leads; anything after it is listed
+  // compactly underneath, and gets promoted simply by the one above expiring.
+  const featuredSingle = data.upcoming && data.upcoming[0] && data.upcoming[0].title
 
   if(featuredSingle && showsHeading){
     showsHeading.textContent = data.upcoming[0].title
@@ -1122,16 +1124,18 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   // loaded successfully, so a failed request never erases the promotion.
   container.innerHTML = ''
   if (editorial) {
-    container.classList.toggle('shows-editorial--solo', data.upcoming.length === 1)
+    container.classList.toggle('shows-editorial--solo', Boolean(data.upcoming.length))
   }
 
   data.upcoming.forEach((s, i)=>{
     if(editorial){
       const parts = parseDateParts(s.date)
       const row = document.createElement('a')
-      const solo = data.upcoming.length === 1 ? ' show-row--solo' : ''
-      const featured = s.banner ? ' show-row--featured' : ''
-      row.className = 'show-row reveal' + solo + featured
+      const isNext = i === 0
+      const solo = isNext ? ' show-row--solo' : ''
+      const featured = isNext && s.banner ? ' show-row--featured' : ''
+      const secondary = isNext ? '' : ' show-row--secondary'
+      row.className = 'show-row reveal' + solo + featured + secondary
       row.style.setProperty('--reveal-delay', `${(i * 0.08).toFixed(2)}s`)
       if(s.link){
         row.href = s.link
@@ -1145,12 +1149,12 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const lineupHtml = s.lineup ? `<span class="show-row-lineup">${s.lineupPrefix || 'w/'} ${s.lineup}</span>` : ''
       // Where the show itself has not been fully announced yet.
       const noteHtml = s.note ? `<span class="show-row-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>${s.note}</span>` : ''
-      const title = s.title
+      const title = isNext && s.title
         ? [s.venue, s.time].filter(Boolean).join(' · ')
-        : s.venue
-      const location = s.title
+        : (s.title || s.venue)
+      const location = isNext && s.title
         ? s.city
-        : [s.city, s.time].filter(Boolean).join(' · ')
+        : [s.venue, s.city, s.time].filter(Boolean).join(' · ')
       const posterSrc = showMediaUrl(s.poster)
       const bannerSrc = showMediaUrl(s.banner)
       const posterDimensions = s.posterWidth && s.posterHeight ? ` width="${s.posterWidth}" height="${s.posterHeight}"` : ''
@@ -1164,7 +1168,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
         ? ` style="--poster-ar:${s.posterWidth} / ${s.posterHeight}"`
         : ''
       const posterHtml = posterSrc ? `<div class="show-row-poster"${posterAspect} data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${posterName} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>` : ''
-      const bannerHtml = bannerSrc ? `<div class="show-row-banner" aria-hidden="true"><img src="${bannerSrc}" alt="" loading="${mediaLoading}" decoding="async"${bannerDimensions}></div>` : ''
+      const bannerHtml = isNext && bannerSrc ? `<div class="show-row-banner" aria-hidden="true"><img src="${bannerSrc}" alt="" loading="${mediaLoading}" decoding="async"${bannerDimensions}></div>` : ''
       row.innerHTML = `
         ${bannerHtml}
         <div class="show-row-date">
@@ -1178,6 +1182,14 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
           ${noteHtml}
         </div>
         ${posterHtml}`
+      // A quiet rule between the show that is next and the ones behind it, so
+      // the second card reads as "also coming up" rather than as a rival to it.
+      if(!isNext && !container.querySelector('.shows-more-label')){
+        const label = document.createElement('p')
+        label.className = 'shows-more-label reveal'
+        label.textContent = 'Also Coming Up'
+        container.appendChild(label)
+      }
       container.appendChild(row)
 
       const posterEl = row.querySelector('.show-row-poster')
