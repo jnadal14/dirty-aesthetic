@@ -16,7 +16,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageFilter, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 # Full-resolution masters live in _source/ and are never committed; assets/
@@ -61,6 +61,41 @@ def resize_to_width(img, target_w):
         return img.copy()
     ratio = target_w / img.width
     return img.resize((target_w, round(img.height * ratio)), Image.LANCZOS)
+
+
+def crop_to_aspect(img, aspect, focus=0.5):
+    """Crop to `aspect` (width/height), keeping `focus` as the centre of the band.
+
+    `focus` is a 0..1 fraction of the source height. Both stage photographs are
+    4:5 portrait and both are used full bleed behind text, where `cover` would
+    otherwise crop them blind: on a wide viewport that throws away most of the
+    frame, and which part it keeps depends on the visitor's window. Choosing the
+    crop here is what keeps the faces in, and it means the bytes we ship are
+    bytes that actually get shown.
+    """
+    width, height = img.size
+    if width / height > aspect:
+        keep_w = round(height * aspect)
+        left = round((width - keep_w) / 2)
+        return img.crop((left, 0, left + keep_w, height))
+    keep_h = round(width / aspect)
+    top = round(focus * height - keep_h / 2)
+    top = max(0, min(top, height - keep_h))
+    return img.crop((0, top, width, top + keep_h))
+
+
+def roll_highlights(img, threshold, slope):
+    """Compress everything above `threshold`, leaving the rest untouched.
+
+    The drums photograph has a stage light burst in it, and the EPK intro sets
+    its band name in the accent brown directly over that spot. Measured against
+    the brightest pixel, that text came out at 1.08:1 — invisible. Darkening the
+    whole frame enough to fix it would have thrown away the picture, so only the
+    highlights are pulled down, and the scrim covers the rest.
+    """
+    lut = [v if v <= threshold else round(threshold + (v - threshold) * slope)
+           for v in range(256)]
+    return img.point(lut * len(img.getbands()))
 
 
 def save_jpeg(img, dest, quality=82):
@@ -385,17 +420,60 @@ for index, show in enumerate(upcoming_shows):
         report(banner_webp)
         report(banner_jpeg)
 
-print("Page backgrounds")
-# These were being served straight from assets/images/BACKGROUND/ as full-size
-# JPEGs with no WebP variant — 500 KB and 672 KB on every EPK and Watch load.
-for src_name, out_base in [("2.jpg", "epk-bg"), ("3.jpg", "watch-bg")]:
-    src = SRC / "backgrounds" / src_name
+print("Scene backgrounds")
+# Photographs used as full-bleed section backgrounds.
+#
+# `wide_ar` is not a house style, it is the shape of the box the picture lands
+# in, measured in the browser. The EPK intro is 1425x1671 on a desktop: handing
+# it a 16:9 frame made `cover` scale the image up 1.86x and throw away 1546px of
+# width, which is where the drummer was standing. A portrait crop for a portrait
+# box crops almost nothing and needs no upscaling, which is also what stops it
+# looking soft.
+#
+# `blur` buys file size back on grainy frames, where WebP otherwise spends its
+# whole bitrate on noise. It is set per photograph because it costs sharpness,
+# and a frame that is already clean should not pay for it.
+#
+# `highlights` (threshold, slope) tames a hot spot that would otherwise leave
+# text unreadable over it. See roll_highlights.
+for cfg in [
+    {"src": "BW DYL + CROWD.jpg", "out": "shows-bg",
+     "focus": 0.58, "wide_ar": 16 / 9, "wide_w": 1920, "blur": 0.7, "highlights": None},
+    {"src": "watch.jpg", "out": "watch-bg",
+     "focus": 0.66, "wide_ar": 16 / 9, "wide_w": 1920, "blur": 0.6, "highlights": None},
+    {"src": "band from drums.jpg", "out": "epk-bg",
+     "focus": 0.50, "wide_ar": 4 / 5, "wide_w": 1800, "blur": 0.3, "highlights": (95, 0.30),
+     "q": 62},
+]:
+    src = SRC / "backgrounds" / cfg["src"]
     if not src.exists():
-        print(f"  SKIP BACKGROUND/{src_name} (missing)")
+        print(f"  SKIP backgrounds/{cfg['src']} (missing)")
         continue
-    meta = process_raster(src, OUT_BACKGROUNDS, out_base, 1600, jpeg_q=80, webp_q=76)
-    report(ROOT / meta["src"])
-    report(ROOT / meta["webp"])
+    master = flatten_alpha(ImageOps.exif_transpose(Image.open(src)))
+    out_base = cfg["out"]
+
+    def finish(img, blur):
+        if blur:
+            img = img.filter(ImageFilter.GaussianBlur(blur))
+        return roll_highlights(img, *cfg["highlights"]) if cfg["highlights"] else img
+
+    wide = finish(
+        resize_to_width(crop_to_aspect(master, cfg["wide_ar"], cfg["focus"]), cfg["wide_w"]),
+        cfg["blur"],
+    )
+    save_jpeg(wide, OUT_BACKGROUNDS / f"{out_base}.jpg", 76)
+    save_webp_from_image(wide, OUT_BACKGROUNDS / f"{out_base}.webp", cfg.get("q", 66))
+
+    # Phones get a 3:4 frame whatever the desktop shape is: a wide crop under a
+    # portrait viewport keeps only a narrow strip, and not the strip with the
+    # subject in it.
+    tall = finish(resize_to_width(crop_to_aspect(master, 3 / 4, cfg["focus"]), 900), cfg["blur"] * 0.6)
+    save_jpeg(tall, OUT_BACKGROUNDS / f"{out_base}-mobile.jpg", 74)
+    save_webp_from_image(tall, OUT_BACKGROUNDS / f"{out_base}-mobile.webp", 66)
+
+    print(f"  {out_base} wide {wide.width}x{wide.height} / tall {tall.width}x{tall.height}")
+    for suffix in (".jpg", ".webp", "-mobile.jpg", "-mobile.webp"):
+        report(OUT_BACKGROUNDS / f"{out_base}{suffix}")
 
 print("Logos")
 # The wordmark shipped at 2657px wide for a 600px maximum display size, and the

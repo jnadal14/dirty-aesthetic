@@ -1150,7 +1150,7 @@ body.privacy-page .privacy-page-main p{
   padding:clamp(100px,12vw,140px) clamp(40px,6vw,80px) 0;
   animation:fadeUp .7s ease both;
   background:
-    linear-gradient(180deg, rgba(32,23,15,.5) 0%, rgba(32,23,15,.65) 50%, rgba(32,23,15,.8) 100%),
+    linear-gradient(180deg, rgba(32,23,15,.76) 0%, rgba(32,23,15,.82) 50%, rgba(32,23,15,.9) 100%),
     image-set(
       url('../assets/images/backgrounds/epk-bg.webp') type('image/webp'),
       url('../assets/images/backgrounds/epk-bg.jpg') type('image/jpeg')
@@ -1203,6 +1203,10 @@ body.privacy-page .privacy-page-main p{
   display:block;
   margin:0 auto 16px;
   filter:drop-shadow(0 4px 20px rgba(0,0,0,.3));
+}
+.epk-intro-copy .epk-subtitle,
+.epk-intro-bio p{
+  text-shadow:0 1px 3px rgba(0,0,0,.55);
 }
 .epk-subtitle{
   display:block;
@@ -1462,10 +1466,10 @@ body.privacy-page .privacy-page-main p{
     padding:clamp(90px,14vw,110px) clamp(20px,4vw,32px) 0;
     gap:clamp(20px,4vw,36px);
     background:
-      linear-gradient(180deg, rgba(32,23,15,.45) 0%, rgba(32,23,15,.7) 50%, rgba(32,23,15,.9) 100%),
+      linear-gradient(180deg, rgba(32,23,15,.76) 0%, rgba(32,23,15,.82) 50%, rgba(32,23,15,.9) 100%),
       image-set(
-      url('../assets/images/backgrounds/epk-bg.webp') type('image/webp'),
-      url('../assets/images/backgrounds/epk-bg.jpg') type('image/jpeg')
+      url('../assets/images/backgrounds/epk-bg-mobile.webp') type('image/webp'),
+      url('../assets/images/backgrounds/epk-bg-mobile.jpg') type('image/jpeg')
     ) center top/cover no-repeat;
   }
   .epk-intro-photo{
@@ -2076,18 +2080,25 @@ blockquote.tiktok-embed section{margin:0!important}
 .shows-feature{
   position:relative;
   padding:clamp(48px,8vw,80px) 0 clamp(40px,6vw,64px);
-  /* Colour, not artwork. The card already shows the poster, and the poster is
-     also the card's own backdrop — putting it here as well meant the same
-     wordmark and the same date appeared three times at three scales, and no
-     scrim dark enough to stop that left anything worth looking at. These tints
-     are sampled off the current poster, so the section still belongs to the
-     show without repeating it. */
+  /* A photograph of the room, not the poster. The card already shows the poster
+     and uses it as its own backdrop, so putting it here too printed the same
+     wordmark and the same date three times at three scales. The band with a
+     crowd says the same thing without competing with the card.
+
+     Layer order is scrim, poster-sampled tints, photo. The scrim is doing real
+     work: the shot has white shirts and lit faces in it, and the section's
+     heading sits directly over them. */
   background-color:#0b0406;
   background-image:
-    radial-gradient(ellipse 70% 60% at 20% 24%,rgba(234,57,42,.2) 0%,transparent 60%),
-    radial-gradient(ellipse 58% 50% at 84% 76%,rgba(226,1,191,.16) 0%,transparent 62%),
-    radial-gradient(ellipse 90% 70% at 50% 50%,rgba(196,31,78,.1) 0%,transparent 70%),
-    linear-gradient(180deg,rgba(10,4,6,.55) 0%,rgba(14,5,8,.3) 45%,rgba(6,2,4,.75) 100%);
+    linear-gradient(180deg,rgba(9,4,5,.90) 0%,rgba(12,5,7,.84) 42%,rgba(5,2,3,.94) 100%),
+    radial-gradient(ellipse 70% 60% at 20% 24%,rgba(234,57,42,.22) 0%,transparent 60%),
+    radial-gradient(ellipse 58% 50% at 84% 76%,rgba(226,1,191,.18) 0%,transparent 62%),
+    image-set(
+      url('../assets/images/backgrounds/shows-bg.webp') type('image/webp'),
+      url('../assets/images/backgrounds/shows-bg.jpg') type('image/jpeg')
+    );
+  background-size:cover;
+  background-position:center;
   background-repeat:no-repeat;
   overflow:hidden;
 }
@@ -2618,6 +2629,10 @@ a.show-row[href]{cursor:pointer}
   margin:0;
   padding:5px 11px 4px;
   border:1px solid rgba(234,57,42,.5);
+  /* Nine-pixel bold type directly over a photograph. The fill gives it a
+     surface of its own, so its legibility stops depending on which part of
+     the crowd happens to sit behind it. */
+  background:rgba(8,3,5,.68);
   border-radius:999px;
   color:var(--fest-sun);
   font-size:.58em;
@@ -3855,6 +3870,33 @@ a.show-row[href]{cursor:pointer}
       image-set(
         url('../assets/images/header-mobile.webp') type('image/webp'),
         url('../assets/images/header-mobile.jpg') type('image/jpeg')
+      );
+  }
+
+  /* iOS resolves background-attachment:fixed against the document, not the
+     viewport, so a fixed cover background on a phone is scaled to the whole
+     scroll height and then mostly cropped. Scrolling with it is the honest
+     behaviour there, and the tall crop is the frame that fits. */
+  body.watch-page-bg{
+    background:
+      linear-gradient(180deg, rgba(32,23,15,.92) 0%, rgba(32,23,15,.85) 50%, rgba(32,23,15,.92) 100%),
+      image-set(
+        url('../assets/images/backgrounds/watch-bg-mobile.webp') type('image/webp'),
+        url('../assets/images/backgrounds/watch-bg-mobile.jpg') type('image/jpeg')
+      ) center top/cover no-repeat scroll;
+  }
+
+  /* The tall crop of the same photograph: a 16:9 frame under a phone-shaped
+     section is mostly cropped away, and the part `cover` keeps is not the part
+     with the faces in it. */
+  .shows-feature{
+    background-image:
+      linear-gradient(180deg,rgba(9,4,5,.90) 0%,rgba(12,5,7,.84) 42%,rgba(5,2,3,.94) 100%),
+      radial-gradient(ellipse 70% 60% at 20% 24%,rgba(234,57,42,.22) 0%,transparent 60%),
+      radial-gradient(ellipse 58% 50% at 84% 76%,rgba(226,1,191,.18) 0%,transparent 62%),
+      image-set(
+        url('../assets/images/backgrounds/shows-bg-mobile.webp') type('image/webp'),
+        url('../assets/images/backgrounds/shows-bg-mobile.jpg') type('image/jpeg')
       );
   }
   
