@@ -1058,6 +1058,59 @@ function parseDateParts(dateStr) {
   return { month: months[match[1]] || match[1], day: match[2], dayOrd: n + suffix, year: match[3] }
 }
 
+// Publish the announced dates as MusicEvent structured data. Search engines only
+// see the shows section after this script renders it, and the markup is built
+// from the same shows.json the page draws, so a date can never be announced in
+// one place and stale in the other. Only the page that actually lists the shows
+// emits it, so the markup is never duplicated across the site.
+const SITE_ORIGIN = 'https://www.dirtyaesthetic.com'
+const MONTH_INDEX = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'}
+
+function isoShowDate(dateStr){
+  const match = /^(\w{3})\w*\s+(\d{1,2}),\s*(\d{4})$/.exec(dateStr || '')
+  if(!match) return null
+  const month = MONTH_INDEX[match[1]]
+  if(!month) return null
+  return `${match[3]}-${month}-${String(match[2]).padStart(2,'0')}`
+}
+
+function publishShowSchema(shows){
+  const events = shows.map(s => {
+    const startDate = isoShowDate(s.date)
+    if(!startDate || !s.venue) return null
+    // shows.json carries a street address in `city` for some rooms and a plain
+    // city name for others; a leading digit is what separates the two.
+    const street = /^\d/.test(s.city || '') ? s.city : null
+    const event = {
+      '@type': 'MusicEvent',
+      name: `Dirty Aesthetic at ${s.venue}${s.title ? ', ' + s.title : ''}`,
+      startDate,
+      eventStatus: 'https://schema.org/EventScheduled',
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      url: `${SITE_ORIGIN}/#upcoming-section`,
+      location: {
+        '@type': 'MusicVenue',
+        name: s.venue,
+        address: Object.assign(
+          { '@type': 'PostalAddress', addressLocality: 'Vancouver', addressRegion: 'BC', addressCountry: 'CA' },
+          street ? { streetAddress: street } : {}
+        )
+      },
+      performer: { '@id': `${SITE_ORIGIN}/#band` },
+      organizer: { '@id': `${SITE_ORIGIN}/#band` }
+    }
+    if(s.poster) event.image = `${SITE_ORIGIN}/${s.poster.replace(/^\//,'')}`
+    if(s.link) event.offers = { '@type': 'Offer', url: s.link, availability: 'https://schema.org/InStock' }
+    return event
+  }).filter(Boolean)
+
+  if(!events.length) return
+  const tag = document.createElement('script')
+  tag.type = 'application/ld+json'
+  tag.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': events })
+  document.head.appendChild(tag)
+}
+
 // Load shows
 const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><span class="show-row-venue">TBA</span></div>`
 const featuredShowSlug = 'roxy-falling-doves-2026'
@@ -1105,6 +1158,8 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const container=document.getElementById('upcoming')
   if(!container)return
   const editorial = container.classList.contains('shows-editorial')
+
+  publishShowSchema(data.upcoming || [])
 
   if(!data.upcoming || data.upcoming.length===0){
     container.innerHTML = ''
@@ -1287,7 +1342,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
 
       const image = document.createElement('img')
       image.src = optimized.webp || optimized.src
-      image.alt = `${title} show poster — ${show.date}`
+      image.alt = `${title} show poster, ${show.date}`
       image.loading = index < 3 ? 'eager' : 'lazy'
       image.decoding = 'async'
       if(index < 2) image.fetchPriority = 'high'
@@ -1577,18 +1632,23 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     }
     item.dataset.fullSrc = image.full
     if(image.fullWebp) item.dataset.fullWebp = image.fullWebp
+    // Every gallery photo used to carry the same two-word alt, which tells a
+    // screen reader and an image crawler nothing about any individual shot.
+    // Set `alt` on an entry in epk-images.json to describe that photo; the
+    // numbered fallback at least keeps them distinguishable.
+    const alt = image.alt || `Dirty Aesthetic press photo ${index + 1}`
 
     if(eager){
       item.innerHTML = `
         <picture>
           <source type="image/webp" srcset="${image.webp}">
-          <img src="${image.src}" alt="Dirty Aesthetic" width="${image.width || ''}" height="${image.height || ''}" loading="eager" decoding="async"${index < 3 ? ' fetchpriority="high"' : ''}>
+          <img src="${image.src}" alt="${alt}" width="${image.width || ''}" height="${image.height || ''}" loading="eager" decoding="async"${index < 3 ? ' fetchpriority="high"' : ''}>
         </picture>`
     } else {
       item.innerHTML = `
         <picture>
           <source type="image/webp" data-srcset="${image.webp}">
-          <img src="${IMG_PLACEHOLDER}" data-src="${image.src}" data-webp="${image.webp}" alt="Dirty Aesthetic" width="${image.width || ''}" height="${image.height || ''}" loading="lazy" decoding="async">
+          <img src="${IMG_PLACEHOLDER}" data-src="${image.src}" data-webp="${image.webp}" alt="${alt}" width="${image.width || ''}" height="${image.height || ''}" loading="lazy" decoding="async">
         </picture>`
     }
     return item

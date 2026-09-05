@@ -551,6 +551,8 @@ body.contact-page-bg{
 .watch-feature{max-width:1000px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
 .watch-feature-caption{text-align:center;color:var(--ink);font-size:clamp(1.05em,2vw,1.3em);letter-spacing:1px;margin:clamp(16px,2.5vw,24px) 0 0}
 
+.watch-feature-note{text-align:center;color:var(--muted);max-width:64ch;margin:12px auto 0;line-height:1.7;font-size:clamp(.95em,1.6vw,1.05em)}
+
 /* Watch — secondary clips */
 .watch-clips{max-width:880px;margin:0 auto;padding:clamp(40px,6vw,72px) clamp(16px,4vw,48px) clamp(32px,5vw,56px)}
 .watch-clips-heading{text-align:center;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-size:clamp(.95em,1.8vw,1.15em);margin:0 0 clamp(20px,3vw,32px)}
@@ -558,6 +560,9 @@ body.contact-page-bg{
 .watch-clip{animation:fadeUp .6s ease both}
 .watch-clip .video-embed{box-shadow:0 6px 24px rgba(0,0,0,.35);transition:transform .3s ease,box-shadow .3s ease}
 .watch-clip:hover .video-embed{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.45)}
+.watch-clip-title{margin:14px 0 4px;font-size:clamp(1.05em,2vw,1.2em);letter-spacing:1px}
+.watch-clip-note{margin:0;color:var(--muted);line-height:1.65;font-size:.92em}
+.watch-clip-kind{display:block;color:var(--accent);letter-spacing:2px;text-transform:uppercase;font-size:.78em;margin-bottom:4px}
 @media (max-width:640px){
   .watch-clips-grid{grid-template-columns:1fr;gap:16px}
 }
@@ -711,6 +716,133 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
 }
 .music-feature-actions{margin-top:clamp(16px,2.5vw,26px)}
 .music-feature-actions .album-stream-links{margin-top:12px}
+.music-album-detail{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+  align-items:start;
+  gap:clamp(28px,4vw,56px);
+  max-width:1100px;
+  margin:0 auto clamp(44px,6vw,76px);
+  padding:0 clamp(16px,4vw,32px);
+  text-align:left;
+}
+.music-album-copy h2{
+  margin:0 0 clamp(14px,2vw,20px);
+  color:var(--accent);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  font-size:clamp(.9em,1.7vw,1.1em);
+}
+.music-album-copy p{
+  margin:0 0 1em;
+  color:var(--muted);
+  line-height:1.8;
+  font-size:clamp(.95em,1.6vw,1.05em);
+}
+.music-album-copy p:last-child{margin-bottom:0}
+@media (max-width:760px){
+  .music-album-detail{grid-template-columns:1fr;gap:28px}
+}
+/* Liner notes, not cards. Eleven bordered boxes made the page read as a form;
+   a hairline above each track and everything else left to the type does the
+   same job quietly, and the disclosure keeps the detail off the first pass
+   without hiding it from a crawler. */
+.album-credits{
+  max-width:1100px;
+  margin:clamp(40px,6vw,72px) auto clamp(44px,6vw,76px);
+  padding:clamp(32px,4vw,48px) clamp(16px,4vw,32px) 0;
+  border-top:1px solid rgba(255,255,255,.08);
+  text-align:left;
+}
+.album-credits-summary{
+  margin:0 0 clamp(18px,2.4vw,26px);
+  max-width:70ch;
+  color:var(--muted);
+  line-height:1.8;
+  font-size:clamp(.93em,1.6vw,1.02em);
+}
+.album-credits-detail summary{
+  display:block;
+  list-style:none;
+  cursor:pointer;
+}
+.album-credits-detail summary::-webkit-details-marker{display:none}
+.album-credits-detail summary > span{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  /* A thumb needs a target, not a text baseline. */
+  min-height:44px;
+  color:var(--accent);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  font-size:.8em;
+}
+.album-credits-detail summary > span::after{
+  content:'';
+  width:6px;
+  height:6px;
+  border-right:1px solid currentColor;
+  border-bottom:1px solid currentColor;
+  transform:translateY(-2px) rotate(45deg);
+  transition:transform .25s ease;
+}
+.album-credits-detail[open] summary > span::after{transform:translateY(1px) rotate(225deg)}
+.album-credits-detail summary:focus-visible > span{outline:2px solid var(--accent);outline-offset:4px}
+.album-credits-body{
+  padding-top:clamp(22px,3vw,32px);
+  animation:fadeIn .35s ease both;
+}
+.album-credits-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));
+  gap:clamp(22px,3vw,34px) clamp(28px,4vw,56px);
+}
+.album-credit{
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.album-credit-track{
+  margin:0 0 9px;
+  font-size:clamp(.98em,1.7vw,1.08em);
+  letter-spacing:.5px;
+  color:var(--ink);
+}
+.album-credit-num{
+  color:var(--accent);
+  font-size:.76em;
+  letter-spacing:1.5px;
+  margin-right:10px;
+}
+.album-credit-line{
+  margin:0;
+  color:var(--muted);
+  line-height:1.7;
+  font-size:.92em;
+}
+.album-credit-line + .album-credit-line{margin-top:7px}
+.album-credit-label{
+  display:block;
+  color:var(--accent);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  font-size:.8em;
+  opacity:.75;
+  margin-bottom:3px;
+}
+.credit-name{color:var(--ink);opacity:.86}
+.credit-role{opacity:.8}
+.credit-sep{padding:0 6px;opacity:.4}
+.album-credits-source{
+  margin:clamp(22px,3vw,30px) 0 0;
+  color:var(--muted);
+  opacity:.7;
+  font-size:.8em;
+  letter-spacing:.5px;
+}
 .music-catalog-heading{
   max-width:1100px;
   margin:0 auto clamp(18px,3vw,28px);
@@ -878,6 +1010,8 @@ body:not(.spatial-scroll-active) .album-tracklist-section{
 .scroll-cue-arrow{animation:scrollCueBreathe 2.4s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){
   .scroll-cue-arrow{animation:none}
+  .album-credits-body{animation:none}
+  .album-credits-detail summary > span::after{transition:none}
 }
 .social{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(12px,3vw,20px)}
 .social a{color:var(--muted);position:relative;transition:color .2s ease;padding:4px 0;letter-spacing:.5px}
@@ -1055,6 +1189,13 @@ body.privacy-page .privacy-page-main p{
   width:100%;
   max-width:760px;
   margin:0 auto;
+}
+/* The page's h1 is the wordmark plus the kicker beneath it. Both children carry
+   their own sizing, so the heading itself must not impose h1 defaults. */
+.epk-title{
+  margin:0;
+  font-size:inherit;
+  font-weight:inherit;
 }
 .epk-logo{
   width:clamp(300px,48vw,520px);
@@ -2873,6 +3014,25 @@ a.show-row[href]{cursor:pointer}
 
 /* contact form */
 .contact-subtitle{color:var(--muted);margin:0 0 clamp(24px,4vw,40px);font-size:clamp(1em,2vw,1.15em);letter-spacing:.5px}
+.contact-intro{max-width:64ch;margin:0 auto clamp(28px,4vw,44px);color:var(--muted);line-height:1.75;font-size:clamp(.95em,1.7vw,1.05em)}
+.contact-aside{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));
+  gap:clamp(20px,3vw,32px);
+  max-width:900px;
+  margin:clamp(40px,6vw,64px) auto 0;
+  padding-top:clamp(28px,4vw,40px);
+  border-top:1px solid rgba(255,255,255,.08);
+  text-align:left;
+}
+.contact-aside-block h2{
+  margin:0 0 8px;
+  color:var(--accent);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  font-size:clamp(.82em,1.5vw,.92em);
+}
+.contact-aside-block p{margin:0;color:var(--muted);line-height:1.7;font-size:.94em}
 .contact-form{max-width:100%;margin:0 auto;display:grid;gap:16px;background:transparent;border:none;border-radius:0;padding:0;animation:fadeUp .5s ease both}
 .contact-form label{display:grid;gap:8px}
 .contact-form span{color:var(--muted);font-size:.85em;text-transform:uppercase;letter-spacing:1px}
@@ -3473,6 +3633,19 @@ a.show-row[href]{cursor:pointer}
   display:flex;
   flex-direction:column;
   gap:14px;
+}
+.store-product-copy{margin:0 0 clamp(20px,3vw,28px)}
+.store-product-copy p{margin:0 0 .85em;color:var(--muted);line-height:1.7;font-size:clamp(.93em,1.6vw,1em)}
+.store-product-facts{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.store-product-facts li{color:var(--muted);font-size:.9em;line-height:1.55}
+.store-product-facts strong{
+  display:inline-block;
+  min-width:88px;
+  color:var(--accent);
+  font-weight:600;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-size:.82em;
 }
 .store-form.contact-form{
   gap:14px;
@@ -4165,6 +4338,23 @@ a.show-row[href]{cursor:pointer}
   z-index:80;
   top:18px;
 }
+.poster-archive-intro{
+  max-width:72ch;
+  margin:0 auto clamp(32px,5vw,56px);
+  text-align:center;
+}
+.poster-archive-intro h1{
+  font-size:clamp(30px,5.5vw,48px);
+  letter-spacing:2px;
+  margin:0 0 clamp(12px,2vw,18px);
+}
+.poster-archive-intro p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.75;
+  font-size:clamp(.95em,1.7vw,1.05em);
+}
+.poster-archive-intro p + p{margin-top:.9em}
 .poster-archive-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));

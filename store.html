@@ -38,6 +38,97 @@ src="https://www.facebook.com/tr?id=1503298771840666&ev=PageView&noscript=1" alt
 <link rel="stylesheet" href="css/styles.css">
 <link rel="preload" as="image" type="image/webp" href="assets/images/merch/merch-1.webp" fetchpriority="high">
 <link rel="icon" type="image/png" href="assets/images/favicon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "MusicGroup",
+      "@id": "https://www.dirtyaesthetic.com/#band",
+      "name": "Dirty Aesthetic",
+      "alternateName": "Dirty Aesthetic Band",
+      "url": "https://www.dirtyaesthetic.com/",
+      "description": "Dirty Aesthetic is a five piece indie garage rock band from Vancouver, British Columbia, formed in the summer of 2024. Their debut album, Modern Nostalgia, was released in August 2026.",
+      "genre": [
+        "Indie rock",
+        "Garage rock",
+        "Alternative rock"
+      ],
+      "foundingDate": "2024",
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "Vancouver, British Columbia, Canada"
+      },
+      "location": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Vancouver",
+          "addressRegion": "BC",
+          "addressCountry": "CA"
+        }
+      },
+      "email": "dirtyaestheticmusic@gmail.com",
+      "image": "https://www.dirtyaesthetic.com/assets/images/header-desktop.jpg",
+      "logo": "https://www.dirtyaesthetic.com/assets/images/logos/da-wordmark.png",
+      "member": [
+        {
+          "@type": "Person",
+          "name": "Dylan Iwaschuk"
+        },
+        {
+          "@type": "Person",
+          "name": "Bardia Tarjoman"
+        },
+        {
+          "@type": "Person",
+          "name": "Jacob Nadal"
+        },
+        {
+          "@type": "Person",
+          "name": "Josh Seaman"
+        },
+        {
+          "@type": "Person",
+          "name": "Josh Chapman"
+        }
+      ],
+      "sameAs": [
+        "https://open.spotify.com/artist/6LJB3zSDmtQ3NxA6GjUwlt",
+        "https://music.apple.com/ca/artist/dirty-aesthetic/1773260865",
+        "https://dirtyaesthetic.bandcamp.com/",
+        "https://www.youtube.com/@dirtyaesthetic",
+        "https://instagram.com/dirtyaestheticband",
+        "https://tiktok.com/@dirty_aesthetic",
+        "https://linktr.ee/dirtyaesthetic"
+      ]
+    },
+    {
+      "@type": "Product",
+      "@id": "https://www.dirtyaesthetic.com/store.html#tee",
+      "name": "Dirty Aesthetic Tee",
+      "description": "The first Dirty Aesthetic merch drop: the band's splat mark printed on a tee. Sizes XS to XXL, with local pickup in Vancouver or shipping.",
+      "image": "https://www.dirtyaesthetic.com/assets/images/merch/merch-1.jpg",
+      "brand": {
+        "@type": "Brand",
+        "name": "Dirty Aesthetic"
+      },
+      "url": "https://www.dirtyaesthetic.com/store.html",
+      "offers": {
+        "@type": "Offer",
+        "url": "https://www.dirtyaesthetic.com/store.html",
+        "price": "35.00",
+        "priceCurrency": "CAD",
+        "availability": "https://schema.org/PreOrder",
+        "itemCondition": "https://schema.org/NewCondition",
+        "seller": {
+          "@id": "https://www.dirtyaesthetic.com/#band"
+        }
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="store-page-bg">
   <header class="site-header">
@@ -81,6 +172,16 @@ src="https://www.facebook.com/tr?id=1503298771840666&ev=PageView&noscript=1" alt
           <span class="ep-release-tag store-product-tag">Preorder</span>
           <h1 class="store-product-title">Dirty Aesthetic Tee <span class="store-price-amount">$35</span></h1>
         </header>
+
+        <div class="store-product-copy">
+          <p>The first merch drop from Dirty Aesthetic, the five piece indie garage rock band out of Vancouver, British Columbia. The band&rsquo;s splat mark, printed on a tee, $35 CAD. Select the artwork to see the full design.</p>
+          <p>This is a preorder rather than a checkout: send your size and quantity below and the band will email you to sort payment and pickup. Pick up in Vancouver at a show, or have it shipped. Choose below, and add an address if you want it mailed.</p>
+          <ul class="store-product-facts">
+            <li><strong>Sizes</strong> XS, S, M, L, XL, XXL</li>
+            <li><strong>Price</strong> $35 CAD each</li>
+            <li><strong>Delivery</strong> Local pickup in Vancouver, or shipping</li>
+          </ul>
+        </div>
 
         <form id="merch-order-form" class="store-form contact-form" action="https://formspree.io/f/xjgvzapo" method="POST">
           <input type="hidden" name="_subject" value="New Merch Preorder Dirty Aesthetic">

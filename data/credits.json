@@ -1,0 +1,611 @@
+{
+  "_readme": "Per track credits for Modern Nostalgia, taken from the album's own Apple Music listing (music.apple.com/us/album/modern-nostalgia/6796626416) so the site and the streaming services cannot disagree. Roles are reproduced as Apple publishes them. Regenerate by re-reading the album and song pages if a credit is corrected upstream.",
+  "album": {
+    "title": "Modern Nostalgia",
+    "releaseDate": "2026-08-12",
+    "copyright": "℗ 2026 Dirty Music",
+    "source": "Apple Music",
+    "sourceUrl": "https://music.apple.com/us/album/modern-nostalgia/6796626416"
+  },
+  "tracks": [
+    {
+      "position": 1,
+      "title": "In a Haze",
+      "duration": "5:09",
+      "appleId": "6796626417",
+      "songwriters": [
+        "Dylan Iwaschuk",
+        "Jacob Nadal",
+        "Bardia Tarjoman",
+        "Josh Chapman",
+        "Josh Seaman"
+      ],
+      "performers": [
+        {
+          "name": "Dylan Iwaschuk",
+          "roles": [
+            "Vocals"
+          ]
+        },
+        {
+          "name": "Jacob Nadal",
+          "roles": [
+            "Background Vocals",
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Bardia Tarjoman",
+          "roles": [
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Josh Chapman",
+          "roles": [
+            "Drums"
+          ]
+        },
+        {
+          "name": "Josh Seaman",
+          "roles": [
+            "Bass"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        },
+        {
+          "name": "Taarish Sood",
+          "roles": [
+            "Recording Engineer"
+          ]
+        }
+      ]
+    },
+    {
+      "position": 2,
+      "title": "Maybe",
+      "duration": "3:27",
+      "appleId": "6796626418",
+      "songwriters": [
+        "Dylan Iwaschuk",
+        "Jacob Nadal",
+        "Bardia Tarjoman",
+        "Josh Chapman",
+        "Josh Seaman"
+      ],
+      "performers": [
+        {
+          "name": "Dylan Iwaschuk",
+          "roles": [
+            "Vocals"
+          ]
+        },
+        {
+          "name": "Jacob Nadal",
+          "roles": [
+            "Background Vocals",
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Bardia Tarjoman",
+          "roles": [
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Josh Chapman",
+          "roles": [
+            "Drums"
+          ]
+        },
+        {
+          "name": "Josh Seaman",
+          "roles": [
+            "Bass"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        },
+        {
+          "name": "Taarish Sood",
+          "roles": [
+            "Recording Engineer"
+          ]
+        }
+      ]
+    },
+    {
+      "position": 3,
+      "title": "Chariot",
+      "duration": "3:27",
+      "appleId": "6796626419",
+      "songwriters": [
+        "Dylan Iwaschuk",
+        "Jacob Nadal",
+        "Bardia Tarjoman",
+        "Josh Chapman",
+        "Josh Seaman"
+      ],
+      "performers": [
+        {
+          "name": "Dylan Iwaschuk",
+          "roles": [
+            "Vocals"
+          ]
+        },
+        {
+          "name": "Jacob Nadal",
+          "roles": [
+            "Background Vocals",
+            "Acoustic Guitar",
+            "Vocals"
+          ]
+        },
+        {
+          "name": "Bardia Tarjoman",
+          "roles": [
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Josh Chapman",
+          "roles": [
+            "Drums"
+          ]
+        },
+        {
+          "name": "Josh Seaman",
+          "roles": [
+            "Bass"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        },
+        {
+          "name": "Taarish Sood",
+          "roles": [
+            "Recording Engineer"
+          ]
+        }
+      ]
+    },
+    {
+      "position": 4,
+      "title": "Defiant",
+      "duration": "4:40",
+      "appleId": "6796626420",
+      "songwriters": [
+        "Dylan Iwaschuk",
+        "Jacob Nadal",
+        "Bardia Tarjoman",
+        "Josh Chapman",
+        "Josh Seaman"
+      ],
+      "performers": [
+        {
+          "name": "Dylan Iwaschuk",
+          "roles": [
+            "Background Vocals"
+          ]
+        },
+        {
+          "name": "Jacob Nadal",
+          "roles": [
+            "Background Vocals",
+            "Vocals"
+          ]
+        },
+        {
+          "name": "Bardia Tarjoman",
+          "roles": [
+            "Acoustic Guitar",
+            "Background Vocals"
+          ]
+        },
+        {
+          "name": "Josh Chapman",
+          "roles": [
+            "Cymbals"
+          ]
+        },
+        {
+          "name": "Josh Seaman",
+          "roles": [
+            "Bass"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        },
+        {
+          "name": "Taarish Sood",
+          "roles": [
+            "Recording Engineer"
+          ]
+        }
+      ]
+    },
+    {
+      "position": 5,
+      "title": "Modern Nostalgia",
+      "duration": "4:06",
+      "appleId": "6796626421",
+      "songwriters": [
+        "Jacob Nadal",
+        "Dylan Iwaschuk",
+        "Bardia Tarjoman",
+        "Josh Chapman",
+        "Josh Seaman"
+      ],
+      "performers": [
+        {
+          "name": "Jacob Nadal",
+          "roles": [
+            "Background Vocals",
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Dylan Iwaschuk",
+          "roles": [
+            "Vocals"
+          ]
+        },
+        {
+          "name": "Bardia Tarjoman",
+          "roles": [
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Josh Chapman",
+          "roles": [
+            "Drums"
+          ]
+        },
+        {
+          "name": "Josh Seaman",
+          "roles": [
+            "Bass"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        },
+        {
+          "name": "Taarish Sood",
+          "roles": [
+            "Recording Engineer"
+          ]
+        }
+      ]
+    },
+    {
+      "position": 6,
+      "title": "Limerence Interlude",
+      "duration": "1:23",
+      "appleId": "6796626422",
+      "songwriters": [
+        "Bardia Tarjoman"
+      ],
+      "performers": [
+        {
+          "name": "Bardia Tarjoman",
+          "roles": [
+            "Guitar"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        }
+      ]
+    },
+    {
+      "position": 7,
+      "title": "Back to Me",
+      "duration": "4:49",
+      "appleId": "6796626423",
+      "songwriters": [
+        "Dylan Iwaschuk",
+        "Jacob Nadal",
+        "Josh Seaman",
+        "Josh Chapman",
+        "Bardia Tarjoman"
+      ],
+      "performers": [
+        {
+          "name": "Dylan Iwaschuk",
+          "roles": [
+            "Vocals"
+          ]
+        },
+        {
+          "name": "Jacob Nadal",
+          "roles": [
+            "Background Vocals",
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Josh Seaman",
+          "roles": [
+            "Bass"
+          ]
+        },
+        {
+          "name": "Josh Chapman",
+          "roles": [
+            "Drums"
+          ]
+        },
+        {
+          "name": "Bardia Tarjoman",
+          "roles": [
+            "Guitar"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        },
+        {
+          "name": "Taarish Sood",
+          "roles": [
+            "Recording Engineer"
+          ]
+        }
+      ]
+    },
+    {
+      "position": 8,
+      "title": "Jaded",
+      "duration": "4:04",
+      "appleId": "6796626424",
+      "songwriters": [
+        "Dylan Iwaschuk",
+        "Jacob Nadal",
+        "Bardia Tarjoman",
+        "Josh Chapman",
+        "Josh Seaman"
+      ],
+      "performers": [
+        {
+          "name": "Dylan Iwaschuk",
+          "roles": [
+            "Vocals"
+          ]
+        },
+        {
+          "name": "Jacob Nadal",
+          "roles": [
+            "Background Vocals",
+            "Acoustic Guitar"
+          ]
+        },
+        {
+          "name": "Bardia Tarjoman",
+          "roles": [
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Josh Chapman",
+          "roles": [
+            "Drums"
+          ]
+        },
+        {
+          "name": "Josh Seaman",
+          "roles": [
+            "Bass"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        },
+        {
+          "name": "Taarish Sood",
+          "roles": [
+            "Recording Engineer"
+          ]
+        }
+      ]
+    },
+    {
+      "position": 9,
+      "title": "Am I Alone?",
+      "duration": "4:56",
+      "appleId": "6796626425",
+      "songwriters": [
+        "Dylan Iwaschuk",
+        "Josh Chapman"
+      ],
+      "performers": [
+        {
+          "name": "Dylan Iwaschuk",
+          "roles": [
+            "Vocals",
+            "Acoustic Guitar"
+          ]
+        },
+        {
+          "name": "Josh Chapman",
+          "roles": [
+            "Drums"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        },
+        {
+          "name": "Taarish Sood",
+          "roles": [
+            "Recording Engineer"
+          ]
+        }
+      ]
+    },
+    {
+      "position": 10,
+      "title": "Irrational",
+      "duration": "3:19",
+      "appleId": "6796626426",
+      "songwriters": [
+        "Dylan Iwaschuk",
+        "Jacob Nadal",
+        "Josh Chapman",
+        "Bardia Tarjoman",
+        "Josh Seaman"
+      ],
+      "performers": [
+        {
+          "name": "Dylan Iwaschuk",
+          "roles": [
+            "Vocals"
+          ]
+        },
+        {
+          "name": "Jacob Nadal",
+          "roles": [
+            "Background Vocals",
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Josh Chapman",
+          "roles": [
+            "Drums"
+          ]
+        },
+        {
+          "name": "Bardia Tarjoman",
+          "roles": [
+            "Guitar"
+          ]
+        },
+        {
+          "name": "Josh Seaman",
+          "roles": [
+            "Bass"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        },
+        {
+          "name": "Taarish Sood",
+          "roles": [
+            "Recording Engineer"
+          ]
+        }
+      ]
+    },
+    {
+      "position": 11,
+      "title": "Used to You",
+      "duration": "4:04",
+      "appleId": "6796626427",
+      "songwriters": [
+        "Jacob Nadal",
+        "Bardia Tarjoman",
+        "Josh Seaman"
+      ],
+      "performers": [
+        {
+          "name": "Jacob Nadal",
+          "roles": [
+            "Background Vocals",
+            "Acoustic Guitar",
+            "Vocals"
+          ]
+        },
+        {
+          "name": "Bardia Tarjoman",
+          "roles": [
+            "Acoustic Guitar"
+          ]
+        },
+        {
+          "name": "Josh Seaman",
+          "roles": [
+            "Bass"
+          ]
+        },
+        {
+          "name": "Dylan Iwaschuk",
+          "roles": [
+            "Background Vocals"
+          ]
+        }
+      ],
+      "engineering": [
+        {
+          "name": "Mendy Noah Stein",
+          "roles": [
+            "Mixing Engineer"
+          ]
+        },
+        {
+          "name": "Taarish Sood",
+          "roles": [
+            "Recording Engineer"
+          ]
+        }
+      ]
+    }
+  ]
+}
