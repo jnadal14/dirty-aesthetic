@@ -11,13 +11,26 @@
       "poster": "assets/images/posters/roxy-falling-doves-2026.webp",
       "posterWidth": 900,
       "posterHeight": 450,
-      "banner": "assets/images/posters/roxy-falling-doves-2026-banner.webp",
-      "bannerWidth": 1200,
-      "bannerHeight": 600,
       "link": "https://www.showpass.com/falling-doves/",
       "linkLabel": "Tickets",
       "posterSource": "_source/posters/ROXY_FALLING DOVES_09:11:26.webp",
       "posterSlug": "roxy-falling-doves-2026"
+    },
+    {
+      "date": "Sep 12, 2026",
+      "title": "Acoustic Set at Batch",
+      "venue": "Batch Kitsilano",
+      "city": "2305 Cornwall Ave, Kits Beach",
+      "time": "2 to 5 PM"
+    },
+    {
+      "date": "Sep 23, 2026",
+      "title": "The Shelf Concert",
+      "venue": "Hestia Kitchen + Bar",
+      "city": "Unit 160, 4351 No. 3 Rd, Richmond",
+      "time": "9:30 PM · $33 with buffet",
+      "link": "https://www.theshelfconcert.com/",
+      "linkLabel": "Details"
     },
     {
       "date": "Sep 30, 2026",

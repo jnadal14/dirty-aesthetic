@@ -1153,6 +1153,21 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     const short = nextShow.ticketLabelShort || long
     document.querySelectorAll('[data-show-label]').forEach(el => { el.textContent = long })
     document.querySelectorAll('[data-show-label-short]').forEach(el => { el.textContent = short })
+
+    // The header button sells the next show, so it goes where that show is
+    // sold. A date with no ticket link yet falls back to the section, which is
+    // the only place left that says anything useful about it.
+    document.querySelectorAll('[data-show-ticket]').forEach(el => {
+      if (nextShow.link) {
+        el.href = nextShow.link
+        el.target = '_blank'
+        el.rel = 'noopener'
+      } else {
+        el.href = '/#upcoming-section'
+        el.removeAttribute('target')
+        el.removeAttribute('rel')
+      }
+    })
   }
 
   const container=document.getElementById('upcoming')
@@ -1164,7 +1179,6 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   if(!data.upcoming || data.upcoming.length===0){
     container.innerHTML = ''
     if(editorial){
-      container.classList.remove('shows-editorial--solo')
       container.innerHTML = emptyShowsEditorialHtml
     } else {
       const li=document.createElement('li')
@@ -1179,7 +1193,6 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   // loaded successfully, so a failed request never erases the promotion.
   container.innerHTML = ''
   if (editorial) {
-    container.classList.toggle('shows-editorial--solo', Boolean(data.upcoming.length))
   }
 
   data.upcoming.forEach((s, i)=>{
@@ -1187,10 +1200,10 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const parts = parseDateParts(s.date)
       const row = document.createElement('a')
       const isNext = i === 0
-      const solo = isNext ? ' show-row--solo' : ''
-      const featured = isNext && s.banner ? ' show-row--featured' : ''
-      const secondary = isNext ? '' : ' show-row--secondary'
-      row.className = 'show-row reveal' + solo + featured + secondary
+      // Every date is the same kind of row. The next one is marked so it can be
+      // given weight by type and scale, rather than by being lifted onto a card
+      // of its own that hides the section behind it.
+      row.className = 'show-row reveal' + (isNext ? ' show-row--next' : '')
       row.style.setProperty('--reveal-delay', `${(i * 0.08).toFixed(2)}s`)
       if(s.link){
         row.href = s.link
@@ -1211,9 +1224,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
         ? s.city
         : [s.venue, s.city, s.time].filter(Boolean).join(' · ')
       const posterSrc = showMediaUrl(s.poster)
-      const bannerSrc = showMediaUrl(s.banner)
       const posterDimensions = s.posterWidth && s.posterHeight ? ` width="${s.posterWidth}" height="${s.posterHeight}"` : ''
-      const bannerDimensions = s.bannerWidth && s.bannerHeight ? ` width="${s.bannerWidth}" height="${s.bannerHeight}"` : ''
       const mediaLoading = i === 0 ? 'eager' : 'lazy'
       const posterName = s.title || s.venue
       // The box is shaped by the poster, not the other way round. Without this
@@ -1223,9 +1234,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
         ? ` style="--poster-ar:${s.posterWidth} / ${s.posterHeight}"`
         : ''
       const posterHtml = posterSrc ? `<div class="show-row-poster"${posterAspect} data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${posterName} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>` : ''
-      const bannerHtml = isNext && bannerSrc ? `<div class="show-row-banner" aria-hidden="true"><img src="${bannerSrc}" alt="" loading="${mediaLoading}" decoding="async"${bannerDimensions}></div>` : ''
       row.innerHTML = `
-        ${bannerHtml}
         <div class="show-row-date">
           <span class="show-row-month">${parts ? parts.month : s.date}</span>
           <span class="show-row-day">${parts ? parts.dayOrd : ''}</span>
@@ -1282,7 +1291,6 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   if(!container)return
   if(container.children.length) return
   if(container.classList.contains('shows-editorial')){
-    container.classList.remove('shows-editorial--solo')
     container.innerHTML = emptyShowsEditorialHtml
   } else {
     const li=document.createElement('li')
@@ -1585,7 +1593,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const lineupPhotos = document.querySelectorAll('[data-lineup]')
   if(!galleryRoot && !lineupPhotos.length) return
 
-  const EPK_ASSET_VERSION = '20260730-1738'
+  const EPK_ASSET_VERSION = '20260908-0021'
   const GALLERY_EAGER = 6
   const LAZY_ROOT_MARGIN = '500px 0px'
   const IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'

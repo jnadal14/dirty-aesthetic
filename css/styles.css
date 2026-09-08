@@ -148,10 +148,10 @@ picture{display:contents}
   height:100svh;
   overflow:hidden;
   background-color:#0a0705;
-  background-image:url('../assets/images/header-desktop.jpg');
+  background-image:url('../assets/images/backgrounds/header-desktop.jpg');
   background-image:image-set(
-    url('../assets/images/header-desktop.webp') type('image/webp'),
-    url('../assets/images/header-desktop.jpg') type('image/jpeg')
+    url('../assets/images/backgrounds/header-desktop.webp') type('image/webp'),
+    url('../assets/images/backgrounds/header-desktop.jpg') type('image/jpeg')
   );
   background-position:center 55%;
   background-size:cover;
@@ -283,7 +283,6 @@ body:not(.music-page-bg) .page{
   }
 }
 
-
 /* Buttons — compact, cut-corner controls instead of generic pills. */
 .btn{
   --btn-x:0px;
@@ -392,11 +391,14 @@ body.music-page-bg::after{
   inset:0;
   z-index:-1;
   pointer-events:none;
+  /* Scrim is a touch heavier than the header shot it replaces because this one
+     carries a lit phone screen and a white vest. Measured, it lands within a
+     hundredth of the old contrast rather than under it. */
   background-image:
-    linear-gradient(180deg,rgba(12,8,6,.9) 0%,rgba(18,12,8,.82) 45%,rgba(8,6,4,.94) 100%),
+    linear-gradient(180deg,rgba(12,8,6,.93) 0%,rgba(18,12,8,.88) 45%,rgba(8,6,4,.95) 100%),
     image-set(
-      url('../assets/images/header-desktop.webp') type('image/webp'),
-      url('../assets/images/header-desktop.jpg') type('image/jpeg')
+      url('../assets/images/backgrounds/music-bg.webp') type('image/webp'),
+      url('../assets/images/backgrounds/music-bg.jpg') type('image/jpeg')
     );
   background-position:center,center;
   background-size:cover,cover;
@@ -567,8 +569,6 @@ body.contact-page-bg{
   .watch-clips-grid{grid-template-columns:1fr;gap:16px}
 }
 
-
-
 .clips-section{padding:clamp(32px,5vw,56px) clamp(16px,4vw,32px);background:rgba(0,0,0,.15);margin-top:24px}
 .clips-section h2{text-align:center;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin:0 0 24px}
 
@@ -584,8 +584,6 @@ body.contact-page-bg{
 
 /* footer */
 .site-footer{display:flex;flex-direction:column;align-items:center;gap:16px;padding:32px clamp(16px,4vw,32px);border-top:1px solid rgba(255,255,255,.06);animation:fadeIn .6s ease .2s both;text-align:center}
-
-
 
 /* ===== iOS / touch refinements ===== */
 /* Most of this traffic is iPhone, so these target real Safari behaviours
@@ -677,7 +675,6 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
   gap:10px;
   margin-top:14px;
 }
-
 
 /* ===== Music page — featured release ===== */
 /* The current album leads the page at a size the catalog grid below cannot
@@ -1153,7 +1150,7 @@ body.privacy-page .privacy-page-main p{
 /* — Intro: large photo + bio — */
 .epk-intro{
   display:grid;
-  grid-template-columns:auto 1fr;
+  grid-template-columns:1fr;
   gap:clamp(28px,4vw,48px);
   align-items:stretch;
   min-height:auto;
@@ -1165,26 +1162,6 @@ body.privacy-page .privacy-page-main p{
       url('../assets/images/backgrounds/epk-bg.webp') type('image/webp'),
       url('../assets/images/backgrounds/epk-bg.jpg') type('image/jpeg')
     ) center/cover no-repeat;
-}
-.epk-intro-photo{
-  position:relative;
-  border-radius:6px;
-  overflow:hidden;
-  box-shadow:0 8px 32px rgba(0,0,0,.4);
-  width:clamp(200px,22vw,320px);
-  height:100%;
-  max-height:100%;
-}
-.epk-intro-photo img{
-  width:100%;
-  height:100%;
-  display:block;
-  border-radius:6px;
-  object-fit:cover;
-}
-.epk-intro-photo-alt-logo,
-.epk-intro-photo-mobile-bottom{
-  display:none;
 }
 .epk-intro-content{
   display:flex;
@@ -1254,9 +1231,6 @@ body.privacy-page .privacy-page-main p{
     grid-template-columns:1fr;
     align-items:start;
   }
-  .epk-intro-photo{
-    display:none;
-  }
 }
 
 /* — Spotify embed — */
@@ -1270,8 +1244,30 @@ body.privacy-page .privacy-page-main p{
 
 /* — Band Members — */
 .epk-members{
-  background:#000;
+  /* Light scrim by intent. Measured at this weight the heading still reads at
+     8.7:1 and the roles at 5.5:1, so there is no reason to bury the picture
+     any further than the type actually needs. */
+  background-color:#060403;
+  background-image:
+    linear-gradient(180deg,rgba(6,4,3,.82) 0%,rgba(6,4,3,.76) 50%,rgba(6,4,3,.86) 100%),
+    image-set(
+      url('../assets/images/backgrounds/members-bg.webp') type('image/webp'),
+      url('../assets/images/backgrounds/members-bg.jpg') type('image/jpeg')
+    );
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
   padding:clamp(32px,5vw,56px) 0;
+}
+@media (max-width:760px){
+  .epk-members{
+    background-image:
+      linear-gradient(180deg,rgba(6,4,3,.82) 0%,rgba(6,4,3,.76) 50%,rgba(6,4,3,.86) 100%),
+      image-set(
+        url('../assets/images/backgrounds/members-bg-mobile.webp') type('image/webp'),
+        url('../assets/images/backgrounds/members-bg-mobile.jpg') type('image/jpeg')
+      );
+  }
 }
 .epk-members .epk-section-title{
   color:var(--ink);
@@ -1470,7 +1466,7 @@ body.privacy-page .privacy-page-main p{
 /* — EPK responsive — */
 @media (max-width:800px){
   .epk-intro{
-    grid-template-columns:auto 1fr;
+    grid-template-columns:1fr;
     align-items:start;
     min-height:auto;
     padding:clamp(90px,14vw,110px) clamp(20px,4vw,32px) 0;
@@ -1481,24 +1477,6 @@ body.privacy-page .privacy-page-main p{
       url('../assets/images/backgrounds/epk-bg-mobile.webp') type('image/webp'),
       url('../assets/images/backgrounds/epk-bg-mobile.jpg') type('image/jpeg')
     ) center top/cover no-repeat;
-  }
-  .epk-intro-photo{
-    width:clamp(110px,22vw,180px);
-    position:relative;
-    height:auto;
-    align-self:start;
-    display:block;
-    border-radius:6px;
-    overflow:hidden;
-    box-shadow:0 8px 32px rgba(0,0,0,.4);
-  }
-  .epk-intro-photo img{
-    height:auto;
-    object-fit:initial;
-  }
-  .epk-intro-photo-alt-logo,
-  .epk-intro-photo-mobile-bottom{
-    display:none;
   }
   .epk-intro-content{
     padding:0;
@@ -1567,9 +1545,6 @@ body.privacy-page .privacy-page-main p{
     grid-template-columns:1fr;
     align-items:start;
   }
-  .epk-intro-photo{
-    display:none;
-  }
   .epk-logo{
     margin-left:auto;
     margin-right:auto;
@@ -1583,9 +1558,6 @@ body.privacy-page .privacy-page-main p{
   .epk-intro{
     padding:clamp(80px,16vw,100px) 16px 0;
     gap:16px;
-  }
-  .epk-intro-photo{
-    width:clamp(90px,24vw,130px);
   }
   .epk-logo{
     width:clamp(160px,50vw,260px);
@@ -1889,15 +1861,8 @@ body.privacy-page .privacy-page-main p{
   .spatial-scroll-active .shows-feature::before{
     animation:none;
   }
-  .spatial-scroll-active .shows-feature{padding:88px 0 32px}
-  /* The featured poster is portrait, and on a tall window its column width
-     alone would size it past 500px and push the heading under the header. On a
-     fixed-height slide it has to be capped by height, like the video. */
-  .spatial-scroll-active .shows-editorial--solo .show-row--solo{
-    padding:clamp(20px,3vw,34px);
-  }
-  .spatial-scroll-active .shows-editorial--solo .show-row--solo .show-row-poster{
-    max-height:40vh;
+  .spatial-scroll-active .shows-feature{
+    padding:calc(var(--home-header-h,81px) + clamp(6px,1.2vh,14px)) 0 32px;
   }
 
   /* The camera now moves the whole scene, so the smaller content drift from
@@ -2129,7 +2094,10 @@ blockquote.tiktok-embed section{margin:0!important}
   background:linear-gradient(90deg, transparent 5%, rgba(234,57,42,.5) 30%, rgba(226,1,191,.5) 70%, transparent 95%);
 }
 .shows-feature-inner{
-  max-width:1000px;
+  /* Widening this on a large screen is a height fix, not a width one: boxed at
+     1000px the address lines wrapped, and on a slide that must fit one screen
+     every wrapped line is ~32px that has to come from somewhere else. */
+  max-width:clamp(1000px,62vw,1280px);
   margin:0 auto;
   padding:0 clamp(24px,5vw,64px);
   position:relative;
@@ -2289,7 +2257,10 @@ a.show-row[href]{cursor:pointer}
   flex-shrink:0;
   border-radius:6px;
   overflow:hidden;
-  box-shadow:0 4px 16px rgba(0,0,0,.3);
+  /* The card the poster used to sit on is what separated it from the section.
+     With that gone it needs an edge of its own, or a dark poster disappears
+     into a bright frame of the crowd behind it. */
+  box-shadow:0 6px 22px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.12);
   transition:transform .2s ease, box-shadow .2s ease;
   cursor:pointer;
   align-self:center;
@@ -2304,240 +2275,81 @@ a.show-row[href]{cursor:pointer}
   box-shadow:0 6px 24px rgba(0,0,0,.45);
 }
 
-/* Featured show — uses its landscape art as a cinematic row backdrop. */
-.show-row--featured{
-  min-height:clamp(140px,16vw,186px);
-  margin-top:10px;
-  margin-bottom:10px;
-  overflow:hidden;
-  isolation:isolate;
-  border:1px solid rgba(234,57,42,.26);
-  background:#0a0705;
-}
-.show-row--featured:first-child{border-top-color:rgba(234,57,42,.26)}
-.show-row--featured::before{
-  z-index:1;
-  opacity:1;
-  background:
-    linear-gradient(90deg,rgba(6,5,5,.95) 0%,rgba(6,5,5,.88) 38%,rgba(6,5,5,.56) 70%,rgba(6,5,5,.3) 100%),
-    linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.58));
-}
-.show-row--featured:hover::before{opacity:.9}
-.show-row--featured > .show-row-date,
-.show-row--featured > .show-row-info,
-.show-row--featured > .show-row-poster{
+/* The next date, told apart by weight rather than by a container of its own.
+   A rule down the left edge, a warmer month, a bigger poster: the section's
+   photograph runs straight through it the way it does every other row. */
+.show-row--next{
   position:relative;
-  z-index:2;
+  padding-left:clamp(15px,2.2vw,24px);
+  border-bottom-color:rgba(234,57,42,.3);
 }
-.show-row-banner{
+.show-row--next::after{
+  content:'';
   position:absolute;
-  z-index:0;
-  inset:0;
-  pointer-events:none;
+  left:0;
+  top:clamp(10px,1.6vw,16px);
+  bottom:clamp(10px,1.6vw,16px);
+  width:2px;
+  border-radius:2px;
+  background:linear-gradient(180deg,var(--fest-sun) 0%,rgba(226,1,191,.75) 100%);
 }
-.show-row-banner img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center;
-  opacity:.72;
+.show-row--next .show-row-month{color:var(--fest-sun)}
+.show-row--next .show-row-day{color:var(--ink)}
+.show-row--next .show-row-venue{
+  color:#fff1ea;
+  font-size:clamp(1.3em,3vw,1.95em);
+  line-height:1.1;
 }
-.show-row--featured .show-row-month{
-  color:var(--fest-sun);
+.show-row--next .show-row-poster{
+  width:clamp(150px,30vw,330px);
+  box-shadow:0 10px 30px rgba(0,0,0,.6),0 0 0 1px rgba(234,57,42,.32);
 }
-.show-row--featured .show-row-venue{
-  color:#fff1ed;
-}
-.show-row--featured .show-row-poster{
-  width:clamp(74px,11vw,104px);
-  box-shadow:0 8px 28px rgba(0,0,0,.55),0 0 0 1px rgba(234,57,42,.22);
-}
-
-/* Single upcoming show — hero card, large poster */
-.shows-feature-inner:has(.shows-editorial--solo){
-  max-width:1100px;
-}
-.shows-editorial--solo .show-row--solo{
-  display:grid;
-  grid-template-columns:minmax(220px, min(44vw, 420px)) 1fr;
-  grid-template-rows:auto 1fr;
-  align-items:start;
-  column-gap:clamp(28px,4vw,52px);
-  row-gap:clamp(12px,2vw,20px);
-  padding:clamp(28px,4vw,48px);
-  margin:0;
-  border:1px solid rgba(176,122,63,.18);
-  border-radius:18px;
-  background:
-    linear-gradient(145deg, rgba(176,122,63,.08) 0%, transparent 50%),
-    rgba(0,0,0,.28);
-  box-shadow:
-    0 12px 48px rgba(0,0,0,.4),
-    inset 0 1px 0 rgba(255,255,255,.07);
-  transition:transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s ease, box-shadow .35s ease;
-}
-.shows-editorial--solo .show-row--solo:first-child{
-  border-top-color:rgba(176,122,63,.14);
-}
-.shows-editorial--solo .show-row--solo:hover{
-  transform:translateY(-4px);
-  border-color:rgba(176,122,63,.32);
-  box-shadow:
-    0 20px 56px rgba(0,0,0,.45),
-    0 0 0 1px rgba(176,122,63,.1),
-    inset 0 1px 0 rgba(255,255,255,.08);
-}
-.shows-editorial--solo .show-row--solo .show-row-poster{
-  grid-column:1;
-  grid-row:1 / -1;
-  width:100%;
-  max-width:none;
-  /* Shaped by the poster rather than stretched to the card. Stretching only
-     worked while every poster was portrait; a 2:1 one was letterboxed into a
-     300x200 box and painted 300x150. Starting from the ratio means the box is
-     the picture, whatever shape the picture is. */
-  aspect-ratio:var(--poster-ar, 900 / 1112);
-  align-self:start;
-  border-radius:14px;
-  overflow:hidden;
-  box-shadow:
-    0 16px 48px rgba(0,0,0,.5),
-    0 0 0 1px rgba(255,255,255,.08);
-}
-.shows-editorial--solo .show-row--solo .show-row-poster:hover{
-  transform:scale(1.02);
-  box-shadow:
-    0 20px 56px rgba(0,0,0,.55),
-    0 0 0 1px rgba(176,122,63,.15);
-}
-.shows-editorial--solo .show-row--solo .show-row-poster img{
-  width:100%;
-  height:100%;
-  /* The box already carries the ratio, so cover fits exactly — it neither
-     crops nor letterboxes, and the min/max heights that used to force a
-     portrait box are what made a wide poster float in empty space. */
-  object-fit:cover;
-  object-position:center;
-  background:radial-gradient(ellipse 80% 60% at 50% 20%, rgba(255,255,255,.06), transparent 65%);
-}
-.shows-editorial--solo .show-row--solo .show-row-date{
-  grid-column:2;
-  grid-row:1;
-  min-width:0;
-  align-self:end;
-  padding-bottom:4px;
-}
-.shows-editorial--solo .show-row--solo .show-row-info{
-  grid-column:2;
-  grid-row:2;
-  gap:10px;
-  max-width:40rem;
-}
-.shows-editorial--solo .show-row--solo .show-row-month{
-  font-size:clamp(1.85em,4.2vw,2.85em);
-  letter-spacing:3px;
-}
-.shows-editorial--solo .show-row--solo .show-row-day{
-  font-size:clamp(1.25em,2.8vw,1.95em);
-}
-.shows-editorial--solo .show-row--solo .show-row-venue{
-  font-size:clamp(1.25em,2.8vw,1.75em);
-  line-height:1.25;
-}
-.shows-editorial--solo .show-row--solo .show-row-lineup{
-  font-size:clamp(.88em,1.5vw,1.05em);
-  line-height:1.45;
-}
-.shows-editorial--solo .show-row--solo .show-row-city{
-  font-size:clamp(.82em,1.4vw,.95em);
-  letter-spacing:2px;
-}
-.shows-editorial--solo .show-row--solo .show-row-arrow{
-  font-size:.72em;
-}
-/* With the billing trimmed off, the date and details are a short block sitting
-   beside a tall poster, and top-aligning them left a hole under the text. Two
-   flexible spacer rows centre the pair against the artwork. Only where the card
-   is actually two columns — the stacked phone layout wants none of this. */
-@media (min-width:721px){
-  .shows-editorial--solo .show-row--solo{
-    grid-template-rows:1fr auto auto 1fr;
-    row-gap:0;
-  }
-  .shows-editorial--solo .show-row--solo .show-row-poster{grid-row:1 / -1}
-  .shows-editorial--solo .show-row--solo .show-row-date{grid-row:2}
-  .shows-editorial--solo .show-row--solo .show-row-info{
-    grid-row:3;
-    margin-top:clamp(10px,1.6vw,16px);
-  }
-}
-
-.shows-editorial--solo .show-row--solo:not(:has(.show-row-poster)){
-  grid-template-columns:1fr;
-  justify-items:center;
-  text-align:center;
-}
-.shows-editorial--solo .show-row--solo:not(:has(.show-row-poster)) .show-row-date,
-.shows-editorial--solo .show-row--solo:not(:has(.show-row-poster)) .show-row-info{
-  grid-column:1;
-  grid-row:auto;
-  align-items:center;
-}
-.shows-editorial--solo .show-row--solo:not(:has(.show-row-poster)) .show-row-date{
-  align-self:center;
-}
-
-/* A single upcoming date is treated as the section's headline event. */
-.shows-editorial--solo .show-row--featured.show-row--solo{
-  border-color:rgba(234,57,42,.44);
-  background:#0a0603;
-  box-shadow:
-    0 24px 74px rgba(0,0,0,.58),
-    0 0 54px rgba(226,1,191,.12),
-    inset 0 1px 0 rgba(255,255,255,.1);
-}
-.shows-editorial--solo .show-row--featured.show-row--solo:hover{
-  border-color:rgba(234,57,42,.72);
-  box-shadow:
-    0 30px 82px rgba(0,0,0,.64),
-    0 0 66px rgba(226,1,191,.18),
-    inset 0 1px 0 rgba(255,255,255,.12);
-}
-.shows-editorial--solo .show-row--featured.show-row--solo::before{
-  background:
-    linear-gradient(100deg,rgba(8,5,2,.97) 0%,rgba(8,5,2,.92) 42%,rgba(8,5,2,.68) 74%,rgba(8,5,2,.46) 100%),
-    linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.66));
-}
-.shows-editorial--solo .show-row--featured.show-row--solo .show-row-banner img{
-  opacity:.84;
-}
-.shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:10px 14px;
-  color:#fff6ea;
-  font-size:clamp(1.45em,3vw,2.1em);
-  line-height:1.06;
-}
-.shows-editorial--solo .show-row--featured.show-row--solo .show-row-arrow{
+.show-row--next .show-row-arrow{
   display:inline-flex;
   align-items:center;
-  justify-content:center;
-  margin:0;
-  padding:9px 15px 8px;
-  border:1px solid rgba(234,57,42,.66);
+  margin-left:14px;
+  padding:6px 13px 5px;
   border-radius:999px;
   background:var(--fest-sun);
   color:#1a0d02;
-  font-size:.42em;
-  font-style:normal;
+  font-size:.4em;
   font-weight:700;
   letter-spacing:2px;
 }
-.shows-editorial--solo .show-row--featured.show-row--solo:hover .show-row-arrow{
-  background:#fff3e2;
-  color:#1a0d02;
+.show-row--next:hover .show-row-arrow{background:#fff3e2;color:#1a0d02}
+
+/* Narrow screens: three columns will not fit a date, a billing and a poster, so
+   the poster keeps a column of its own and the date stacks above the details
+   rather than reserving 130px beside them. The date also goes horizontal, which
+   is a line of text instead of a two-line block. */
+@media (max-width:560px){
+  .show-row:not(.show-row-empty){
+    /* auto, not a fixed track: a date with no poster (an acoustic set, a radio
+       session) should not reserve a column and a gutter for nothing. */
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:'date poster' 'info poster';
+    align-items:start;
+    column-gap:0;
+    row-gap:6px;
+  }
+  .show-row:not(.show-row-empty) .show-row-date{
+    grid-area:date;
+    flex-direction:row;
+    align-items:baseline;
+    gap:8px;
+    min-width:0;
+  }
+  .show-row:not(.show-row-empty) .show-row-info{grid-area:info}
+  .show-row:not(.show-row-empty) .show-row-poster{
+    grid-area:poster;
+    width:clamp(72px,25vw,116px);
+    margin-left:14px;
+    align-self:start;
+  }
+  .show-row-month{font-size:clamp(1.3em,7vw,1.9em)}
+  .show-row-day{font-size:clamp(.95em,4.4vw,1.2em)}
+  .show-row--next .show-row-venue{font-size:clamp(1.1em,5.4vw,1.45em)}
+  .show-row--next .show-row-arrow{margin-left:10px;padding:5px 11px 4px}
 }
 
 /* Where the show is real but the details are not announced yet. Reads as an
@@ -2580,108 +2392,8 @@ a.show-row[href]{cursor:pointer}
   letter-spacing:2.4px;
   text-transform:uppercase;
 }
-.shows-editorial--solo .show-row--secondary{
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr) auto;
-  align-items:center;
-  gap:clamp(14px,2.4vw,26px);
-  margin:0;
-  padding:clamp(12px,1.8vw,18px) clamp(12px,1.6vw,18px);
-  border:1px solid rgba(176,122,63,.16);
-  border-radius:12px;
-  background:rgba(0,0,0,.26);
-  transition:border-color .3s ease,background .3s ease,transform .3s ease;
-}
-.shows-editorial--solo .show-row--secondary:hover{
-  border-color:rgba(234,57,42,.4);
-  background:rgba(0,0,0,.4);
-  transform:translateY(-2px);
-}
-.shows-editorial--solo .show-row--secondary .show-row-date{
-  grid-column:1;
-  grid-row:auto;
-  min-width:0;
-  align-self:center;
-  padding-bottom:0;
-  text-align:center;
-}
-.shows-editorial--solo .show-row--secondary .show-row-month{
-  font-size:clamp(.86em,1.5vw,1.05em);
-  letter-spacing:1.6px;
-}
-.shows-editorial--solo .show-row--secondary .show-row-day{
-  font-size:clamp(1.05em,1.9vw,1.35em);
-}
-.shows-editorial--solo .show-row--secondary .show-row-info{
-  grid-column:2;
-  grid-row:auto;
-  gap:3px;
-  max-width:none;
-}
-.shows-editorial--solo .show-row--secondary .show-row-venue{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:6px 10px;
-  font-size:clamp(.95em,1.7vw,1.2em);
-  line-height:1.15;
-}
-.shows-editorial--solo .show-row--secondary .show-row-lineup{
-  font-size:clamp(.72em,1.2vw,.84em);
-}
-.shows-editorial--solo .show-row--secondary .show-row-city{
-  font-size:clamp(.68em,1.1vw,.8em);
-  letter-spacing:.8px;
-}
-.shows-editorial--solo .show-row--secondary .show-row-arrow{
-  display:inline-flex;
-  align-items:center;
-  margin:0;
-  padding:5px 11px 4px;
-  border:1px solid rgba(234,57,42,.5);
-  /* Nine-pixel bold type directly over a photograph. The fill gives it a
-     surface of its own, so its legibility stops depending on which part of
-     the crowd happens to sit behind it. */
-  background:rgba(8,3,5,.68);
-  border-radius:999px;
-  color:var(--fest-sun);
-  font-size:.58em;
-  font-weight:700;
-  letter-spacing:1.6px;
-}
-.shows-editorial--solo .show-row--secondary:hover .show-row-arrow{
-  background:var(--fest-sun);
-  color:#1a0d02;
-}
-/* Its own shape, same as the featured one — the thumbnail is just smaller. */
-.shows-editorial--solo .show-row--secondary .show-row-poster{
-  grid-column:3;
-  grid-row:auto;
-  width:clamp(52px,7vw,74px);
-  max-width:none;
-  aspect-ratio:var(--poster-ar, 900 / 1112);
-  max-height:none;
-  align-self:center;
-  border-radius:8px;
-}
-.shows-editorial--solo .show-row--secondary .show-row-poster img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center;
-}
 
 @media (max-width:720px){
-  .shows-editorial--solo .show-row--secondary{
-    grid-template-columns:auto minmax(0,1fr);
-    gap:10px 12px;
-    padding:11px 12px;
-  }
-  /* The thumbnail is the first thing to go when the row has to fit a phone. */
-  .shows-editorial--solo .show-row--secondary .show-row-poster{display:none}
-  .shows-editorial--solo .show-row--secondary .show-row-venue{font-size:clamp(.88em,3.6vw,1.02em)}
-  .shows-editorial--solo .show-row--secondary .show-row-lineup{font-size:.72em}
-  .shows-editorial--solo .show-row--secondary .show-row-city{font-size:.68em}
   .shows-more-label{margin-top:16px;letter-spacing:1.8px}
 }
 
@@ -2723,36 +2435,6 @@ a.show-row[href]{cursor:pointer}
 .shows-archive-link:hover .shows-archive-link-arrow{transform:translateX(5px)}
 
 @media (max-width:720px){
-  .shows-editorial--solo .show-row--solo{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    text-align:center;
-    padding:clamp(22px,5vw,36px);
-    gap:clamp(18px,4vw,26px);
-  }
-  .shows-editorial--solo .show-row--solo .show-row-poster{
-    order:-1;
-    width:min(100%,400px);
-    max-width:100%;
-    align-self:center;
-  }
-  .shows-editorial--solo .show-row--solo .show-row-poster{
-    max-height:min(58vh,480px);
-  }
-  .shows-editorial--solo .show-row--solo .show-row-date{
-    min-width:auto;
-    align-items:center;
-    align-self:center;
-    padding-bottom:0;
-  }
-  .shows-editorial--solo .show-row--solo .show-row-info{
-    align-items:center;
-    max-width:100%;
-  }
-  .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
-    justify-content:center;
-  }
   .shows-archive-link{
     grid-template-columns:1fr auto;
     text-align:left;
@@ -2762,35 +2444,21 @@ a.show-row[href]{cursor:pointer}
   .shows-archive-link-arrow{grid-column:2;grid-row:1 / 3}
 }
 
-
-
 /* The shows slide is a fixed 100svh carrying a heading, a poster, the billing,
    the set time and the archive link. Against the 81px fixed header and the
    pinned footer, a 720px-tall window leaves about 530px for roughly 590px of
    content — so these scale with the viewport's own height rather than sitting
    at one size, and the slide fits from 700px up without looking squeezed on a
    tall screen. Widths are unaffected. */
-@media (min-width:1081px) and (max-height:940px) and (hover:hover) and (pointer:fine){
+@media (min-width:1081px) and (min-height:680px) and (hover:hover) and (pointer:fine){
   .spatial-scroll-active .shows-feature{padding-bottom:clamp(10px,2.2vh,20px)}
   .spatial-scroll-active .shows-feature-kicker{font-size:.68em}
   .spatial-scroll-active .shows-feature-heading{
-    margin-bottom:clamp(8px,1.9vh,14px);
-    padding-bottom:clamp(6px,1.4vh,10px);
-    font-size:clamp(1.32em,min(3.5vw,4.6vh),2.55em);
+    margin-bottom:clamp(6px,1.4vh,12px);
+    padding-bottom:clamp(4px,1vh,8px);
+    font-size:clamp(1.28em,min(3.1vw,4.1vh),2.4em);
   }
-  .spatial-scroll-active .shows-editorial--solo .show-row--solo{
-    grid-template-columns:minmax(190px,min(30vw,300px)) 1fr;
-    padding:clamp(12px,2.4vh,18px);
-    row-gap:clamp(8px,1.4vh,20px);
-  }
-  .spatial-scroll-active .shows-editorial--solo .show-row--solo .show-row-poster{
-    max-height:36vh;
-  }
-  .spatial-scroll-active .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
-    gap:clamp(6px,1.1vh,10px) 14px;
-    font-size:clamp(1.2em,3.7vh,2.1em);
-  }
-  .spatial-scroll-active .show-row-month{font-size:clamp(1.5em,4.4vh,2.6em)}
+  .spatial-scroll-active .show-row-month{font-size:clamp(1.5em,4.2vh,2.35em)}
   .spatial-scroll-active .show-row-day{font-size:clamp(1em,2.4vh,1.7em)}
   .spatial-scroll-active .show-row-info{gap:clamp(3px,.8vh,6px)}
   .spatial-scroll-active .show-row-lineup{
@@ -2809,25 +2477,95 @@ a.show-row[href]{cursor:pointer}
     margin:clamp(8px,1.4vh,20px) 0 clamp(3px,.6vh,8px);
     font-size:clamp(.6em,.95vh,.74em);
   }
-  .spatial-scroll-active .shows-editorial--solo .show-row--secondary{
-    padding:clamp(8px,1.3vh,16px) clamp(10px,1.2vw,16px);
-    gap:clamp(10px,1.6vw,22px);
+  .spatial-scroll-active .shows-archive-link{
+    margin-top:clamp(5px,.9vh,10px);
+    padding:clamp(4px,.85vh,8px) 16px;
   }
-  .spatial-scroll-active .shows-editorial--solo .show-row--secondary .show-row-venue{
-    font-size:clamp(.86em,1.7vh,1.15em);
+}
+
+/* The slide is exactly one screen, and the list on it grew from two dates to
+   four. Height is therefore the scarce axis, not width, so on this slide the
+   rows are measured in vh: their padding, and the posters, which were sized by
+   width and drove the tallest row to 223px on a 900px screen.
+   Sizing a poster by height also means a landscape bill and a portrait one cost
+   the same number of pixels down the page, which is what has to add up here. */
+@media (min-width:1081px) and (min-height:680px) and (hover:hover) and (pointer:fine){
+  .spatial-scroll-active .show-row{
+    padding-top:clamp(6px,1.15vh,18px);
+    padding-bottom:clamp(6px,1.15vh,18px);
+    gap:clamp(14px,2.2vw,36px);
   }
-  .spatial-scroll-active .shows-editorial--solo .show-row--secondary .show-row-lineup{
-    font-size:clamp(.68em,1.15vh,.82em);
+  .spatial-scroll-active .show-row-poster,
+  .spatial-scroll-active .show-row--next .show-row-poster{
+    width:auto;
+    height:clamp(50px,9vh,120px);
   }
-  .spatial-scroll-active .shows-editorial--solo .show-row--secondary .show-row-city{
-    font-size:clamp(.64em,1.05vh,.78em);
+  .spatial-scroll-active .show-row--next .show-row-poster{
+    height:clamp(56px,10.4vh,160px);
   }
-  .spatial-scroll-active .shows-editorial--solo .show-row--secondary .show-row-poster{
-    width:clamp(42px,5.2vw,66px);
+  .spatial-scroll-active .show-row-poster img{
+    width:auto;
+    height:100%;
+  }
+  .spatial-scroll-active .show-row--next .show-row-venue{
+    font-size:clamp(1.1em,2.9vh,1.95em);
+  }
+  .spatial-scroll-active .show-row-date{
+    min-width:clamp(104px,11vw,200px);
+  }
+  .spatial-scroll-active .show-row-venue{
+    font-size:clamp(1em,2.3vh,1.5em);
+  }
+  .spatial-scroll-active .show-row--next .show-row-venue{
+    font-size:clamp(1.08em,2.9vh,1.9em);
+  }
+}
+
+/* Short desktop windows. A 680px screen loses 81px to the fixed header and 109
+   to the pinned footer before any content exists, so on those the footer earns
+   its height back and the row headings scale with the slide like everything
+   else on it. The footer's reserved space is measured in JS, so shrinking it
+   here frees the room on every slide, not only this one. */
+@media (min-width:1081px) and (max-height:820px) and (hover:hover) and (pointer:fine){
+  .spatial-scroll-active .site-footer{
+    padding:8px clamp(16px,4vw,32px) 10px;
+    gap:clamp(2px,.6vh,6px);
+  }
+  .spatial-scroll-active .site-footer .social{gap:clamp(8px,1.6vw,16px)}
+  .spatial-scroll-active .site-footer .social a{font-size:.84em;padding:2px 0}
+  .spatial-scroll-active .site-footer .legal{font-size:.84em;gap:12px}
+  .spatial-scroll-active .show-row-venue{
+    font-size:clamp(.98em,2.3vh,1.5em);
+  }
+  .spatial-scroll-active .show-row--next .show-row-venue{
+    font-size:clamp(1.05em,2.8vh,1.9em);
+  }
+  .spatial-scroll-active .shows-feature-heading{
+    padding-bottom:clamp(3px,.7vh,7px);
+  }
+  /* The header is 12% of a 680px screen at its full size, and it is fixed over
+     every slide. The wordmark and the padding both come down; JS re-measures
+     it, so the slides get the pixels back. */
+  .spatial-scroll-active .site-header{
+    padding-top:calc(9px + env(safe-area-inset-top));
+    padding-bottom:9px;
+  }
+  .spatial-scroll-active .site-header .brand img{height:clamp(32px,4.6vh,44px)}
+  /* Last of the slack on a short slide, taken evenly rather than from one place. */
+  .spatial-scroll-active .show-row{
+    padding-top:clamp(5px,1vh,16px);
+    padding-bottom:clamp(5px,1vh,16px);
+  }
+  .spatial-scroll-active .show-row--next .show-row-poster{
+    height:clamp(54px,9.6vh,150px);
+  }
+  .spatial-scroll-active .shows-feature-kicker{margin-bottom:2px}
+  .spatial-scroll-active .shows-more-label{
+    margin:clamp(5px,.9vh,14px) 0 clamp(2px,.4vh,6px);
   }
   .spatial-scroll-active .shows-archive-link{
-    margin-top:clamp(6px,1.1vh,11px);
-    padding:clamp(5px,1vh,9px) 16px;
+    margin-top:clamp(4px,.7vh,9px);
+    padding:clamp(3px,.7vh,7px) 16px;
   }
 }
 
@@ -2849,36 +2587,6 @@ a.show-row[href]{cursor:pointer}
     margin-bottom:clamp(20px,4vw,32px);
   }
   .shows-feature-heading::after{left:50%;transform:translateX(-50%)}
-  .show-row:not(.show-row--solo){
-    grid-template-columns:auto 1fr auto;
-    gap:10px;
-    padding:clamp(14px,3vw,20px) 8px;
-    margin:0;
-  }
-  .show-row:not(.show-row--solo) .show-row-date{
-    min-width:auto;
-  }
-  .show-row:not(.show-row--solo) .show-row-month{font-size:clamp(1em,4vw,1.4em)}
-  .show-row:not(.show-row--solo) .show-row-day{font-size:clamp(.8em,3vw,1em)}
-  .show-row:not(.show-row--solo) .show-row-venue{font-size:clamp(.9em,3.5vw,1.15em)}
-  .show-row:not(.show-row--solo) .show-row-lineup{font-size:clamp(.7em,2.5vw,.85em)}
-  .show-row:not(.show-row--solo) .show-row-city{font-size:clamp(.65em,2.4vw,.8em)}
-  .show-row:not(.show-row--solo) .show-row-poster{
-    width:clamp(50px,14vw,75px);
-  }
-  .show-row:not(.show-row--solo) .show-row-arrow{
-    font-size:.65em;
-    letter-spacing:1px;
-  }
-  .show-row--featured{
-    min-height:126px;
-  }
-  .show-row--featured::before{
-    background:linear-gradient(90deg,rgba(6,5,5,.96) 0%,rgba(6,5,5,.88) 68%,rgba(6,5,5,.5) 100%);
-  }
-  .show-row--featured .show-row-poster{
-    width:clamp(58px,16vw,82px);
-  }
 }
 
 /* Phone: the featured show has to read as one card on one screen. At iPhone
@@ -2902,42 +2610,6 @@ a.show-row[href]{cursor:pointer}
     padding-bottom:5px;
   }
   .shows-feature-kicker{font-size:.66em}
-  .shows-editorial--solo .show-row--solo{
-    padding:clamp(14px,3.5vw,24px);
-    gap:clamp(10px,2.5vw,16px);
-  }
-  /* The poster is the flexible element — it gives up the height the rest of the
-     card needs. The cap has to be on the container: its box is width x the
-     image's aspect ratio, so a max-height on the <img> only letterboxes it
-     inside a box that never shrinks. vh first as a fallback for older engines. */
-  .shows-editorial--solo .show-row--solo .show-row-poster{
-    width:auto;
-    max-width:min(100%,320px);
-    /* Shaped by whatever poster is up — the fallback is the portrait most of
-       them have been. A fixed 900/1112 here forced a 2:1 poster into a portrait
-       box and left three fifths of it empty. The cap is max-height, not height,
-       so the box takes its size from the ratio and only gives way when tall
-       artwork would not otherwise fit. */
-    aspect-ratio:var(--poster-ar, 900 / 1112);
-    max-height:min(30vh,280px);
-    max-height:min(30svh,280px);
-  }
-  .shows-editorial--solo .show-row--solo .show-row-poster img{
-    min-height:0;
-    max-height:none;
-    height:100%;
-    width:100%;
-    object-fit:contain;
-  }
-  .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
-    font-size:clamp(1em,4.6vw,1.45em);
-    line-height:1.18;
-  }
-  .shows-editorial--solo .show-row--solo .show-row-lineup{font-size:.78em}
-  .shows-editorial--solo .show-row--solo .show-row-city{font-size:.74em}
-  .shows-editorial--solo .show-row--featured.show-row--solo .show-row-arrow{
-    font-size:.66em;
-  }
 }
 
 /* Short phone screens — and every iPhone is one once Safari's chrome is showing.
@@ -2953,40 +2625,16 @@ a.show-row[href]{cursor:pointer}
     padding-bottom:4px;
   }
   .shows-feature-kicker{font-size:.6em}
-  .shows-editorial--solo .show-row--solo{
-    padding:clamp(10px,2.5vw,16px);
-    gap:clamp(7px,1.8vw,11px);
-  }
-  .shows-editorial--solo .show-row--solo .show-row-poster{
-    max-height:min(24vh,210px);
-    max-height:min(24svh,210px);
-  }
-  .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
-    font-size:clamp(.92em,4vw,1.2em);
-    line-height:1.12;
-  }
-  .shows-editorial--solo .show-row--solo .show-row-date{padding-bottom:0}
-  .shows-editorial--solo .show-row--solo .show-row-lineup{font-size:.72em;line-height:1.25}
-  .shows-editorial--solo .show-row--solo .show-row-city{font-size:.68em}
 }
 
 /* 320px-class phones (SE 1st gen, iPhone 5). Everything wraps harder at this
    width, so the last of the slack comes out of the poster and the archive link. */
 @media (max-width:360px){
   .shows-feature-heading{font-size:clamp(.92em,4.2vw,1.15em)}
-  .shows-editorial--solo .show-row--featured.show-row--solo .show-row-venue{
-    font-size:clamp(.86em,3.8vw,1.05em);
-  }
   .shows-archive-link{padding:10px 12px;gap:2px}
   .shows-archive-link strong{font-size:.86em}
   .shows-feature{padding-bottom:10px}
-  .shows-editorial--solo .show-row--solo .show-row-poster{
-    max-height:min(19vh,150px);
-    max-height:min(19svh,150px);
-  }
 }
-
-
 
 /* Homepage video feature */
 /* Homepage contact section */
@@ -3073,10 +2721,10 @@ a.show-row[href]{cursor:pointer}
   padding:clamp(72px,9vw,120px) clamp(28px,6vw,72px);
   overflow:hidden;
   background-color:#0a0705;
-  background-image:url('../assets/images/back-ep.jpg');
+  background-image:url('../assets/images/backgrounds/back-ep.jpg');
   background-image:image-set(
-    url('../assets/images/back-ep.webp') type('image/webp'),
-    url('../assets/images/back-ep.jpg') type('image/jpeg')
+    url('../assets/images/backgrounds/back-ep.webp') type('image/webp'),
+    url('../assets/images/backgrounds/back-ep.jpg') type('image/jpeg')
   );
   background-position:center 50%;
   background-size:cover;
@@ -3849,12 +3497,6 @@ a.show-row[href]{cursor:pointer}
   .track-time{min-width:35px;font-size:.8em}
 }
 
-/* ===== RESPONSIVE BREAKPOINTS ===== */
-
-/* Tablet landscape */
-@media (max-width:1024px){
-}
-
 /* Tablet portrait */
 @media (max-width:768px){
   .hero{height:60vh;min-height:400px}
@@ -3873,13 +3515,16 @@ a.show-row[href]{cursor:pointer}
   .brand-ticket-short{display:inline}
   .nav{gap:6px}
   .nav a{font-size:.8em;letter-spacing:0}
+  /* Stays fixed. As position:absolute the layer took the body's box, which on
+     this page is 3923px tall against 390 wide: `cover` then scaled the frame to
+     that and kept a tenth of its width, so whichever crop we shipped made no
+     difference on a phone. Fixed keeps the box the screen. */
   body.music-page-bg::after{
-    position:absolute;
     background-image:
-      linear-gradient(180deg,rgba(12,8,6,.9) 0%,rgba(18,12,8,.84) 45%,rgba(8,6,4,.95) 100%),
+      linear-gradient(180deg,rgba(12,8,6,.93) 0%,rgba(18,12,8,.88) 45%,rgba(8,6,4,.95) 100%),
       image-set(
-        url('../assets/images/header-mobile.webp') type('image/webp'),
-        url('../assets/images/header-mobile.jpg') type('image/jpeg')
+        url('../assets/images/backgrounds/music-bg-mobile.webp') type('image/webp'),
+        url('../assets/images/backgrounds/music-bg-mobile.jpg') type('image/jpeg')
       );
   }
 
@@ -3931,10 +3576,10 @@ a.show-row[href]{cursor:pointer}
     height:100svh;
     min-height:100vh;
     min-height:100svh;
-    background-image:url('../assets/images/header-mobile.jpg');
+    background-image:url('../assets/images/backgrounds/header-mobile.jpg');
     background-image:image-set(
-      url('../assets/images/header-mobile.webp') type('image/webp'),
-      url('../assets/images/header-mobile.jpg') type('image/jpeg')
+      url('../assets/images/backgrounds/header-mobile.webp') type('image/webp'),
+      url('../assets/images/backgrounds/header-mobile.jpg') type('image/jpeg')
     );
     background-position:center 0%;
     background-size:cover;
@@ -4013,10 +3658,10 @@ a.show-row[href]{cursor:pointer}
   height:100vh;
   height:100svh;
   min-height:640px;
-  background-image:url('../assets/images/modern-nostalgia-album-bg.jpg');
+  background-image:url('../assets/images/backgrounds/modern-nostalgia-album-bg.jpg');
   background-image:image-set(
-    url('../assets/images/modern-nostalgia-album-bg.webp') type('image/webp'),
-    url('../assets/images/modern-nostalgia-album-bg.jpg') type('image/jpeg')
+    url('../assets/images/backgrounds/modern-nostalgia-album-bg.webp') type('image/webp'),
+    url('../assets/images/backgrounds/modern-nostalgia-album-bg.jpg') type('image/jpeg')
   );
   background-position:center 50%;
 }
@@ -4130,10 +3775,10 @@ a.show-row[href]{cursor:pointer}
   padding:clamp(62px,8vh,92px) clamp(24px,5vw,72px);
   overflow:hidden;
   background-color:#080604;
-  background-image:url('../assets/images/modern-nostalgia-album-bg.jpg');
+  background-image:url('../assets/images/backgrounds/modern-nostalgia-album-bg.jpg');
   background-image:image-set(
-    url('../assets/images/modern-nostalgia-album-bg.webp') type('image/webp'),
-    url('../assets/images/modern-nostalgia-album-bg.jpg') type('image/jpeg')
+    url('../assets/images/backgrounds/modern-nostalgia-album-bg.webp') type('image/webp'),
+    url('../assets/images/backgrounds/modern-nostalgia-album-bg.jpg') type('image/jpeg')
   );
   background-position:center 50%;
   background-size:cover;
@@ -4380,7 +4025,7 @@ a.show-row[href]{cursor:pointer}
   width:min(100%,1440px);
   min-height:100vh;
   margin:0 auto;
-  padding:clamp(92px,10vw,118px) clamp(18px,4vw,56px) clamp(72px,9vw,116px);
+  padding:clamp(70px,8vw,96px) clamp(18px,4vw,56px) clamp(72px,9vw,116px);
 }
 .poster-archive-back{
   display:inline-flex;
@@ -4408,6 +4053,10 @@ a.show-row[href]{cursor:pointer}
   position:sticky;
   z-index:80;
   top:18px;
+  /* On landing this sat 35px under the nav and flush against the heading,
+     belonging to neither. Its top comes from the container's padding, which is
+     shorter now, and the space it was missing underneath is its own margin. */
+  margin-bottom:22px;
 }
 .poster-archive-intro{
   max-width:72ch;
@@ -4580,7 +4229,6 @@ a.show-row[href]{cursor:pointer}
     break-after:page;
     page-break-after:always;
   }
-  .epk-intro-photo{height:auto;max-height:220pt}
   .epk-intro-content p{font-size:10pt;line-height:1.45}
   .epk-spotify-embed{display:none!important}
 

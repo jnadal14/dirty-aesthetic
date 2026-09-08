@@ -49,7 +49,7 @@ BIO_PARAGRAPHS = [
     (
         "Dirty Aesthetic have built their early audience through Vancouver's independent "
         "music community, appearing at rooms including Green Auto, The Roxy, and the Biltmore "
-        "Cabaret. <i>Modern Nostalgia</i> arrives August 12, 2026, with an album-release "
+        "Cabaret. <i>Modern Nostalgia</i> arrives August 13, 2026, with an album-release "
         "performance at the Biltmore and an official video for the title track following the "
         "release."
     ),
@@ -237,7 +237,7 @@ def draw_page_two(pdf):
     side_y = draw_lines(
         pdf,
         [
-            "Modern Nostalgia - album - Aug 12, 2026",
+            "Modern Nostalgia - album - Aug 13, 2026",
             "Modern Nostalgia - single - Jul 23, 2026",
             "Back to Me - single - Jun 18, 2026",
             "Irrational - single - May 23, 2026",

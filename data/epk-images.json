@@ -6,21 +6,21 @@
       "full": "assets/images/lineup/full/bardia.jpg",
       "type": "jpeg",
       "width": 900,
-      "height": 1350,
+      "height": 1125,
       "fullWebp": "assets/images/lineup/full/bardia.webp",
       "fullWidth": 1600,
-      "fullHeight": 2400
+      "fullHeight": 2000
     },
     "dylan": {
       "webp": "assets/images/lineup/dylan.webp",
       "src": "assets/images/lineup/dylan.jpg",
       "full": "assets/images/lineup/full/dylan.jpg",
       "type": "jpeg",
-      "width": 800,
-      "height": 1200,
+      "width": 900,
+      "height": 1125,
       "fullWebp": "assets/images/lineup/full/dylan.webp",
-      "fullWidth": 800,
-      "fullHeight": 1200
+      "fullWidth": 1600,
+      "fullHeight": 2000
     },
     "jacob": {
       "webp": "assets/images/lineup/jacob.webp",
@@ -28,10 +28,10 @@
       "full": "assets/images/lineup/full/jacob.jpg",
       "type": "jpeg",
       "width": 900,
-      "height": 1350,
+      "height": 1125,
       "fullWebp": "assets/images/lineup/full/jacob.webp",
       "fullWidth": 1600,
-      "fullHeight": 2400
+      "fullHeight": 2000
     },
     "josh-c": {
       "webp": "assets/images/lineup/josh-c.webp",
@@ -39,10 +39,10 @@
       "full": "assets/images/lineup/full/josh-c.jpg",
       "type": "jpeg",
       "width": 900,
-      "height": 1350,
+      "height": 1125,
       "fullWebp": "assets/images/lineup/full/josh-c.webp",
       "fullWidth": 1600,
-      "fullHeight": 2400
+      "fullHeight": 2000
     },
     "josh-s": {
       "webp": "assets/images/lineup/josh-s.webp",
@@ -50,10 +50,10 @@
       "full": "assets/images/lineup/full/josh-s.jpg",
       "type": "jpeg",
       "width": 900,
-      "height": 1350,
+      "height": 1125,
       "fullWebp": "assets/images/lineup/full/josh-s.webp",
       "fullWidth": 1600,
-      "fullHeight": 2400
+      "fullHeight": 2000
     }
   },
   "gallery": [

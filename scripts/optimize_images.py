@@ -47,12 +47,14 @@ if not CWEBP:
 
 IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".JPG", ".JPEG", ".PNG")
 
+# Aliases, not renames: the shoot arrives named however the photographer named
+# it, and the two Joshes are told apart by surname there and by initial here.
 LINEUP_SOURCES = {
     "bardia": ["BARDIA"],
     "dylan": ["DYLAN"],
     "jacob": ["JACOB"],
-    "josh-c": ["JOSH C", "JOSH-C", "JOSH_C"],
-    "josh-s": ["JOSH S", "JOSH-S", "JOSH_S"],
+    "josh-c": ["CHAPMAN", "JOSH C", "JOSH-C", "JOSH_C"],
+    "josh-s": ["SEAMAN", "JOSH S", "JOSH-S", "JOSH_S"],
 }
 
 
@@ -281,19 +283,20 @@ def process_raster(src_path, out_dir, out_base, target_width, jpeg_q=82, webp_q=
     return meta
 
 
-def process(src_name, out_name, target_width, jpeg_q=82, webp_q=80):
+def process(src_name, out_name, target_width, jpeg_q=82, webp_q=80, out_dir=None):
     src = SRC / src_name
     if not src.exists():
         print(f"  SKIP {src_name} (missing)")
         return None
+    out_dir = OUT if out_dir is None else out_dir
     # Strip any extension from out_name. Passing "header-desktop.jpg" through
     # produced header-desktop.jpg.jpg while the pages referenced
     # header-desktop.jpg, so the file the site actually served stopped being
     # regenerated and silently went stale.
     out_base = Path(out_name).stem
-    meta = process_raster(src, OUT, out_base, target_width, jpeg_q, webp_q)
-    report(OUT / Path(meta["src"]).name)
-    report(OUT / Path(meta["webp"]).name)
+    meta = process_raster(src, out_dir, out_base, target_width, jpeg_q, webp_q)
+    report(out_dir / Path(meta["src"]).name)
+    report(out_dir / Path(meta["webp"]).name)
     return meta
 
 
@@ -325,16 +328,20 @@ def discover_gallery_sources():
 
 print("Hero / background images")
 for r in [
-    process("misc/HEADER.jpg", "header-desktop.jpg", 1920, jpeg_q=82, webp_q=78),
-    process("misc/HEADER_MOBILE.jpg", "header-mobile.jpg", 1080, jpeg_q=82, webp_q=78),
-    process("misc/FULL_PROFILE.jpg", "full-profile.jpg", 900, jpeg_q=82, webp_q=80),
+    process("misc/HEADER.jpg", "header-desktop.jpg", 1920, jpeg_q=82, webp_q=78,
+            out_dir=OUT_BACKGROUNDS),
+    process("misc/HEADER_MOBILE.jpg", "header-mobile.jpg", 1080, jpeg_q=82, webp_q=78,
+            out_dir=OUT_BACKGROUNDS),
+    # FULL_PROFILE was the press kit's vertical strip. The strip is gone, so the
+    # variant is not built; the master stays in _source if it is ever wanted.
 ]:
     if r:
         report(ROOT / r["src"])
         report(ROOT / r["webp"])
 
 print("Section background")
-r = process("backgrounds/BACK_EP.jpg", "back-ep.jpg", 1600, jpeg_q=80, webp_q=78)
+r = process("backgrounds/BACK_EP.jpg", "back-ep.jpg", 1600, jpeg_q=80, webp_q=78,
+            out_dir=OUT_BACKGROUNDS)
 if r:
     report(ROOT / r["src"])
     report(ROOT / r["webp"])
@@ -344,24 +351,19 @@ r = process(
     1920,
     jpeg_q=84,
     webp_q=82,
+    out_dir=OUT_BACKGROUNDS,
 )
 if r:
     report(ROOT / r["src"])
     report(ROOT / r["webp"])
 
 print("Featured show artwork")
-# The show poster hangs in the upcoming-shows card. The banner is the same
-# artwork cropped wide: it sits behind that card and tiles the whole section
-# background, both of which crop to `cover` anyway, so the crop is chosen for
-# what survives — the centre band, clear of the title and the lineup panel.
-# Fractions rather than pixels so a re-export at another resolution still lands
-# on the same part of the picture.
 # Upcoming-show artwork, driven by data/shows.json rather than named here, so
 # adding a show is a data edit. Each entry needs posterSource (a path under
-# _source/) and posterSlug; only the first one — the featured card — needs the
-# wide banner that sits behind it.
-FEATURED_BANNER_BAND = (0.225, 0.625)   # portrait sources only, see below
-FEATURED_BANNER_MIN_ASPECT = 1.6
+# _source/) and posterSlug.
+#
+# The poster now hangs beside its row and nothing sits behind it, so there is no
+# wide banner variant to cut. The next show simply gets a larger one.
 
 upcoming_shows = []
 _shows_path = DATA / "shows.json"
@@ -400,30 +402,6 @@ for index, show in enumerate(upcoming_shows):
         report(poster_webp)
         report(poster_jpeg)
 
-        # Only the featured show gets a banner; the rest render as compact rows
-        # with no backdrop of their own.
-        if index > 0:
-            continue
-
-        # Posters come in both shapes. A portrait one has to be cropped to a
-        # band for the wide backdrop — chosen to miss the title and the lineup
-        # panel — but artwork that is already wide IS the banner, and cropping
-        # a band out of the middle of it would just cut the art in half.
-        if art.width / art.height >= FEATURED_BANNER_MIN_ASPECT:
-            banner = resize_to_width(art, 1600)
-            print(f"  (wide source {art.width}x{art.height} — used whole, not cropped)")
-        else:
-            top = round(art.height * FEATURED_BANNER_BAND[0])
-            bottom = round(art.height * FEATURED_BANNER_BAND[1])
-            banner = resize_to_width(art.crop((0, top, art.width, bottom)), 1600)
-        banner_webp = OUT_POSTERS_ROOT / f"{slug}-banner.webp"
-        banner_jpeg = OUT_POSTERS_ROOT / f"{slug}-banner.jpg"
-        # Only ever seen through a scrim, behind text.
-        save_webp_from_image(banner, banner_webp, quality=72)
-        save_jpeg(banner, banner_jpeg, quality=74)
-        print(f"  {slug}-banner {banner.width}x{banner.height}")
-        report(banner_webp)
-        report(banner_jpeg)
 
 print("Scene backgrounds")
 # Photographs used as full-bleed section backgrounds.
@@ -450,6 +428,19 @@ for cfg in [
     {"src": "watch.jpg", "out": "watch-bg",
      "focus": 0.66, "focus_x": 0.73, "tall_ar": 9 / 16,
      "wide_ar": 16 / 9, "wide_w": 1920, "tall_w": 1000, "blur": 0.6, "highlights": None},
+    # Shot from inside the crowd, tilted, looking past a raised phone at the
+    # singer. The wide crop sits at 0.58 rather than centre: lower and his head
+    # clips the top edge, higher and the foreground hands that make the shot go.
+    # Its right third is near black, which is where the page's text lands.
+    {"src": "crowdddd.jpg", "out": "music-bg",
+     "focus": 0.58, "wide_ar": 16 / 9, "wide_w": 1920,
+     "tall_ar": 9 / 16, "tall_w": 1000, "blur": 0.6, "highlights": None},
+    # Behind the lineup grid on the press kit. The standing players sit right of
+    # centre and the drummer's arm crosses the foreground left, so the phone crop
+    # is pulled right to keep the band rather than the cymbals.
+    {"src": "band members.jpg", "out": "members-bg",
+     "focus": 0.42, "focus_x": 0.60, "wide_ar": 16 / 9, "wide_w": 1920,
+     "tall_ar": 3 / 4, "tall_w": 900, "blur": 0.6, "highlights": None},
     {"src": "band from drums.jpg", "out": "epk-bg",
      "focus": 0.50, "wide_ar": 4 / 5, "wide_w": 1800, "blur": 0.3, "highlights": (95, 0.30),
      "q": 62},
@@ -492,6 +483,29 @@ for cfg in [
     print(f"  {out_base} wide {wide.width}x{wide.height} / tall {tall.width}x{tall.height}")
     for suffix in (".jpg", ".webp", "-mobile.jpg", "-mobile.webp"):
         report(OUT_BACKGROUNDS / f"{out_base}{suffix}")
+
+print("Favicon")
+# The mark is off-white on transparency, sitting in the middle of a canvas four
+# times its own size. A tab icon is 16 to 32 pixels: shipped as-is it would be a
+# pale speck on whatever colour the browser puts behind it, and invisible
+# outright on a light tab. So it is cropped to the artwork, given an even
+# margin, and set on the site's own ground instead of being left transparent.
+FAVICON_BG = (10, 7, 5)   # matches the theme-color every page declares
+fav_src = SRC / "logos" / "DA_SPLAT" / "DA-OFF_WHITE-2000.png"
+if not fav_src.exists():
+    print(f"  SKIP {fav_src.name} (missing)")
+else:
+    mark = ImageOps.exif_transpose(Image.open(fav_src)).convert("RGBA")
+    mark = mark.crop(mark.getchannel("A").getbbox())
+    pad = round(max(mark.size) * 0.09)
+    side = max(mark.size) + pad * 2
+    ground = Image.new("RGB", (side, side), FAVICON_BG)
+    ground.paste(mark, ((side - mark.width) // 2, (side - mark.height) // 2), mark)
+    for px, name in ((180, "favicon.png"), (32, "favicon-32.png")):
+        icon = ground.resize((px, px), Image.LANCZOS)
+        icon.save(OUT / name, "PNG", optimize=True)
+        print(f"  {name} {px}x{px}")
+        report(OUT / name)
 
 print("Logos")
 # The wordmark shipped at 2657px wide for a 600px maximum display size, and the
