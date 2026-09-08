@@ -63,20 +63,25 @@ def resize_to_width(img, target_w):
     return img.resize((target_w, round(img.height * ratio)), Image.LANCZOS)
 
 
-def crop_to_aspect(img, aspect, focus=0.5):
-    """Crop to `aspect` (width/height), keeping `focus` as the centre of the band.
+def crop_to_aspect(img, aspect, focus=0.5, focus_x=0.5):
+    """Crop to `aspect` (width/height), centred on `focus` / `focus_x`.
 
-    `focus` is a 0..1 fraction of the source height. Both stage photographs are
-    4:5 portrait and both are used full bleed behind text, where `cover` would
-    otherwise crop them blind: on a wide viewport that throws away most of the
-    frame, and which part it keeps depends on the visitor's window. Choosing the
-    crop here is what keeps the faces in, and it means the bytes we ship are
-    bytes that actually get shown.
+    Both are 0..1 fractions of the source. The stage photographs are 4:5
+    portrait and all of them are used full bleed, where `cover` would otherwise
+    crop them blind: on a viewport shaped differently to the frame it throws
+    most of the picture away, and which part it keeps depends on the visitor's
+    window. Choosing the crop here is what keeps the subject in, and it means
+    the bytes we ship are bytes that actually get shown.
+
+    `focus_x` matters when the subject is off centre. The singer on the watch
+    page stands in the right third, so a centred phone crop kept the curtain
+    and lost him.
     """
     width, height = img.size
     if width / height > aspect:
         keep_w = round(height * aspect)
-        left = round((width - keep_w) / 2)
+        left = round(focus_x * width - keep_w / 2)
+        left = max(0, min(left, width - keep_w))
         return img.crop((left, 0, left + keep_w, height))
     keep_h = round(width / aspect)
     top = round(focus * height - keep_h / 2)
@@ -439,8 +444,12 @@ print("Scene backgrounds")
 for cfg in [
     {"src": "BW DYL + CROWD.jpg", "out": "shows-bg",
      "focus": 0.58, "wide_ar": 16 / 9, "wide_w": 1920, "blur": 0.7, "highlights": None},
+    # The watch background covers the whole phone screen rather than a section,
+    # so its phone crop is screen shaped (9:16) rather than 3:4, and framed on
+    # the singer instead of the middle of the curtain.
     {"src": "watch.jpg", "out": "watch-bg",
-     "focus": 0.66, "wide_ar": 16 / 9, "wide_w": 1920, "blur": 0.6, "highlights": None},
+     "focus": 0.66, "focus_x": 0.73, "tall_ar": 9 / 16,
+     "wide_ar": 16 / 9, "wide_w": 1920, "tall_w": 1000, "blur": 0.6, "highlights": None},
     {"src": "band from drums.jpg", "out": "epk-bg",
      "focus": 0.50, "wide_ar": 4 / 5, "wide_w": 1800, "blur": 0.3, "highlights": (95, 0.30),
      "q": 62},
@@ -457,8 +466,11 @@ for cfg in [
             img = img.filter(ImageFilter.GaussianBlur(blur))
         return roll_highlights(img, *cfg["highlights"]) if cfg["highlights"] else img
 
+    focus_x = cfg.get("focus_x", 0.5)
     wide = finish(
-        resize_to_width(crop_to_aspect(master, cfg["wide_ar"], cfg["focus"]), cfg["wide_w"]),
+        resize_to_width(
+            crop_to_aspect(master, cfg["wide_ar"], cfg["focus"], focus_x), cfg["wide_w"]
+        ),
         cfg["blur"],
     )
     save_jpeg(wide, OUT_BACKGROUNDS / f"{out_base}.jpg", 76)
@@ -467,7 +479,13 @@ for cfg in [
     # Phones get a 3:4 frame whatever the desktop shape is: a wide crop under a
     # portrait viewport keeps only a narrow strip, and not the strip with the
     # subject in it.
-    tall = finish(resize_to_width(crop_to_aspect(master, 3 / 4, cfg["focus"]), 900), cfg["blur"] * 0.6)
+    tall = finish(
+        resize_to_width(
+            crop_to_aspect(master, cfg.get("tall_ar", 3 / 4), cfg["focus"], focus_x),
+            cfg.get("tall_w", 900),
+        ),
+        cfg["blur"] * 0.6,
+    )
     save_jpeg(tall, OUT_BACKGROUNDS / f"{out_base}-mobile.jpg", 74)
     save_webp_from_image(tall, OUT_BACKGROUNDS / f"{out_base}-mobile.webp", 66)
 

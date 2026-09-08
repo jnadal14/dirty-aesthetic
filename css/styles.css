@@ -648,6 +648,12 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
 .btn-spotify,
 .btn-apple{
   border-color:transparent;
+  /* A wrapped label does not just look wrong, it doubles the button's height
+     and stretches whatever sits beside it to match. At 320px "Apple Music" had
+     under 7px of room inside its box, so any engine setting this face a few
+     percent wider than Chrome broke the pair. The labels are two short words:
+     they stay on one line, and the row breaks instead when it has to. */
+  white-space:nowrap;
 }
 .btn-spotify{background:#1DB954;color:#08130c}
 .btn-spotify:hover,
@@ -863,6 +869,10 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
   .music-feature-art{width:min(62vw,32vh,260px)}
   .music-feature-art{width:min(62vw,32svh,260px)}
   .music-feature-copy{align-items:center}
+  /* The column centres here, so the buttons inside it have to as well. Left
+     against a centred heading is what made them read as broken when they
+     wrapped onto separate lines. */
+  .music-feature-copy .album-cta-row{justify-content:center}
   .music-catalog-heading{text-align:center}
   /* The page title repeats what the nav already says is active, so it gives up
      its margin first. */
@@ -3873,17 +3883,33 @@ a.show-row[href]{cursor:pointer}
       );
   }
 
-  /* iOS resolves background-attachment:fixed against the document, not the
-     viewport, so a fixed cover background on a phone is scaled to the whole
-     scroll height and then mostly cropped. Scrolling with it is the honest
-     behaviour there, and the tall crop is the frame that fits. */
+  /* A background on the body paints inside the body's own box, and it cannot
+     escape to the canvas here because html carries its own --bg. So with
+     attachment:scroll everything past the last pixel of content is flat black,
+     which is exactly what iOS puts on screen when the URL bar collapses at the
+     foot of the page and the viewport grows taller than the document.
+     attachment:fixed has no such gap, but iOS sizes a fixed background against
+     the document rather than the viewport, so the frame gets scaled to the full
+     scroll height and the singer is cropped out of shot.
+     A fixed element is neither: it covers whatever is on screen, and it is only
+     ever screen shaped. Sitting behind the content at z-index -1 needs the body
+     itself to stay transparent, since a block's own background paints over any
+     negative layer beneath it. */
   body.watch-page-bg{
+    background:transparent;
+  }
+  body.watch-page-bg::after{
+    content:'';
+    position:fixed;
+    inset:0;
+    z-index:-1;
     background:
       linear-gradient(180deg, rgba(32,23,15,.92) 0%, rgba(32,23,15,.85) 50%, rgba(32,23,15,.92) 100%),
       image-set(
         url('../assets/images/backgrounds/watch-bg-mobile.webp') type('image/webp'),
         url('../assets/images/backgrounds/watch-bg-mobile.jpg') type('image/jpeg')
-      ) center top/cover no-repeat scroll;
+      ) center/cover no-repeat;
+    pointer-events:none;
   }
 
   /* The tall crop of the same photograph: a 16:9 frame under a phone-shaped
@@ -4290,11 +4316,14 @@ a.show-row[href]{cursor:pointer}
   .album-hero .hero-ctas .btn-spotify,
   .album-hero .hero-ctas .btn-apple{
     flex:1 1 calc(50% - 5px);
-    min-width:0;
+    /* Sharing the row is the preference, not a requirement. Below its own
+       label width the button stops shrinking and the row wraps, which gives
+       two full-width buttons rather than a clipped or doubled one. */
+    min-width:max-content;
     min-height:50px;
-    padding:14px 12px 13px;
-    font-size:.98em;
-    letter-spacing:1.2px;
+    padding:14px 11px 13px;
+    font-size:.94em;
+    letter-spacing:1px;
   }
   .album-hero .hero-ctas .btn.ghost{
     flex:1 1 calc(50% - 5px);
