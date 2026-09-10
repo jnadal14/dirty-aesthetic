@@ -530,6 +530,33 @@ for rel_src, out_base, width in [
         art.quantize(colors=256, method=Image.FASTOCTREE).save(dest, "PNG", optimize=True)
         report(dest)
 
+print("Partner logos")
+# Logos belonging to the rooms and series the band plays, shown beside those
+# dates. They arrive as flat black-on-transparent artwork, which is invisible on
+# this site, so the RGB is replaced and the alpha kept: the standard reversed
+# colourway of a one-colour mark, not a redraw. Cropped to the artwork first,
+# because the supplied files carry their own margins and the row sets its own.
+PARTNER_INK = (240, 230, 216)   # --ink
+for rel_src, out_base, width in [
+    ("PARTNERS/THE-SHELF-CONCERTS.png", "the-shelf-concerts", 620),
+    ("PARTNERS/BATCH.png", "batch", 620),
+]:
+    src = SRC / "logos" / rel_src
+    if not src.exists():
+        print(f"  SKIP logos/{rel_src} (missing)")
+        continue
+    with Image.open(src) as image:
+        art = ImageOps.exif_transpose(image).convert("RGBA")
+        art = art.crop(art.getchannel("A").getbbox())
+        alpha = art.getchannel("A")
+        art = Image.new("RGBA", art.size, PARTNER_INK + (255,))
+        art.putalpha(alpha)
+        art = resize_to_width(art, width)
+        dest = OUT_LOGOS / f"{out_base}.png"
+        art.quantize(colors=256, method=Image.FASTOCTREE).save(dest, "PNG", optimize=True)
+        print(f"  {out_base} {art.width}x{art.height}")
+        report(dest)
+
 print("Album / single covers")
 # Only these open in the lightbox (index.html), so only these need the larger
 # variant. The rest appear at grid size on music.html and nowhere else.

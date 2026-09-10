@@ -4272,3 +4272,36 @@ a.show-row[href]{cursor:pointer}
   @page{margin:0;size:A4}
   body{padding:1cm 1.2cm}
 }
+
+/* ===== A room's own mark, where a date has no poster =====
+   A logo is not artwork: it gets no frame, no shadow and nothing to open, so it
+   opts out of the poster chrome rather than inheriting it and being ringed
+   around empty space. Declared last so it wins on order, not on specificity.
+   Height-capped and width-capped together, because these arrive at very
+   different proportions (a 2.5:1 stacked wordmark and a 4.4:1 single line) and
+   both have to sit in the same slot without one dwarfing the other. */
+.show-row-poster.show-row-poster--logo{
+  width:auto;
+  height:auto;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  border-radius:0;
+  overflow:visible;
+  background:none;
+  box-shadow:none;
+  cursor:default;
+}
+.show-row-poster.show-row-poster--logo img{
+  width:auto;
+  height:auto;
+  max-width:clamp(92px,12vw,164px);
+  max-height:clamp(28px,4.2vh,56px);
+  border-radius:0;
+  opacity:.92;
+}
+.show-row-poster.show-row-poster--logo:hover{
+  transform:none;
+  box-shadow:none;
+}
+.show-row:hover .show-row-poster.show-row-poster--logo img{opacity:1}

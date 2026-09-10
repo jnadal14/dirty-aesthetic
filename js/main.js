@@ -1233,7 +1233,16 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const posterAspect = s.posterWidth && s.posterHeight
         ? ` style="--poster-ar:${s.posterWidth} / ${s.posterHeight}"`
         : ''
-      const posterHtml = posterSrc ? `<div class="show-row-poster"${posterAspect} data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${posterName} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>` : ''
+      // A date with no poster can still carry the room's own mark. It is a logo,
+      // not artwork: no frame, no shadow, and nothing to open in the lightbox,
+      // so it deliberately skips the poster chrome and the data-poster-src hook.
+      const logoSrc = !posterSrc && s.logo ? showMediaUrl(s.logo) : ''
+      const logoDimensions = s.logoWidth && s.logoHeight ? ` width="${s.logoWidth}" height="${s.logoHeight}"` : ''
+      const mediaHtml = posterSrc
+        ? `<div class="show-row-poster"${posterAspect} data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${posterName} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>`
+        : (logoSrc
+          ? `<div class="show-row-poster show-row-poster--logo"><img src="${logoSrc}" alt="${s.logoAlt || posterName}" loading="${mediaLoading}" decoding="async"${logoDimensions}></div>`
+          : '')
       row.innerHTML = `
         <div class="show-row-date">
           <span class="show-row-month">${parts ? parts.month : s.date}</span>
@@ -1245,7 +1254,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
           ${location ? `<span class="show-row-city">${location}</span>` : ''}
           ${noteHtml}
         </div>
-        ${posterHtml}`
+        ${mediaHtml}`
       // A quiet rule between the show that is next and the ones behind it, so
       // the second card reads as "also coming up" rather than as a rival to it.
       if(!isNext && !container.querySelector('.shows-more-label')){

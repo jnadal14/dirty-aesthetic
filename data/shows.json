@@ -21,7 +21,11 @@
       "title": "Acoustic Set at Batch",
       "venue": "Batch Kitsilano",
       "city": "2305 Cornwall Ave, Kits Beach",
-      "time": "2 to 5 PM"
+      "time": "2 to 5 PM",
+      "logo": "assets/images/logos/batch.png",
+      "logoWidth": 620,
+      "logoHeight": 140,
+      "logoAlt": "Batch Kitsilano"
     },
     {
       "date": "Sep 23, 2026",
@@ -29,8 +33,12 @@
       "venue": "Hestia Kitchen + Bar",
       "city": "Unit 160, 4351 No. 3 Rd, Richmond",
       "time": "9:30 PM · $33 with buffet",
-      "link": "https://www.theshelfconcert.com/",
-      "linkLabel": "Details"
+      "link": "https://www.theshelfconcert.com/events/concert-buffet-66-dirty-aesthetic",
+      "linkLabel": "Tickets",
+      "logo": "assets/images/logos/the-shelf-concerts.png",
+      "logoWidth": 620,
+      "logoHeight": 247,
+      "logoAlt": "The Shelf Concerts by Hestia"
     },
     {
       "date": "Sep 30, 2026",
