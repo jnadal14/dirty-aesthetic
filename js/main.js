@@ -1113,12 +1113,14 @@ function publishShowSchema(shows){
 
 // Load shows
 const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="status"><span class="show-row-venue">TBA</span></div>`
-const featuredShowSlug = 'roxy-falling-doves-2026'
-const featuredShowAssetVersion = '20260827-fallingdoves'
+// Show posters are replaced in place under the same filename whenever a bill
+// changes, so every one is versioned rather than only whichever show happened
+// to be featured when this was written. Bump it when artwork is swapped.
+const showsAssetVersion = '20260911'
 
 function showMediaUrl(path){
-  if(!path || !path.includes(featuredShowSlug)) return path
-  return `${path}${path.includes('?') ? '&' : '?'}v=${featuredShowAssetVersion}`
+  if(!path) return path
+  return `${path}${path.includes('?') ? '&' : '?'}v=${showsAssetVersion}`
 }
 
 fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{

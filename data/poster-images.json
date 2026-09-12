@@ -1,4 +1,15 @@
 {
+  "_source/posters/ROXY_FALLING DOVES_09:11:26_OFFICIAL.jpeg": {
+    "webp": "assets/images/posters/archive/sep-11-2026-the-roxy-cabaret.webp",
+    "src": "assets/images/posters/archive/sep-11-2026-the-roxy-cabaret.jpg",
+    "full": "assets/images/posters/archive/full/sep-11-2026-the-roxy-cabaret.jpg",
+    "type": "jpeg",
+    "width": 900,
+    "height": 1125,
+    "fullWebp": "assets/images/posters/archive/full/sep-11-2026-the-roxy-cabaret.webp",
+    "fullWidth": 1536,
+    "fullHeight": 1920
+  },
   "_source/posters/NAME IT YOURSELF FEST_08:22:26.jpg": {
     "webp": "assets/images/posters/archive/aug-22-2026-name-it-yourself-music-festival.webp",
     "src": "assets/images/posters/archive/aug-22-2026-name-it-yourself-music-festival.jpg",

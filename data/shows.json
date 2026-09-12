@@ -1,44 +1,21 @@
 {
   "upcoming": [
     {
-      "date": "Sep 11, 2026",
-      "title": "Opening for Falling Doves",
-      "kicker": "Next Show",
-      "ticketLabel": "Sept 11 at The Roxy",
-      "ticketLabelShort": "Sept 11 Roxy",
-      "venue": "The Roxy",
-      "time": "Doors 8 PM",
-      "poster": "assets/images/posters/roxy-falling-doves-2026.webp",
-      "posterWidth": 900,
-      "posterHeight": 450,
-      "link": "https://www.showpass.com/falling-doves/",
-      "linkLabel": "Tickets",
-      "posterSource": "_source/posters/ROXY_FALLING DOVES_09:11:26.webp",
-      "posterSlug": "roxy-falling-doves-2026"
-    },
-    {
-      "date": "Sep 12, 2026",
-      "title": "Acoustic Set at Batch",
-      "venue": "Batch Kitsilano",
-      "city": "2305 Cornwall Ave, Kits Beach",
-      "time": "2 to 5 PM",
-      "logo": "assets/images/logos/batch.png",
-      "logoWidth": 620,
-      "logoHeight": 140,
-      "logoAlt": "Batch Kitsilano"
-    },
-    {
       "date": "Sep 23, 2026",
       "title": "The Shelf Concert",
+      "kicker": "Next Show",
+      "ticketLabel": "Sept 23 at The Shelf",
+      "ticketLabelShort": "Sept 23 Shelf",
       "venue": "Hestia Kitchen + Bar",
       "city": "Unit 160, 4351 No. 3 Rd, Richmond",
       "time": "9:30 PM · $33 with buffet",
       "link": "https://www.theshelfconcert.com/events/concert-buffet-66-dirty-aesthetic",
       "linkLabel": "Tickets",
-      "logo": "assets/images/logos/the-shelf-concerts.png",
-      "logoWidth": 620,
-      "logoHeight": 247,
-      "logoAlt": "The Shelf Concerts by Hestia"
+      "posterSource": "_source/posters/THE SHELF_SESSION 66_09:23:26.png",
+      "posterSlug": "the-shelf-session-66-2026",
+      "poster": "assets/images/posters/the-shelf-session-66-2026.webp",
+      "posterWidth": 900,
+      "posterHeight": 900
     },
     {
       "date": "Sep 30, 2026",
@@ -58,6 +35,14 @@
     }
   ],
   "past": [
+    {
+      "date": "Sep 11, 2026",
+      "city": "Vancouver",
+      "venue": "The Roxy Cabaret",
+      "lineup": "Falling Doves",
+      "poster": "_source/posters/ROXY_FALLING DOVES_09:11:26_OFFICIAL.jpeg",
+      "link": "https://www.showpass.com/falling-doves/"
+    },
     {
       "date": "Aug 22, 2026",
       "city": "Vancouver",

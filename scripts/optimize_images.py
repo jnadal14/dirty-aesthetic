@@ -538,8 +538,10 @@ print("Partner logos")
 # because the supplied files carry their own margins and the row sets its own.
 PARTNER_INK = (240, 230, 216)   # --ink
 for rel_src, out_base, width in [
-    ("PARTNERS/THE-SHELF-CONCERTS.png", "the-shelf-concerts", 620),
-    ("PARTNERS/BATCH.png", "batch", 620),
+    # None in use right now: The Shelf date carries its session graphic instead,
+    # and the Batch set came off the list. Masters stay in _source/logos/PARTNERS.
+    # ("PARTNERS/THE-SHELF-CONCERTS.png", "the-shelf-concerts", 620),
+    # ("PARTNERS/BATCH.png", "batch", 620),
 ]:
     src = SRC / "logos" / rel_src
     if not src.exists():
