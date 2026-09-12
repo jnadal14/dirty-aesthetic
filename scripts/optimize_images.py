@@ -485,50 +485,47 @@ for cfg in [
         report(OUT_BACKGROUNDS / f"{out_base}{suffix}")
 
 print("Favicon")
-# The mark is off-white on transparency, sitting in the middle of a canvas four
-# times its own size. A tab icon is 16 to 32 pixels: shipped as-is it would be a
-# pale speck on whatever colour the browser puts behind it, and invisible
-# outright on a light tab. So it is cropped to the artwork, given an even
-# margin, and set on the site's own ground instead of being left transparent.
+# Two transparent tab icons, picked by the page through prefers-color-scheme:
+# the black mark for light tab bars, the off-white one for dark. Neither needs a
+# keyline or a tile, because each is only ever shown against a tab that
+# contrasts with it. A single transparent icon cannot manage that: black
+# disappears on a dark tab, off-white on a light one, and a dark square behind
+# either reads as a black tile.
+#
+# The home-screen icon keeps a ground. iOS paints transparency black, so it is
+# its own file rather than sharing a tab PNG.
 FAVICON_BG = (10, 7, 5)   # matches the theme-color every page declares
-fav_src = SRC / "logos" / "DA_SPLAT" / "DA-OFF_WHITE-2000.png"
-if not fav_src.exists():
-    print(f"  SKIP {fav_src.name} (missing)")
-else:
-    mark = ImageOps.exif_transpose(Image.open(fav_src)).convert("RGBA")
+DA = SRC / "logos" / "DA_SPLAT"
+
+def favicon_square(path):
+    mark = ImageOps.exif_transpose(Image.open(path)).convert("RGBA")
     mark = mark.crop(mark.getchannel("A").getbbox())
     pad = round(max(mark.size) * 0.09)
     side = max(mark.size) + pad * 2
-    ground = Image.new("RGB", (side, side), FAVICON_BG)
-    ground.paste(mark, ((side - mark.width) // 2, (side - mark.height) // 2), mark)
-    for px, name in ((180, "favicon.png"), (32, "favicon-32.png")):
-        icon = ground.resize((px, px), Image.LANCZOS)
-        icon.save(OUT / name, "PNG", optimize=True)
-        print(f"  {name} {px}x{px}")
+    square = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+    square.paste(mark, ((side - mark.width) // 2, (side - mark.height) // 2), mark)
+    return square
+
+for master, suffix in (("DA-BLACK-2000.png", ""), ("DA-OFF_WHITE-2000.png", "-dark")):
+    src = DA / master
+    if not src.exists():
+        print(f"  SKIP {master} (missing)")
+        continue
+    square = favicon_square(src)
+    for px, base in ((32, "favicon-32"), (180, "favicon")):
+        name = f"{base}{suffix}.png"
+        square.resize((px, px), Image.LANCZOS).save(OUT / name, "PNG", optimize=True)
+        print(f"  {name} {px}x{px} transparent")
         report(OUT / name)
 
-print("Logos")
-# The wordmark shipped at 2657px wide for a 600px maximum display size, and the
-# splat at 989px for a 48px one. Both load on every page.
-#
-# These are flat white-on-transparent artwork, so a palette PNG beats both the
-# truecolour PNG and lossy WebP by a wide margin: the wordmark is 28 KB as a
-# 256-colour palette against 133 KB truecolour and 67 KB WebP. Staying PNG also
-# means the pages keep a plain <img src> with no <picture> fallback.
-for rel_src, out_base, width in [
-    ("DA_SPLAT/DA-OFF_WHITE.png", "da-splat", 240),
-    ("FULL_NAME/FULL-OFF_WHITE.png", "da-wordmark", 1400),
-]:
-    src = SRC / "logos" / rel_src
-    if not src.exists():
-        print(f"  SKIP logos/{rel_src} (missing)")
-        continue
-    with Image.open(src) as image:
-        art = ImageOps.exif_transpose(image).convert("RGBA")
-        art = resize_to_width(art, width)
-        dest = OUT_LOGOS / f"{out_base}.png"
-        art.quantize(colors=256, method=Image.FASTOCTREE).save(dest, "PNG", optimize=True)
-        report(dest)
+touch_src = DA / "DA-OFF_WHITE-2000.png"
+if touch_src.exists():
+    square = favicon_square(touch_src)
+    ground = Image.new("RGB", square.size, FAVICON_BG)
+    ground.paste(square, (0, 0), square)
+    ground.resize((180, 180), Image.LANCZOS).save(OUT / "apple-touch-icon.png", "PNG", optimize=True)
+    print("  apple-touch-icon.png 180x180 on ground")
+    report(OUT / "apple-touch-icon.png")
 
 print("Partner logos")
 # Logos belonging to the rooms and series the band plays, shown beside those
