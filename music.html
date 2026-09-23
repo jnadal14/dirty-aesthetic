@@ -8,15 +8,21 @@
 <meta name="theme-color" content="#0a0705">
 
 <!-- Meta Pixel -->
+<!-- The pixel library is 108KB of third-party JavaScript. Fetched inline it
+     landed ~40ms into the load, competing with the hero image for bandwidth and
+     the main thread during the only window that decides how fast the page feels.
+     Only the fetch is deferred: fbq() is defined immediately and queues init and
+     PageView right away, and the queue flushes when the library arrives, so no
+     event is lost. -->
 <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+!function(f,b,e,v,n){
+if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window,document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];
+var load=function(){var t=b.createElement(e);t.async=!0;t.src=v;
+var s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)};
+if(b.readyState==='complete')load();else f.addEventListener('load',load)
+}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '1503298771840666');
 fbq('track', 'PageView');
 </script>
@@ -40,11 +46,11 @@ src="https://www.facebook.com/tr?id=1503298771840666&ev=PageView&noscript=1" alt
 <link rel="preload" as="image" type="image/webp" href="assets/images/covers/cover_LP_modern_nostalgia.webp" fetchpriority="high">
 <link rel="preload" href="assets/fonts/NaftaLight-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/styles.css">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32-dark.png?v=5" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="180x180" href="assets/images/favicon-dark.png?v=5" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png?v=5" media="(prefers-color-scheme: light)">
-<link rel="icon" type="image/png" sizes="180x180" href="assets/images/favicon.png?v=5" media="(prefers-color-scheme: light)">
-<link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png?v=5">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32-dark.png?v=6" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" sizes="180x180" href="assets/images/favicon-dark.png?v=6" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png?v=6" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="180x180" href="assets/images/favicon.png?v=6" media="(prefers-color-scheme: light)">
+<link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png?v=6">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",

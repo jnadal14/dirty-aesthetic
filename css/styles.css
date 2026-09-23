@@ -157,7 +157,11 @@ picture{display:contents}
   background-size:cover;
   background-repeat:no-repeat;
 }
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(32,23,15,.4) 0%,rgba(32,23,15,.65) 50%,rgba(32,23,15,.9) 100%);filter:sepia(50%)}
+/* The stops are rgba(32,23,15) already run through sepia(50%). The overlay is an
+   empty div, so that filter only ever recoloured this one gradient — a constant
+   result the browser was recomputing on a full-viewport layer over the hero.
+   Per the filter spec sepia leaves alpha alone, so only the RGB moved. */
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(33,26,19,.4) 0%,rgba(33,26,19,.65) 50%,rgba(33,26,19,.9) 100%)}
 .hero-inner{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 clamp(16px,5vw,40px)}
 .hero h1{font-size:clamp(36px,8vw,72px);letter-spacing:2px;margin:0;animation:fadeUp .8s ease both;text-shadow:0 4px 30px rgba(0,0,0,.5);max-width:900px}
 .hero-logo{width:clamp(280px,60vw,600px);height:auto;filter:drop-shadow(0 4px 30px rgba(0,0,0,.5))}
@@ -520,34 +524,23 @@ body.contact-page-bg{
 .video-embed-large{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--card);box-shadow:0 8px 40px rgba(0,0,0,.4);transition:transform .3s ease,box-shadow .3s ease}
 .video-embed-large:hover{transform:translateY(-4px);box-shadow:0 16px 56px rgba(0,0,0,.5)}
 .video-embed-large iframe{width:100%;height:100%;border:none}
-/* A wheel whose pointer is over a cross-origin iframe is dispatched inside that
-   frame. It never enters this document's event path, so the section engine's
-   handler never runs, nothing calls preventDefault, and the browser chains the
-   scroll into the page at a raw delta the engine did not author. On the video
-   slide that iframe is the middle of the screen — exactly where the cursor is
-   when you scroll away from it.
 
-   This shield lives in OUR document, so the gesture reaches the engine. It only
-   exists where the engine actually owns the wheel, and the first click both
-   dismisses it and starts the video, so playback costs no extra click. The
-   YouTube poster and its own play button show straight through it. */
-.embed-scroll-shield{display:none}
-.spatial-scroll-active .embed-scroll-shield{
-  display:block;
-  position:absolute;
-  inset:0;
-  z-index:2;
-  margin:0;
-  padding:0;
-  border:0;
-  background:transparent;
-  cursor:pointer;
-}
-.spatial-scroll-active .embed-scroll-shield:focus-visible{
-  outline:2px solid var(--fest-sun);
-  outline-offset:-4px;
-}
-.spatial-scroll-active .video-embed-large.is-embed-live .embed-scroll-shield{display:none}
+/* Click-to-load facade for YouTube embeds. A real cross-origin iframe carries
+   a 500KB+ player bundle and, on the homepage, sits in the middle of the
+   screen where a wheel gesture is dispatched straight into that frame and
+   never reaches the section engine — so it used to have to stay loaded (and
+   shielded) the instant it scrolled near view. A thumbnail + button is
+   same-origin and captures nothing, so the real iframe (built by
+   youtubeFacades in main.js) is worth deferring to the actual click and
+   costs nothing until someone asks for it. */
+.yt-facade{position:relative}
+.yt-facade-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.yt-facade-play{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;background:rgba(0,0,0,.22);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s ease}
+.yt-facade-play:hover,.yt-facade-play:focus-visible{background:rgba(0,0,0,.38)}
+.yt-facade-play:focus-visible{outline:2px solid var(--fest-sun);outline-offset:-4px}
+.yt-facade-badge{width:clamp(56px,9vw,76px);height:clamp(56px,9vw,76px);border-radius:50%;background:rgba(10,7,5,.82);box-shadow:0 8px 28px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;transition:transform .2s ease}
+.yt-facade-play:hover .yt-facade-badge{transform:scale(1.08)}
+.yt-facade-badge::before{content:'';width:0;height:0;margin-left:5px;border-style:solid;border-width:12px 0 12px 20px;border-color:transparent transparent transparent var(--ink)}
 
 /* Watch — featured music video */
 .watch-feature{max-width:1000px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
@@ -577,7 +570,7 @@ body.contact-page-bg{
 @media (max-width:800px){.video-grid{grid-template-columns:1fr}}
 .video-thumb{aspect-ratio:16/9;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:10px;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease}
 .video-thumb:hover{transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,.3)}
-.video-embed{aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:var(--card)}
+.video-embed{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:var(--card)}
 .video-embed iframe{width:100%;height:100%;border:none}
 .link{color:var(--accent);text-decoration:underline;transition:color .2s ease}
 .link:hover{color:var(--ink)}
@@ -1785,6 +1778,12 @@ body.privacy-page .privacy-page-main p{
     transform:var(--scene-transform,none);
     opacity:var(--scene-opacity);
     backface-visibility:hidden;
+  }
+  /* will-change is scoped to the active chapter and its neighbours (main.js
+     toggles .is-scene-live) rather than all six permanently — six full-viewport
+     photo backdrops is six standing GPU textures for chapters nowhere near the
+     camera. */
+  .spatial-scroll-active main > [data-scroll-chapter].is-scene-live > .chapter-scene{
     will-change:transform,opacity;
   }
   .spatial-scroll-active main > .hero,
@@ -1965,6 +1964,7 @@ body.privacy-page .privacy-page-main p{
 
 /* Gallery masonry */
 .gallery-masonry{
+  --gallery-cols:2;
   columns:2;
   column-gap:10px;
   max-width:none;
@@ -1997,6 +1997,7 @@ body.privacy-page .privacy-page-main p{
 }
 @media (min-width:769px){
   .gallery-masonry{
+    --gallery-cols:3;
     columns:3;
     column-gap:clamp(20px,2vw,32px);
   }
@@ -2009,6 +2010,21 @@ body.privacy-page .privacy-page-main p{
 @media (max-width:400px){
   .gallery-masonry{column-gap:8px}
 }
+/* Once the script has placed every photo, each item carries its own left, top
+   and width, and the gallery its height. The column count and gap above still
+   drive it; without the script it stays plain CSS columns. */
+.gallery-masonry.is-grid{
+  display:block;
+  position:relative;
+  columns:auto;
+}
+.gallery-masonry.is-grid .gallery-item{
+  position:absolute;
+  margin:0;
+}
+/* The shared reveal blurs elements in. Over a wall of large photos that blur is
+   repainted on every frame of the wave, so gallery tiles only fade and rise. */
+.gallery-masonry .gallery-item.reveal-scale{filter:none}
 
 /* Lightbox */
 .lightbox-overlay{position:fixed;inset:0;background:rgba(10,7,5,.95);z-index:10000;display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .3s ease;cursor:zoom-out;backdrop-filter:blur(8px)}
@@ -3665,10 +3681,29 @@ a.show-row[href]{cursor:pointer}
   );
   background-position:center 50%;
 }
+/* On a phone this hero is full-viewport and positioned dead centre, so `cover`
+   on the square artwork above paints a narrow vertical slice and discards the
+   sides — 44% of the pixels the phone had just decoded. This file is that slice,
+   cut from the 3000px master, so the phone gets the same framing at the same
+   sharpness out of 185KB instead of 303KB. It has to sit after .album-hero:
+   the breakpoint's own .hero rule earlier in the file is overridden by that. */
+@media (max-width:640px){
+  .album-hero{
+    background-image:url('../assets/images/backgrounds/modern-nostalgia-album-bg-mobile.jpg');
+    background-image:image-set(
+      url('../assets/images/backgrounds/modern-nostalgia-album-bg-mobile.webp') type('image/webp'),
+      url('../assets/images/backgrounds/modern-nostalgia-album-bg-mobile.jpg') type('image/jpeg')
+    );
+  }
+}
+/* This is the overlay the homepage actually uses, and the stops are its old
+   colours already run through sepia(35%). The overlay is an empty div, so the
+   filter only ever recoloured this one gradient — a constant result, recomputed
+   on a full-viewport layer sitting over the hero. Alpha is untouched by the
+   sepia matrix, so only the RGB moved. */
 .album-hero .hero-overlay{
-  background:linear-gradient(180deg,rgba(22,15,10,.3) 0%,rgba(22,15,10,.5) 52%,rgba(10,7,5,.88) 100%);
+  background:linear-gradient(180deg,rgba(22,17,12,.3) 0%,rgba(22,17,12,.5) 52%,rgba(10,8,6,.88) 100%);
   backdrop-filter:none;
-  filter:sepia(35%);
 }
 .album-hero .hero-inner{
   position:absolute;
@@ -3713,6 +3748,11 @@ a.show-row[href]{cursor:pointer}
 .album-hero .album-hero-caption{
   animation:heroCaptionPulse 2.6s ease-in-out infinite;
   will-change:opacity,transform;
+  /* Static, not animated: text-shadow can't run on the compositor, so
+     keyframing it repainted this element every frame of an infinite
+     animation, forever, from the moment the page loads. The glow layer stays
+     put and just reads dimmer on its own as opacity drops through the cycle. */
+  text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 28px rgba(248,143,158,.42);
 }
 /* Bright is the 0%/100% frame deliberately: that is also the resting state if
    animations never run (reduced motion, a backgrounded tab, an engine that
@@ -3722,12 +3762,10 @@ a.show-row[href]{cursor:pointer}
   0%,100%{
     opacity:1;
     transform:scale(1.025);
-    text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 28px rgba(248,143,158,.42);
   }
   50%{
     opacity:.38;
     transform:scale(.988);
-    text-shadow:0 2px 14px rgba(0,0,0,.9);
   }
 }
 @media (prefers-reduced-motion:reduce){
@@ -4261,8 +4299,8 @@ a.show-row[href]{cursor:pointer}
   .member-role{font-size:8pt}
   .epk-venue-label{font-size:9pt;margin:8pt 0 4pt}
 
-  .gallery-masonry{columns:3;column-gap:8pt}
-  .gallery-masonry .gallery-item{border-radius:4pt;margin-bottom:8pt}
+  .gallery-masonry,.gallery-masonry.is-grid{display:block;columns:3;column-gap:8pt;height:auto!important}
+  .gallery-masonry .gallery-item{border-radius:4pt;margin-bottom:8pt!important;position:relative!important;left:auto!important;top:auto!important;width:auto!important}
   .lightbox-overlay{display:none!important}
 
   a::after{content:none!important}

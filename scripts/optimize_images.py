@@ -49,13 +49,34 @@ IMAGE_EXTS = (".jpg", ".jpeg", ".png", ".JPG", ".JPEG", ".PNG")
 
 # Aliases, not renames: the shoot arrives named however the photographer named
 # it, and the two Joshes are told apart by surname there and by initial here.
+# Masters are named PHOTOGRAPHER__MEMBER so the credit travels with the file.
+# The untagged names stay as fallbacks for a master dropped in without one.
 LINEUP_SOURCES = {
-    "bardia": ["BARDIA"],
-    "dylan": ["DYLAN"],
-    "jacob": ["JACOB"],
-    "josh-c": ["CHAPMAN", "JOSH C", "JOSH-C", "JOSH_C"],
-    "josh-s": ["SEAMAN", "JOSH S", "JOSH-S", "JOSH_S"],
+    "bardia": ["JACKSON-ISELI__BARDIA", "BARDIA"],
+    "dylan": ["JACKSON-ISELI__DYLAN", "DYLAN"],
+    "jacob": ["JACKSON-ISELI__JACOB", "JACOB"],
+    "josh-c": ["JACKSON-ISELI__CHAPMAN", "CHAPMAN", "JOSH C", "JOSH-C", "JOSH_C"],
+    "josh-s": ["JACKSON-ISELI__SEAMAN", "SEAMAN", "JOSH S", "JOSH-S", "JOSH_S"],
 }
+
+# Who shot each master, and how that is known. Read by the gallery and lineup
+# builds so every manifest entry carries a credit ready for display later.
+PHOTO_CREDITS = ROOT / "data" / "photo-credits.json"
+GALLERY_ORDER = ROOT / "data" / "gallery-order.json"
+
+
+def load_photo_credits():
+    if PHOTO_CREDITS.exists():
+        return json.loads(PHOTO_CREDITS.read_text(encoding="utf-8"))
+    return {}
+
+
+def credit_slug(stem):
+    """'micah-pattern__aug14-2026-22' -> ('micah-pattern', 'aug14-2026-22')."""
+    if "__" in stem:
+        who, _, shot = stem.partition("__")
+        return who.lower(), shot.lower()
+    return "uncredited", stem.lower()
 
 
 def resize_to_width(img, target_w):
@@ -187,7 +208,7 @@ def flatten_alpha(img, bg=(0, 0, 0)):
     return img
 
 
-def process_gallery_item(src_path, out_dir, out_base, grid_w=800, lightbox_w=1600):
+def process_gallery_item(src_path, out_dir, out_base, grid_w=800, small_w=600, lightbox_w=1600):
     """Grid-sized JPEG/WebP for masonry + separate lightbox variants."""
     img = Image.open(src_path)
     img = ImageOps.exif_transpose(img)
@@ -198,6 +219,13 @@ def process_gallery_item(src_path, out_dir, out_base, grid_w=800, lightbox_w=160
     out_webp = out_dir / f"{out_base}.webp"
     save_webp_from_image(grid, out_webp, 76)
 
+    # On a phone the gallery is two columns about 190 CSS px wide, so even a 3x
+    # screen draws each photo under 600 real pixels. The page offers this smaller
+    # WebP through srcset and phones skip roughly half the bytes of the 800.
+    small = flatten_alpha(resize_to_width(img, small_w))
+    out_small = out_dir / f"{out_base}-{small_w}.webp"
+    save_webp_from_image(small, out_small, 76)
+
     lb = flatten_alpha(resize_to_width(img, lightbox_w))
     lb_jpg = OUT_GALLERY_FULL / f"{out_base}.jpg"
     save_jpeg(lb, lb_jpg, quality=84)
@@ -206,6 +234,8 @@ def process_gallery_item(src_path, out_dir, out_base, grid_w=800, lightbox_w=160
 
     return {
         "webp": rel(out_webp),
+        "webpSmall": rel(out_small),
+        "smallWidth": small.width,
         "src": rel(out_jpg),
         "full": rel(lb_jpg),
         "fullWebp": rel(lb_webp),
@@ -314,16 +344,31 @@ def process_cover(src_name, out_name=None, target=1200, jpeg_q=85, webp_q=82, li
 
 
 def discover_gallery_sources():
+    """Gallery masters in display order, each with its chosen alt text.
+
+    The order lives in data/gallery-order.json rather than in the filenames,
+    because the filenames now carry who shot each photo. A master sitting in
+    _source/gallery that the order file does not mention is appended at the end
+    and reported, so a new photo is never silently left off the page. An order
+    entry naming a master that is gone stops the build instead of shipping a gap.
+    """
     gallery_dir = SRC / "gallery"
-    numbered = []
-    for path in gallery_dir.iterdir():
-        if not path.is_file():
-            continue
-        match = re.match(r"^(\d+)\.(jpg|jpeg|png)$", path.name, re.I)
-        if match:
-            numbered.append((int(match.group(1)), path))
-    numbered.sort(key=lambda item: item[0])
-    return [path for _, path in numbered]
+    masters = sorted(
+        p for p in gallery_dir.iterdir()
+        if p.is_file() and not p.name.startswith(".") and p.suffix.lower() in (".jpg", ".jpeg", ".png")
+    )
+    by_name = {p.name: p for p in masters}
+    ordered = []
+    if GALLERY_ORDER.exists():
+        for entry in json.loads(GALLERY_ORDER.read_text(encoding="utf-8")).get("order", []):
+            path = by_name.pop(entry["master"], None)
+            if path is None:
+                raise SystemExit(f"gallery-order.json names a master that is not in _source/gallery: {entry['master']}")
+            ordered.append((path, entry.get("alt")))
+    for path in by_name.values():
+        print(f"  NOTE {path.name} is not in gallery-order.json, appended at the end")
+        ordered.append((path, None))
+    return ordered
 
 
 print("Hero / background images")
@@ -345,17 +390,37 @@ r = process("backgrounds/BACK_EP.jpg", "back-ep.jpg", 1600, jpeg_q=80, webp_q=78
 if r:
     report(ROOT / r["src"])
     report(ROOT / r["webp"])
-r = process(
-    "backgrounds/modern nostalgia full cover no text.png",
-    "modern-nostalgia-album-bg",
-    1920,
-    jpeg_q=84,
-    webp_q=82,
-    out_dir=OUT_BACKGROUNDS,
-)
-if r:
-    report(ROOT / r["src"])
-    report(ROOT / r["webp"])
+# The album artwork is square, and both the hero and the tracklist section paint
+# it full-viewport with `cover` and `center 50%`. That means neither one ever
+# shows the whole thing: a desktop window sees a horizontal band and a phone a
+# vertical slice, and on the square master every pixel outside that was decoded
+# and then thrown away — 44% of a 3.69 megapixel picture, on the frame the
+# chapter first scrolls into view.
+#
+# So each shape gets the cut it actually paints, taken from the 3000px master so
+# neither loses sharpness. 16:10 covers any desktop window at least that wide,
+# which is all of them in practice; a taller one zooms exactly as `cover` always
+# did. The phone keeps full height and drops the sides.
+_album_master_name = "backgrounds/modern nostalgia full cover no text.png"
+_album_master = SRC / _album_master_name
+if _album_master.exists():
+    with Image.open(_album_master) as _album_src:
+        _album_art = ImageOps.exif_transpose(_album_src).convert("RGB")
+
+    for _label, _aspect, _width, _suffix in (
+        ("desktop", 16 / 10, 1920, ""),
+        ("phone", 9 / 16, 1080, "-mobile"),
+    ):
+        _variant = resize_to_width(crop_to_aspect(_album_art, _aspect), _width)
+        _variant_jpg = OUT_BACKGROUNDS / f"modern-nostalgia-album-bg{_suffix}.jpg"
+        _variant_webp = OUT_BACKGROUNDS / f"modern-nostalgia-album-bg{_suffix}.webp"
+        save_jpeg(_variant, _variant_jpg, quality=84)
+        save_webp_from_image(_variant, _variant_webp, quality=82)
+        print(f"  modern-nostalgia-album-bg{_suffix} {_variant.width}x{_variant.height} ({_label})")
+        report(_variant_jpg)
+        report(_variant_webp)
+else:
+    print(f"  SKIP modern-nostalgia-album-bg (missing {_album_master_name})")
 
 print("Featured show artwork")
 # Upcoming-show artwork, driven by data/shows.json rather than named here, so
@@ -364,6 +429,10 @@ print("Featured show artwork")
 #
 # The poster now hangs beside its row and nothing sits behind it, so there is no
 # wide banner variant to cut. The next show simply gets a larger one.
+
+# Width of the thumbnail variant every poster also gets. main.js hard-codes the
+# same number in the srcset it builds, so the two move together.
+POSTER_SMALL_W = 400
 
 upcoming_shows = []
 _shows_path = DATA / "shows.json"
@@ -401,6 +470,18 @@ for index, show in enumerate(upcoming_shows):
         print(f"  {slug} {poster.width}x{poster.height}")
         report(poster_webp)
         report(poster_jpeg)
+
+        # The row beside the date paints this poster at anywhere from 66 to 330
+        # CSS px depending on the layout in force, never at the size the lightbox
+        # wants. Measured on the homepage the next show's poster sits in a 66px
+        # box and was decoding the 900px file above to fill it. That file stays,
+        # because the lightbox does want it; the page offers this one through
+        # srcset so the thumbnail stops paying for pixels it cannot show.
+        small = resize_to_width(art, POSTER_SMALL_W)
+        small_webp = OUT_POSTERS_ROOT / f"{slug}-sm.webp"
+        save_webp_from_image(small, small_webp, quality=poster_q)
+        print(f"  {slug}-sm {small.width}x{small.height}")
+        report(small_webp)
 
 
 print("Scene backgrounds")
@@ -486,24 +567,60 @@ for cfg in [
 
 print("Favicon")
 # Two transparent tab icons, picked by the page through prefers-color-scheme:
-# the black mark for light tab bars, the off-white one for dark. Neither needs a
-# keyline or a tile, because each is only ever shown against a tab that
-# contrasts with it. A single transparent icon cannot manage that: black
-# disappears on a dark tab, off-white on a light one, and a dark square behind
-# either reads as a black tile.
+# the black mark for light tab bars, the off-white one for dark. Each is only
+# shown against a tab that contrasts with it, so neither needs a tile.
 #
-# The home-screen icon keeps a ground. iOS paints transparency black, so it is
-# its own file rather than sharing a tab PNG.
+# Framing. Fitting the whole splat into a 32px square leaves the D and A a few
+# pixels tall, because the long arms and the loose droplets set the bounding box.
+# So the tab icons trim the droplets and crop to a square centred on the ink,
+# FAVICON_ZOOM of the splat's own size, letting the arm tips run off the edge.
+# The arms still radiate, so it reads as the splat, and the letters get the room.
+#
+# The home-screen icon keeps the whole splat with a margin: iOS shows it large and
+# rounds its corners, and it keeps a ground because iOS paints transparency black.
 FAVICON_BG = (10, 7, 5)   # matches the theme-color every page declares
+FAVICON_ZOOM = 0.86
 DA = SRC / "logos" / "DA_SPLAT"
 
-def favicon_square(path):
+def splat_body(mark):
+    """Bounding box of the largest connected shape: the splat without droplets."""
+    step = 4
+    alpha = mark.getchannel("A").resize((mark.width // step, mark.height // step))
+    w, h = alpha.size
+    px = alpha.load()
+    seen = bytearray(w * h)
+    best = (0, None)
+    for y in range(h):
+        for x in range(w):
+            if px[x, y] <= 60 or seen[y * w + x]:
+                continue
+            stack = [(x, y)]
+            seen[y * w + x] = 1
+            n, x0, y0, x1, y1 = 0, x, y, x, y
+            while stack:
+                cx, cy = stack.pop()
+                n += 1
+                x0, y0, x1, y1 = min(x0, cx), min(y0, cy), max(x1, cx), max(y1, cy)
+                for nx, ny in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                    if 0 <= nx < w and 0 <= ny < h and not seen[ny * w + nx] and px[nx, ny] > 60:
+                        seen[ny * w + nx] = 1
+                        stack.append((nx, ny))
+            if n > best[0]:
+                best = (n, (x0 * step, y0 * step, (x1 + 1) * step, (y1 + 1) * step))
+    return best[1]
+
+def favicon_art(path):
     mark = ImageOps.exif_transpose(Image.open(path)).convert("RGBA")
     mark = mark.crop(mark.getchannel("A").getbbox())
-    pad = round(max(mark.size) * 0.09)
-    side = max(mark.size) + pad * 2
+    body = splat_body(mark)
+    trimmed = Image.new("RGBA", mark.size, (0, 0, 0, 0))
+    trimmed.paste(mark.crop(body), body[:2])
+    return trimmed, body
+
+def centred_square(img, cx, cy, side):
+    box = (round(cx - side / 2), round(cy - side / 2))
     square = Image.new("RGBA", (side, side), (0, 0, 0, 0))
-    square.paste(mark, ((side - mark.width) // 2, (side - mark.height) // 2), mark)
+    square.paste(img, (-box[0], -box[1]), img)
     return square
 
 for master, suffix in (("DA-BLACK-2000.png", ""), ("DA-OFF_WHITE-2000.png", "-dark")):
@@ -511,20 +628,30 @@ for master, suffix in (("DA-BLACK-2000.png", ""), ("DA-OFF_WHITE-2000.png", "-da
     if not src.exists():
         print(f"  SKIP {master} (missing)")
         continue
-    square = favicon_square(src)
+    art, body = favicon_art(src)
+    ink = art.getchannel("A").point(lambda v: 255 if v > 60 else 0)
+    # centre of mass of the ink, so the crop sits on the splat's weight, not its box
+    xs = sum(x * v for x, v in enumerate(ink.resize((art.width, 1), Image.BOX).getdata()))
+    ys = sum(y * v for y, v in enumerate(ink.resize((1, art.height), Image.BOX).getdata()))
+    cx = xs / max(sum(ink.resize((art.width, 1), Image.BOX).getdata()), 1)
+    cy = ys / max(sum(ink.resize((1, art.height), Image.BOX).getdata()), 1)
+    side = round(max(body[2] - body[0], body[3] - body[1]) * FAVICON_ZOOM)
+    square = centred_square(art, cx, cy, side)
     for px, base in ((32, "favicon-32"), (180, "favicon")):
         name = f"{base}{suffix}.png"
         square.resize((px, px), Image.LANCZOS).save(OUT / name, "PNG", optimize=True)
-        print(f"  {name} {px}x{px} transparent")
+        print(f"  {name} {px}x{px} transparent, zoom {FAVICON_ZOOM}")
         report(OUT / name)
 
 touch_src = DA / "DA-OFF_WHITE-2000.png"
 if touch_src.exists():
-    square = favicon_square(touch_src)
-    ground = Image.new("RGB", square.size, FAVICON_BG)
-    ground.paste(square, (0, 0), square)
+    art, body = favicon_art(touch_src)
+    art = art.crop(body)
+    side = round(max(art.size) * 1.14)
+    ground = Image.new("RGB", (side, side), FAVICON_BG)
+    ground.paste(art, ((side - art.width) // 2, (side - art.height) // 2), art)
     ground.resize((180, 180), Image.LANCZOS).save(OUT / "apple-touch-icon.png", "PNG", optimize=True)
-    print("  apple-touch-icon.png 180x180 on ground")
+    print("  apple-touch-icon.png 180x180 on ground, whole splat")
     report(OUT / "apple-touch-icon.png")
 
 print("Partner logos")
@@ -581,14 +708,17 @@ for src_name in [
 
 print("Lineup portraits")
 lineup_manifest = {}
+photo_credits = load_photo_credits()
 for slug, names in LINEUP_SOURCES.items():
     src = find_source("lineup", names)
     if not src:
         print(f"  SKIP lineup/{slug} (missing source for {names})")
         continue
     print(f"  {slug} <= {src.relative_to(SRC)}")
-    meta = process_raster(src, OUT_LINEUP, slug, 900, jpeg_q=84, webp_q=82,
+    who, _ = credit_slug(src.stem)
+    meta = process_raster(src, OUT_LINEUP, f"{who}--{slug}", 900, jpeg_q=84, webp_q=82,
                           lightbox_width=1600)
+    meta["credit"] = (photo_credits.get(f"lineup/{src.name}") or {}).get("photographer")
     lineup_manifest[slug] = meta
     report(OUT_LINEUP / Path(meta["src"]).name)
     report(OUT_LINEUP / Path(meta["webp"]).name)
@@ -623,13 +753,18 @@ print(f"Wrote {poster_manifest_path.relative_to(ROOT)}")
 
 print("Gallery photos")
 gallery_manifest = []
-for src in discover_gallery_sources():
-    out_base = src.stem
-    print(f"  {out_base} <= GALLERY/{src.name}")
+for src, alt in discover_gallery_sources():
+    who, shot = credit_slug(src.stem)
+    out_base = f"{who}--{shot}"
+    print(f"  {out_base} <= gallery/{src.name}")
     meta = process_gallery_item(src, OUT_GALLERY, out_base)
+    meta["credit"] = (photo_credits.get(src.name) or {}).get("photographer")
+    if alt:
+        meta["alt"] = alt
     gallery_manifest.append(meta)
     report(OUT_GALLERY / Path(meta["src"]).name)
     report(OUT_GALLERY / Path(meta["webp"]).name)
+    report(OUT_GALLERY / Path(meta["webpSmall"]).name)
     report(OUT_GALLERY_FULL / Path(meta["fullWebp"]).name)
 
 print("Merch")
@@ -646,4 +781,27 @@ manifest_path = DATA / "epk-images.json"
 manifest = {"lineup": lineup_manifest, "gallery": gallery_manifest}
 manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 print(f"\nWrote {manifest_path.relative_to(ROOT)}")
+
+# Built gallery and lineup photos are named after their masters, so renaming or
+# archiving a master leaves the old derivative behind. Anything in those two
+# output folders that the manifest no longer references is removed here; the
+# masters in _source are never touched.
+keep = set()
+for entry in list(manifest["gallery"]) + list(manifest["lineup"].values()):
+    for key in ("src", "webp", "webpSmall", "full", "fullWebp"):
+        if entry.get(key):
+            keep.add((ROOT / entry[key]).resolve())
+swept = 0
+for out_dir in (OUT_GALLERY, OUT_LINEUP):
+    for path in sorted(out_dir.rglob("*"), reverse=True):
+        if path.is_file() and path.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp") and path.resolve() not in keep:
+            path.unlink()
+            swept += 1
+        elif path.is_dir() and path.name != "full" and all(p.name == ".DS_Store" for p in path.iterdir()):
+            # Finder drops a .DS_Store into any folder it has shown, which would
+            # otherwise keep an emptied folder alive forever.
+            for junk in path.iterdir():
+                junk.unlink()
+            path.rmdir()
+print(f"Removed {swept} built photos no longer in the manifest")
 print("Done.")

@@ -7,15 +7,21 @@
 <meta name="theme-color" content="#0a0705">
 
 <!-- Meta Pixel -->
+<!-- The pixel library is 108KB of third-party JavaScript. Fetched inline it
+     landed ~40ms into the load, competing with the hero image for bandwidth and
+     the main thread during the only window that decides how fast the page feels.
+     Only the fetch is deferred: fbq() is defined immediately and queues init and
+     PageView right away, and the queue flushes when the library arrives, so no
+     event is lost. -->
 <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+!function(f,b,e,v,n){
+if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window,document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];
+var load=function(){var t=b.createElement(e);t.async=!0;t.src=v;
+var s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)};
+if(b.readyState==='complete')load();else f.addEventListener('load',load)
+}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '1503298771840666');
 fbq('track', 'PageView');
 </script>
@@ -39,11 +45,11 @@ src="https://www.facebook.com/tr?id=1503298771840666&ev=PageView&noscript=1" alt
 <meta name="twitter:title" content="Dirty Aesthetic • Modern Nostalgia">
 <meta name="twitter:description" content="The debut album from Dirty Aesthetic is out now. Stream Modern Nostalgia everywhere.">
 <meta name="twitter:image" content="https://www.dirtyaesthetic.com/assets/images/covers/cover_LP_modern_nostalgia.jpg">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32-dark.png?v=5" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="180x180" href="assets/images/favicon-dark.png?v=5" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png?v=5" media="(prefers-color-scheme: light)">
-<link rel="icon" type="image/png" sizes="180x180" href="assets/images/favicon.png?v=5" media="(prefers-color-scheme: light)">
-<link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png?v=5">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32-dark.png?v=6" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" sizes="180x180" href="assets/images/favicon-dark.png?v=6" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png?v=6" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" sizes="180x180" href="assets/images/favicon.png?v=6" media="(prefers-color-scheme: light)">
+<link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png?v=6">
 
 <!-- Preload critical (above-the-fold) assets only -->
 <link rel="preload" as="image" type="image/webp" href="assets/images/backgrounds/modern-nostalgia-album-bg.webp" fetchpriority="high">
@@ -679,9 +685,9 @@ src="https://www.facebook.com/tr?id=1503298771840666&ev=PageView&noscript=1" alt
     <div class="video-feature-inner">
       <span class="video-feature-kicker reveal">Official Music Video</span>
       <h2 class="video-feature-title reveal" style="--reveal-delay:.08s">Modern Nostalgia</h2>
-      <div class="video-embed-large reveal-scale" style="--reveal-delay:.14s">
-        <iframe src="https://www.youtube-nocookie.com/embed/WUQRlII35Ow?rel=0&modestbranding=1&enablejsapi=1" title="Dirty Aesthetic, Modern Nostalgia (Official Music Video)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        <button class="embed-scroll-shield" type="button" aria-label="Play the Modern Nostalgia music video"></button>
+      <div class="video-embed-large yt-facade reveal-scale" style="--reveal-delay:.14s" data-yt-id="WUQRlII35Ow" data-yt-params="rel=0&amp;modestbranding=1" data-yt-title="Dirty Aesthetic, Modern Nostalgia (Official Music Video)">
+        <img class="yt-facade-thumb" src="https://i.ytimg.com/vi/WUQRlII35Ow/hqdefault.jpg" alt="" loading="lazy" decoding="async">
+        <button class="yt-facade-play" type="button" aria-label="Play the Modern Nostalgia music video"><span class="yt-facade-badge"></span></button>
       </div>
     </div>
   </section>
@@ -701,7 +707,7 @@ src="https://www.facebook.com/tr?id=1503298771840666&ev=PageView&noscript=1" alt
             <span class="show-row-venue">Hestia Kitchen + Bar &middot; 9:30 PM &middot; $33 with buffet <span class="show-row-arrow">Tickets <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span></span>
             <span class="show-row-city">Unit 160, 4351 No. 3 Rd, Richmond</span>
           </div>
-          <div class="show-row-poster" style="--poster-ar:900 / 900"><img src="assets/images/posters/the-shelf-session-66-2026.webp?v=20260911" alt="The Shelf Concert poster" loading="eager" decoding="async" width="900" height="900"></div>
+          <div class="show-row-poster" style="--poster-ar:900 / 900"><img src="assets/images/posters/the-shelf-session-66-2026.webp?v=20260911" srcset="assets/images/posters/the-shelf-session-66-2026-sm.webp?v=20260911 400w, assets/images/posters/the-shelf-session-66-2026.webp?v=20260911 900w" sizes="(min-width:1081px) and (min-height:680px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) 160px, (max-width:820px) 25vw, 30vw" alt="The Shelf Concert poster" loading="eager" decoding="async" width="900" height="900"></div>
         </a>
 
         <p class="shows-more-label reveal">Also Coming Up</p>
@@ -715,7 +721,7 @@ src="https://www.facebook.com/tr?id=1503298771840666&ev=PageView&noscript=1" alt
             <span class="show-row-lineup">with Math Club, Lazy Dynamite</span>
             <span class="show-row-city">The Roxy Cabaret &middot; 932 Granville St &middot; 19+ &middot; $10 adv / $15 door</span>
           </div>
-          <div class="show-row-poster" style="--poster-ar:700 / 875"><img src="assets/images/posters/best-in-vancouver-showcase-2026.webp?v=20260911" alt="Best in Vancouver Showcase #2 poster" loading="lazy" decoding="async" width="700" height="875"></div>
+          <div class="show-row-poster" style="--poster-ar:700 / 875"><img src="assets/images/posters/best-in-vancouver-showcase-2026.webp?v=20260911" srcset="assets/images/posters/best-in-vancouver-showcase-2026-sm.webp?v=20260911 400w, assets/images/posters/best-in-vancouver-showcase-2026.webp?v=20260911 700w" sizes="(min-width:1081px) and (min-height:680px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) 120px, (max-width:820px) 25vw, 10vw" alt="Best in Vancouver Showcase #2 poster" loading="lazy" decoding="async" width="700" height="875"></div>
         </a>
       </div>
       <a class="shows-archive-link reveal" href="posters.html">

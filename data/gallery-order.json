@@ -1,0 +1,218 @@
+{
+  "_readme": [
+    "Display order of the EPK gallery, top to bottom. The page places each photo in the shortest column, so this order is also the lightbox order.",
+    "master is the filename in _source/gallery. The part before the double underscore names who shot it, credits live in photo-credits.json.",
+    "It was arranged so black and white frames never stack, similar shots and colours are kept apart, drum shots and the two logo tiles are spaced out, and the darkest frames sit next to brighter ones, at both the 3 column desktop and 2 column phone layouts.",
+    "To add a photo, drop the master in _source/gallery and add an entry here where it should sit, then run scripts/optimize_images.py. A master missing from this list is appended at the end with a note."
+  ],
+  "order": [
+    {
+      "master": "luke-dean__11.jpg",
+      "alt": "Singer in dark sunglasses and a spotted shirt leans into the lens gripping a mic, a guitarist glowing in blue haze behind."
+    },
+    {
+      "master": "micah-pattern__aug14-2026-46.jpg",
+      "alt": "Singer in a white tank top holds a microphone aloft and spreads his arms to a packed, cheering crowd, seen from behind on stage."
+    },
+    {
+      "master": "markus-lee__dsc02428.jpg",
+      "alt": "Two members play through red haze and a bright backlight, one shouting with eyes shut, as a fan films on a phone up front"
+    },
+    {
+      "master": "jackson-iseli__03.png",
+      "alt": "Shot from below, a singer in sunglasses and a patterned shirt holds the microphone high overhead under orange stage light"
+    },
+    {
+      "master": "aidan-chow__dscf2619.jpg",
+      "alt": "The five members of Dirty Aesthetic crowd onto a backstage couch by a brick wall of stickers, grinning and throwing hand signs"
+    },
+    {
+      "master": "markus-lee__dsc02136.jpg",
+      "alt": "Mustached bassist in a white tank grins with eyes closed, Fender headstock thrust forward, amid purple and orange light trails."
+    },
+    {
+      "master": "jackson-iseli__08.png",
+      "alt": "Dirty Aesthetic play under teal light with their name projected behind them as the singer points out over a silhouetted crowd"
+    },
+    {
+      "master": "aidan-chow__14.jpg",
+      "alt": "Guitarist in a corduroy jacket plays in front of a low stage while bandmates play behind him against a red velvet curtain"
+    },
+    {
+      "master": "micah-pattern__aug14-2026-01.jpg",
+      "alt": "Tattooed band member in a white tank top leans over the drum kit toward the smiling drummer in a plaid shirt, black and white"
+    },
+    {
+      "master": "markus-lee__24.jpg",
+      "alt": "Guitarist in sunglasses and patterned trousers laughs mid song, lit purple under a low club ceiling"
+    },
+    {
+      "master": "micah-pattern__aug14-2026-26.jpg",
+      "alt": "Guitarist with curly hair and a moustache plays under teal haze and backlight, a bandmate blurred in the foreground"
+    },
+    {
+      "master": "luke-dean__dsc-3118.jpg",
+      "alt": "Dirty Aesthetic mid set, singer in sunglasses belting into a mic beside two guitarists under green and pink neon."
+    },
+    {
+      "master": "micah-pattern__aug14-2026-30.jpg",
+      "alt": "Grinning guitarist in blue and amber haze, shot from a low stage angle, with bandmates beside him and an acoustic guitar below."
+    },
+    {
+      "master": "luke-dean__19.jpg",
+      "alt": "Drummer in a patterned bucket hat plays with eyes closed as smiling fans watch from behind the kit, black and white"
+    },
+    {
+      "master": "markus-lee__dsc02226.jpg",
+      "alt": "Guitarist with a blue guitar plays center stage while a bandmate in a white tank crouches toward fans raising their hands"
+    },
+    {
+      "master": "markus-lee__25.jpg",
+      "alt": "Singer in sunglasses and a white shirt leans over the front row, mic cable raised overhead, under warm red light"
+    },
+    {
+      "master": "luke-dean__dsc-3127.jpg",
+      "alt": "A hand holds a small camera whose screen shows the band playing under orange stage light, green bokeh in the dark behind."
+    },
+    {
+      "master": "markus-lee__dsc02063.jpg",
+      "alt": "Curly haired guitarist seen from behind on stage plays toward a hazy crowd under a bright warm spotlight."
+    },
+    {
+      "master": "markus-lee__dsc02371.jpg",
+      "alt": "Guitarist with curly hair and a blue guitar looks down at raised hands as a photographer shoots from the stage beside him"
+    },
+    {
+      "master": "micah-pattern__aug14-2026-21.jpg",
+      "alt": "Sideways view from inside a packed crowd, a fan filming on a phone as the singer in sunglasses performs on stage, black and white"
+    },
+    {
+      "master": "luke-dean__13.jpg",
+      "alt": "Wide eyed musician in a sleeveless tee gapes up at the camera, holding a cymbal beside his head next to the drum kit."
+    },
+    {
+      "master": "micah-pattern__aug14-2026-22.jpg",
+      "alt": "Dirty Aesthetic plays to a dancing crowd, grinning bassist up front, singer in sunglasses raised above them, black and white"
+    },
+    {
+      "master": "luke-dean__09.jpg",
+      "alt": "Backlit silhouette of a guitarist lunging on stage, violet haze glowing behind, monitor wedges and cables below."
+    },
+    {
+      "master": "aidan-chow__26.jpg",
+      "alt": "Guitarist in a white shirt turns away from a blurred microphone, face washed in red light, an illustrated strap across his chest"
+    },
+    {
+      "master": "makena-sebben__17.png",
+      "alt": "Dirty Aesthetic wordmark in white paint splatter lettering on a plain black background"
+    },
+    {
+      "master": "micah-pattern__aug14-2026-37.jpg",
+      "alt": "From behind the drum kit, the band faces the crowd under a green laser burst and teal haze, the drummer blurred in the foreground."
+    },
+    {
+      "master": "aidan-chow__16.jpg",
+      "alt": "Bearded guitarist in a plaid shirt glances down past his guitar neck as orange light trails streak across the frame"
+    },
+    {
+      "master": "markus-lee__dsc02027.jpg",
+      "alt": "Tattooed bassist in a white tank plays at the stage edge as smiling fans crowd in, one raising a camera, in black and white."
+    },
+    {
+      "master": "micah-pattern__aug14-2026-27.jpg",
+      "alt": "Fans hold up phones in a packed room under red light as Dirty Aesthetic plays in front of a glowing projection screen"
+    },
+    {
+      "master": "luke-dean__18.jpg",
+      "alt": "Singer in a white shirt swigs from a can under a tent canopy as a guitarist plays and fans hold up phones, black and white"
+    },
+    {
+      "master": "luke-dean__06.jpg",
+      "alt": "Grinning guitarist in glasses and a pale blue shirt plays a matching blue guitar, a bandmate in a white tank top behind him."
+    },
+    {
+      "master": "markus-lee__dsc02173.jpg",
+      "alt": "Seen from the stage, a guitarist in a white tank top plays over a packed, smiling crowd under a curved black ceiling"
+    },
+    {
+      "master": "markus-lee__dsc02264.jpg",
+      "alt": "Guitarist in a tank top and jeans crouches low on stage, head bowed over his guitar, washed in red light"
+    },
+    {
+      "master": "micah-pattern__aug14-2026-13.jpg",
+      "alt": "Guitarist in a white tank top kicks a leg up atop a stage monitor, the crowd dancing behind him, black and white"
+    },
+    {
+      "master": "jackson-iseli__02.png",
+      "alt": "Drummer seen from directly above, sticks on the snare, with large copper cymbals filling the foreground of a dark stage"
+    },
+    {
+      "master": "micah-pattern__aug14-2026-42.jpg",
+      "alt": "Guitarist leans back with a knee thrust at the lens, playing an acoustic guitar as two bandmates thrash behind him, in black and white."
+    },
+    {
+      "master": "markus-lee__dsc02060.jpg",
+      "alt": "A packed crowd, front rows seated on the floor, smiles up at the stage, one fan wearing a Dirty Aesthetic shirt."
+    },
+    {
+      "master": "micah-pattern__aug14-2026-33.jpg",
+      "alt": "Guitarist in a white tee plays a hollow body guitar beside a wire mesh gate, with blurred figures behind the mesh, in black and white."
+    },
+    {
+      "master": "luke-dean__dsc-3260.jpg",
+      "alt": "Guitarist in a black sleeveless shirt leans back mid shout with a blonde hollow body guitar, a Live Music Lives sign behind."
+    },
+    {
+      "master": "markus-lee__dsc01953.jpg",
+      "alt": "From the stage, two guitarists frame a dark, packed crowd holding phone flashlights aloft in purple light."
+    },
+    {
+      "master": "luke-dean__07.jpg",
+      "alt": "Low angle shot of a guitarist singing into a mic, red hollow body guitar thrust at the lens, two bandmates behind in blue haze."
+    },
+    {
+      "master": "micah-pattern__aug14-2026-18.jpg",
+      "alt": "Singer in sunglasses sings into a microphone, glimpsed through a gap in blurred foreground shapes, black and white"
+    },
+    {
+      "master": "markus-lee__23.jpg",
+      "alt": "Drummer in a cream striped shirt swings a stick behind large cymbals, blurred by purple and pink light trails"
+    },
+    {
+      "master": "jackson-iseli__05.png",
+      "alt": "Singer in sunglasses and a spotted shirt grips the microphone beside a guitarist with curly hair, both lit in teal and red light"
+    },
+    {
+      "master": "markus-lee__dsc02149.jpg",
+      "alt": "A front row fan leans in as a mustached guitarist pulls a face over a pale guitar, the bassist playing at lower right."
+    },
+    {
+      "master": "markus-lee__dsc02217.jpg",
+      "alt": "Two Dirty Aesthetic members in white tank tops kiss onstage, one holding a microphone, under a purple stage light"
+    },
+    {
+      "master": "aidan-chow__22.jpg",
+      "alt": "Singer in a white tank top leans into the microphone with eyes closed, playing guitar inside a swirl of purple and pink light"
+    },
+    {
+      "master": "luke-dean__15.jpg",
+      "alt": "Bassist in a white tank top plays in profile, lit from behind in violet haze with a ghostly silhouette at his shoulder."
+    },
+    {
+      "master": "makena-sebben__21.png",
+      "alt": "Dirty Aesthetic DA monogram set inside a white paint splat on a black background"
+    },
+    {
+      "master": "micah-pattern__aug14-2026-38.jpg",
+      "alt": "Drummer in a checked shirt plays a red kit, seen over his shoulder, as two guitarists perform under blue light beyond him."
+    },
+    {
+      "master": "micah-pattern__aug14-2026-10.jpg",
+      "alt": "Guitarist in a white tank top kneels on stage under red light, bandmates leaning back behind him in a tilted wide shot"
+    },
+    {
+      "master": "micah-pattern__aug14-2026-28.jpg",
+      "alt": "Tattooed singer in sunglasses sings into a microphone in profile, a bass neck rising behind him, in black and white."
+    }
+  ]
+}

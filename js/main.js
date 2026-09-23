@@ -147,6 +147,7 @@ window.addEventListener('beforeprint', () => {
   let chapterMetrics = []
   let nav = null
   let links = []
+  let lastLiveIndex = -1
 
   // ---- Chapter scaffolding (homepage only) ----
 
@@ -438,25 +439,6 @@ window.addEventListener('beforeprint', () => {
     })
   })
 
-  // Dismiss the embed shield on the click that starts the video, so arming the
-  // player costs the same one click it always did. See .embed-scroll-shield in
-  // the stylesheet for why the shield is there at all.
-  document.querySelectorAll('.embed-scroll-shield').forEach(shield => {
-    shield.addEventListener('click', () => {
-      const box = shield.closest('.video-embed-large')
-      const frame = box && box.querySelector('iframe')
-      if (box) box.classList.add('is-embed-live')
-      // Spend the arming click on playback rather than wasting it. If the
-      // browser declines — the gesture happened in this frame, not YouTube's —
-      // the shield is gone either way and its own play button is right there.
-      if (frame && frame.contentWindow) {
-        frame.contentWindow.postMessage(
-          '{"event":"command","func":"playVideo","args":""}',
-          'https://www.youtube-nocookie.com')
-      }
-    })
-  })
-
   // The hero's scroll cue advances one section, same as a wheel gesture.
   const scrollCue = document.querySelector('.scroll-cue')
   if (scrollCue) {
@@ -601,6 +583,19 @@ window.addEventListener('beforeprint', () => {
       if (active) links[i].setAttribute('aria-current', 'step')
       else links[i].removeAttribute('aria-current')
     }
+
+    // will-change keeps a chapter's whole photo backdrop as its own GPU layer.
+    // Doing that for all six at once, permanently, is six full-viewport
+    // textures held in video memory for the five the camera isn't anywhere
+    // near. Promoting only the active chapter and its immediate neighbours —
+    // enough that a mid-transition frame never finds its destination
+    // un-promoted — keeps the layer budget to three.
+    if (spatialEnabled && activeIndex !== lastLiveIndex) {
+      lastLiveIndex = activeIndex
+      for (let i = 0; i < chapters.length; i++) {
+        chapters[i].classList.toggle('is-scene-live', Math.abs(i - activeIndex) <= 1)
+      }
+    }
   }
 
   function schedule(){
@@ -685,6 +680,8 @@ window.addEventListener('beforeprint', () => {
       wheelAccum = 0
       clearTimeout(settleTimer)
       if (tweenFrame) { cancelAnimationFrame(tweenFrame); tweenFrame = 0 }
+      chapters.forEach(section => section.classList.remove('is-scene-live'))
+      lastLiveIndex = -1
     }
 
     chapters.forEach((section, index) => {
@@ -1123,6 +1120,20 @@ function showMediaUrl(path){
   return `${path}${path.includes('?') ? '&' : '?'}v=${showsAssetVersion}`
 }
 
+// Width of the -sm thumbnail optimize_images.py writes beside every poster.
+const POSTER_SMALL_W = 400
+// The media condition the scroll engine enables itself on, repeated here so the
+// browser can be told how wide the poster really lands in that layout.
+const SPATIAL_QUERY = '(min-width:1081px) and (min-height:680px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference)'
+// What the row actually paints a poster at, mirroring the stylesheet: the
+// spatial homepage sizes it by height and keeps it small, the phone layout by
+// viewport width, everything else by the 30vw/10vw rules. Told nothing, the
+// browser assumes an image fills the page and always fetches the largest file —
+// which is how a 66px slot ended up decoding a 900px picture.
+const posterSizes = isNext => isNext
+  ? `${SPATIAL_QUERY} 160px, (max-width:820px) 25vw, 30vw`
+  : `${SPATIAL_QUERY} 120px, (max-width:820px) 25vw, 10vw`
+
 fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const showsHeading = document.getElementById('shows-feature-heading')
   const showsKicker = document.getElementById('shows-feature-kicker')
@@ -1240,8 +1251,16 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       // so it deliberately skips the poster chrome and the data-poster-src hook.
       const logoSrc = !posterSrc && s.logo ? showMediaUrl(s.logo) : ''
       const logoDimensions = s.logoWidth && s.logoHeight ? ` width="${s.logoWidth}" height="${s.logoHeight}"` : ''
+      // The lightbox keeps the full-size file through data-poster-src; only the
+      // thumbnail in the row gets to pick a smaller one.
+      const posterSmallSrc = s.poster && /\.webp$/i.test(s.poster)
+        ? showMediaUrl(s.poster.replace(/\.webp$/i, '-sm.webp'))
+        : ''
+      const posterResponsive = posterSrc && posterSmallSrc && s.posterWidth
+        ? ` srcset="${posterSmallSrc} ${POSTER_SMALL_W}w, ${posterSrc} ${s.posterWidth}w" sizes="${posterSizes(isNext)}"`
+        : ''
       const mediaHtml = posterSrc
-        ? `<div class="show-row-poster"${posterAspect} data-poster-src="${posterSrc}"><img src="${posterSrc}" alt="${posterName} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>`
+        ? `<div class="show-row-poster"${posterAspect} data-poster-src="${posterSrc}"><img src="${posterSrc}"${posterResponsive} alt="${posterName} poster" loading="${mediaLoading}" decoding="async"${posterDimensions}></div>`
         : (logoSrc
           ? `<div class="show-row-poster show-row-poster--logo"><img src="${logoSrc}" alt="${s.logoAlt || posterName}" loading="${mediaLoading}" decoding="async"${logoDimensions}></div>`
           : '')
@@ -1598,14 +1617,101 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   window.addEventListener('resize', sync, { passive: true })
 })()
 
+// YouTube's player bundle is 500KB+ of JS that starts running the moment an
+// iframe with a real src exists, whether or not anyone ever presses play —
+// watch.html alone was paying that four times over on a single page load.
+// A thumbnail image and a button are same-origin, so nothing downloads and
+// nothing can steal an owned wheel gesture (see the homepage scroll engine)
+// until the click that actually means "play this".
+;(function youtubeFacades(){
+  document.querySelectorAll('.yt-facade[data-yt-id]').forEach(box => {
+    const id = box.dataset.ytId
+    const play = () => {
+      const iframe = document.createElement('iframe')
+      const params = box.dataset.ytParams || ''
+      iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1${params ? '&' + params : ''}`
+      iframe.title = box.dataset.ytTitle || 'YouTube video player'
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+      iframe.allowFullscreen = true
+      box.replaceChildren(iframe)
+    }
+    box.querySelector('.yt-facade-play').addEventListener('click', play, { once: true })
+  })
+})()
+
+// Every full-viewport backdrop here is a multi-megapixel photo, and a browser
+// does not decode one until the frame it first becomes visible. In the homepage
+// section engine that frame lands mid-transition: measured, each first reveal
+// blocked the main thread for 200-240ms, while scrolling back through those same
+// chapters afterwards cost nothing. The decode is the stall, and there is no
+// reason for it to happen during the animation.
+//
+// So once the page has loaded and the browser goes idle, each backdrop is
+// fetched and decoded off the critical path. decode() settles only when the
+// bitmap is ready, and they run one at a time deliberately — the point is to
+// spend idle time, not to trade one stall for a burst of them.
+;(function primeBackdrops(){
+  const stem = url => url.split('?')[0].replace(/\.[a-z0-9]+$/i, '')
+  const isWebp = url => /\.webp(\?|$)/i.test(url)
+
+  // A computed background can stack several layers, and image-set() lists the
+  // same picture as WebP and as JPEG. Keeping the WebP wherever both appear
+  // means priming never pulls a fallback the browser would not have used.
+  function backdropUrls(el){
+    const value = getComputedStyle(el).backgroundImage
+    if (!value || value === 'none') return []
+    const all = [...value.matchAll(/url\(\s*"?([^")]+?)"?\s*\)/g)].map(m => m[1])
+    const haveWebp = new Set(all.filter(isWebp).map(stem))
+    return all.filter(url => isWebp(url) || !haveWebp.has(stem(url)))
+  }
+
+  function collect(){
+    const urls = []
+    const seen = new Set()
+    document.querySelectorAll('*').forEach(el => {
+      const found = backdropUrls(el)
+      if (!found.length) return
+      const box = el.getBoundingClientRect()
+      // Backdrops only. A collapsed or thumbnail-sized box is either not on the
+      // page yet or small enough that priming it costs more than it saves.
+      if (box.width * box.height < 40000) return
+      found.forEach(url => {
+        if (seen.has(url)) return
+        seen.add(url)
+        urls.push(url)
+      })
+    })
+    return urls
+  }
+
+  async function prime(){
+    for (const url of collect()) {
+      const img = new Image()
+      img.decoding = 'async'
+      img.src = url
+      // A backdrop that will not decode is already the page's problem; failing
+      // to prime it just leaves the old behaviour rather than breaking the rest.
+      try { await img.decode() } catch (err) { /* keep priming the others */ }
+    }
+  }
+
+  const start = () => {
+    if (window.requestIdleCallback) requestIdleCallback(prime, { timeout: 2000 })
+    else setTimeout(prime, 200)
+  }
+  if (document.readyState === 'complete') start()
+  else window.addEventListener('load', start, { once: true })
+})()
+
 // EPK — lineup + gallery from data/epk-images.json (supports jpg/png sources)
 ;(function(){
   const galleryRoot = document.getElementById('epk-gallery')
   const lineupPhotos = document.querySelectorAll('[data-lineup]')
   if(!galleryRoot && !lineupPhotos.length) return
 
-  const EPK_ASSET_VERSION = '20260908-0021'
+  const EPK_ASSET_VERSION = '20260914-small'
   const GALLERY_EAGER = 6
+  const GALLERY_SIZES = '(min-width:769px) 31vw, 50vw'
   const LAZY_ROOT_MARGIN = '500px 0px'
   const IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
@@ -1648,6 +1754,7 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     item.style.setProperty('--reveal-delay', '0s')
     if(image.width && image.height){
       item.style.aspectRatio = `${image.width} / ${image.height}`
+      item.dataset.ratio = String(image.width / image.height)
     }
     item.dataset.fullSrc = image.full
     if(image.fullWebp) item.dataset.fullWebp = image.fullWebp
@@ -1656,17 +1763,21 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     // Set `alt` on an entry in epk-images.json to describe that photo; the
     // numbered fallback at least keeps them distinguishable.
     const alt = image.alt || `Dirty Aesthetic press photo ${index + 1}`
+    // Phones get the 600px WebP, everything wider the 800px one.
+    const webpSet = image.webpSmall
+      ? `${image.webpSmall} ${image.smallWidth || 600}w, ${image.webp} ${image.width || 800}w`
+      : image.webp
 
     if(eager){
       item.innerHTML = `
         <picture>
-          <source type="image/webp" srcset="${image.webp}">
+          <source type="image/webp" srcset="${webpSet}" sizes="${GALLERY_SIZES}">
           <img src="${image.src}" alt="${alt}" width="${image.width || ''}" height="${image.height || ''}" loading="eager" decoding="async"${index < 3 ? ' fetchpriority="high"' : ''}>
         </picture>`
     } else {
       item.innerHTML = `
         <picture>
-          <source type="image/webp" data-srcset="${image.webp}">
+          <source type="image/webp" data-srcset="${webpSet}" sizes="${GALLERY_SIZES}">
           <img src="${IMG_PLACEHOLDER}" data-src="${image.src}" data-webp="${image.webp}" alt="${alt}" width="${image.width || ''}" height="${image.height || ''}" loading="lazy" decoding="async">
         </picture>`
     }
@@ -1690,8 +1801,25 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     bindImageLoaded(item, img)
   }
 
+  // Only the photos near the screen play the reveal. The rest switch on with no
+  // transition, otherwise all 52 tiles animate at once, mostly offscreen, and
+  // the browser builds a layer for each of them while the wave plays.
   function revealGallery(root){
-    root.querySelectorAll('.gallery-item').forEach(el => el.classList.add('in-view'))
+    const limit = window.innerHeight * 1.5
+    const rootTop = root.getBoundingClientRect().top
+    const quiet = []
+    root.querySelectorAll('.gallery-item').forEach(el => {
+      if(rootTop + el.offsetTop > limit){
+        el.style.transition = 'none'
+        quiet.push(el)
+      }
+      el.classList.add('in-view')
+    })
+    if(quiet.length){
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        quiet.forEach(el => { el.style.transition = '' })
+      }))
+    }
   }
 
   function watchGalleryReveal(root){
@@ -1709,10 +1837,9 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     observer.observe(root)
   }
 
-  // Stagger the parallax reveal by visual ROW (vertical position), not DOM
-  // order. With CSS multicol the DOM fills column 1 top-to-bottom first, so an
-  // index-based delay animates the whole first column in before the rest.
-  // Bucketing by offsetTop waves it in top-to-bottom across all columns.
+  // Stagger the reveal by visual ROW (vertical position), not DOM order, so the
+  // gallery waves in top to bottom across all columns rather than one column at
+  // a time. Bucketing by offsetTop works for any layout the items end up in.
   function assignRowRevealOrder(root){
     const items = [...root.querySelectorAll('.gallery-item')]
     if(!items.length) return
@@ -1750,14 +1877,64 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     lazyItems.forEach(item => observer.observe(item))
   }
 
+  // Reading-order masonry. CSS columns fill the first column top to bottom
+  // before starting the second, so a curated sequence only ever held down each
+  // column and never across a row. Here each photo, in sequence, goes into
+  // whichever column is currently shortest and is positioned there absolutely.
+  // Heights come from each photo's known aspect ratio, so nothing waits on an
+  // image to load, and the DOM keeps the curated order, which is also the order
+  // the lightbox steps through. This used to be a grid of 1px rows, but the
+  // gallery is about 8,000px tall at 1440 wide and grows with the screen, and
+  // Firefox stops a grid at 10,000 lines, piling the last photos on each other.
+  let lastGalleryLayout = ''
+  function layoutGallery(root, force){
+    const cs = getComputedStyle(root)
+    const cols = parseInt(cs.getPropertyValue('--gallery-cols'), 10) || 2
+    const gap = parseFloat(cs.columnGap) || 0
+    const width = root.clientWidth
+    const key = `${cols}|${gap}|${width}`
+    if(!force && key === lastGalleryLayout) return
+    lastGalleryLayout = key
+    const colWidth = (width - gap * (cols - 1)) / cols
+    const heights = new Array(cols).fill(0)
+    root.querySelectorAll('.gallery-item').forEach(item => {
+      const ratio = parseFloat(item.dataset.ratio) || 1
+      let col = 0
+      for(let k = 1; k < cols; k++) if(heights[k] < heights[col] - 0.5) col = k
+      const height = colWidth / ratio
+      item.style.width = `${colWidth}px`
+      item.style.left = `${col * (colWidth + gap)}px`
+      item.style.top = `${heights[col]}px`
+      heights[col] += height + gap
+    })
+    root.style.height = `${Math.max(0, Math.max(...heights) - gap)}px`
+  }
+
   function initGallery(root){
-    root.classList.add('is-ready')
+    root.classList.add('is-ready', 'is-grid')
+    layoutGallery(root, true)
     assignRowRevealOrder(root)
     root.querySelectorAll('.gallery-item:not(.gallery-item--lazy) img').forEach(img => {
       bindImageLoaded(img.closest('.gallery-item'), img)
     })
     observeLazyGalleryItems(root)
     watchGalleryReveal(root)
+    if(!root.dataset.layoutBound){
+      root.dataset.layoutBound = 'true'
+      let pending = false
+      const relayout = () => {
+        if(pending) return
+        pending = true
+        requestAnimationFrame(() => {
+          pending = false
+          layoutGallery(root)
+        })
+      }
+      // Watching the gallery itself also catches the page scrollbar appearing
+      // once the photos make the page tall, which narrows it without a resize.
+      if('ResizeObserver' in window) new ResizeObserver(relayout).observe(root)
+      else window.addEventListener('resize', relayout, { passive: true })
+    }
   }
 
   fetch(`data/epk-images.json?v=${EPK_ASSET_VERSION}`).then(r => {
