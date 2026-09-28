@@ -1275,6 +1275,13 @@ body.privacy-page .privacy-page-main p{
   justify-items:center;
   gap:clamp(12px,2vw,20px) clamp(32px,5vw,72px);
 }
+/* Five members in a two-column grid leaves the last one stranded in the left
+   column with empty space beside it. Letting it span the row hands it to the
+   grid's justify-items:center. Scoped to an odd count, so a sixth member would
+   fill the row and this stops applying on its own. */
+.members-grid > .member-card:last-child:nth-child(odd){
+  grid-column:1 / -1;
+}
 .member-card{
   display:flex;
   flex-direction:column;
@@ -1454,6 +1461,14 @@ body.privacy-page .privacy-page-main p{
 }
 .epk-download{
   margin-top:clamp(24px,4vw,40px);
+  /* More than one download now, and the buttons are inline-flex, so relying on
+     the section's text-align left the gap between them at whatever the source
+     whitespace collapsed to. Flex sets it, and lets the longer label drop to
+     its own line on a narrow screen instead of overflowing. */
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
 }
 
 /* — EPK responsive — */
@@ -4292,7 +4307,10 @@ a.show-row[href]{cursor:pointer}
   .epk-section{padding:20pt 0;page-break-inside:avoid;break-inside:avoid}
   .epk-section-title{font-size:12pt;margin-bottom:10pt;padding-bottom:8pt}
   .epk-list li{padding:6pt 0;font-size:10pt}
+  /* Three columns here, so the odd-last-card centering above would strand the
+     fourth member on its own row. Print packs them instead. */
   .members-grid{grid-template-columns:1fr 1fr 1fr;gap:12pt}
+  .members-grid > .member-card{grid-column:auto}
   .member-card{opacity:1!important;transform:none!important}
   .member-right{padding-top:0}
   .member-name{font-size:10pt}

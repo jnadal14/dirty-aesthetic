@@ -185,6 +185,15 @@ def slugify(value):
     return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
 
 
+def parse_aspect(value):
+    """'4 / 5' -> 0.8. Written the way the stylesheet writes it, so the number
+    in the data reads as the box it has to fill."""
+    if not value:
+        return None
+    width, _, height = str(value).partition("/")
+    return float(width) / float(height)
+
+
 def rel(path):
     return str(path.relative_to(ROOT)).replace("\\", "/")
 
@@ -279,16 +288,21 @@ def save_variant(img, out_dir, out_base, jpeg_q, webp_q):
 
 
 def process_raster(src_path, out_dir, out_base, target_width, jpeg_q=82, webp_q=80,
-                   lightbox_width=None):
+                   lightbox_width=None, display_aspect=None):
     """Display-sized variant, plus an optional lightbox-sized one.
 
     Without lightbox_width the manifest's "full" points at the untouched
     original — fine for a build input, ruinous when the lightbox serves it to a
     visitor, since these run 3000x3000 and up (10-24 MB per click).
+
+    `display_aspect` crops the display variant only. The lightbox keeps the
+    whole picture, because cropping to fit a card is a layout decision and the
+    full artwork is the thing someone clicked to see.
     """
     img = Image.open(src_path)
     img = ImageOps.exif_transpose(img)
-    resized = resize_to_width(img, target_width)
+    display = crop_to_aspect(img, display_aspect) if display_aspect else img
+    resized = resize_to_width(display, target_width)
 
     out_src, out_webp, kind = save_variant(resized, out_dir, out_base, jpeg_q, webp_q)
     meta = {
@@ -738,11 +752,17 @@ if shows_path.exists():
             continue
         out_base = slugify(f"{show.get('date', '')}-{show.get('venue', src.stem)}")
         print(f"  {out_base} <= {src.relative_to(SRC)}")
+        # The archive card shows every poster in a 4:5 box, so one that is not
+        # roughly 4:5 letterboxes against the card's own dark ground — most
+        # obvious on a square poster, which gets a bar top and bottom. Setting
+        # posterCardAspect ("W / H") on the show crops the card variant to fill
+        # instead. The lightbox still opens the whole poster.
+        card_aspect = parse_aspect(show.get("posterCardAspect"))
         # Grid thumbnails render about 430px wide in a 3-column layout, and a
         # full-size version is one click away in the lightbox, so these do not
         # need archival quality.
         meta = process_raster(src, OUT_POSTERS, out_base, 900, jpeg_q=78, webp_q=72,
-                              lightbox_width=1600)
+                              lightbox_width=1600, display_aspect=card_aspect)
         poster_manifest[poster_path] = meta
         report(OUT_POSTERS / Path(meta["src"]).name)
         report(OUT_POSTERS / Path(meta["webp"]).name)

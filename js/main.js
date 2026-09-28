@@ -1113,7 +1113,7 @@ const emptyShowsEditorialHtml = `<div class="show-row show-row-empty" role="stat
 // Show posters are replaced in place under the same filename whenever a bill
 // changes, so every one is versioned rather than only whichever show happened
 // to be featured when this was written. Bump it when artwork is swapped.
-const showsAssetVersion = '20260911'
+const showsAssetVersion = '20260928'
 
 function showMediaUrl(path){
   if(!path) return path
@@ -1404,15 +1404,21 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       location.className = 'poster-archive-location'
       location.textContent = show.city || 'Vancouver'
 
-      const lineup = document.createElement('p')
-      lineup.className = 'poster-archive-lineup'
-      const lineupLabel = document.createElement('span')
-      lineupLabel.textContent = show.lineupPrefix === 'with' ? 'With' : 'On the bill'
-      const lineupNames = document.createElement('strong')
-      lineupNames.textContent = show.lineup || 'Lineup details unavailable'
-      lineup.append(lineupLabel, lineupNames)
+      details.append(date, heading, location)
 
-      details.append(date, heading, location, lineup)
+      // A night with no support acts is not a night whose bill went unrecorded,
+      // so it gets no line at all rather than "details unavailable". Shows that
+      // simply have no lineup on file keep the fallback.
+      if(!show.soloBill){
+        const lineup = document.createElement('p')
+        lineup.className = 'poster-archive-lineup'
+        const lineupLabel = document.createElement('span')
+        lineupLabel.textContent = show.lineupPrefix === 'with' ? 'With' : 'On the bill'
+        const lineupNames = document.createElement('strong')
+        lineupNames.textContent = show.lineup || 'Lineup details unavailable'
+        lineup.append(lineupLabel, lineupNames)
+        details.appendChild(lineup)
+      }
       if(show.notes){
         const note = document.createElement('span')
         note.className = 'poster-archive-note'
