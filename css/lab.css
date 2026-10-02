@@ -1,0 +1,245 @@
+/* Motion Lab: styles for lab.html only. Nothing here is loaded by a live page;
+   whatever proves out gets moved into styles.css when it ships.
+
+   Everything that moves animates transform, opacity or clip-path only. Heights
+   that pin to the screen use svh, never dvh: dvh changes as Safari's and
+   Instagram's toolbars slide in and out, so anything sized by it jumps
+   mid-scroll. */
+
+/* The homepage header is fixed, so the pinned demos are tested under it. */
+.lab-page .site-header{position:fixed}
+.lab-page{--hdr:var(--lab-header-h,76px)}
+
+/* A fixed offset, not the measured header height: the measurement lands after
+   first paint and nudged the whole page down a few pixels (a layout shift). */
+.lab{padding:116px 0 80px;overflow-x:clip}
+.lab-intro,
+.lab-demo-head,
+.split-variants{
+  padding-left:calc(16px + env(safe-area-inset-left));
+  padding-right:calc(16px + env(safe-area-inset-right));
+  max-width:1100px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.lab-intro h1{font-size:clamp(44px,9vw,96px);line-height:1;margin:.1em 0 .25em;letter-spacing:.02em}
+.lab-intro > p{max-width:62ch;color:var(--muted)}
+.lab-kicker{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0}
+.lab-reduced-note{border:1px solid var(--accent);padding:12px 14px;border-radius:10px;color:var(--ink)!important}
+.lab-index{list-style:none;padding:0;margin:24px 0;display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.lab-index a{display:flex;gap:10px;align-items:baseline;color:var(--ink);text-decoration:none;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:10px}
+.lab-index a span{color:var(--accent);font-size:13px}
+.lab-index em{margin-left:auto;font-style:normal;font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+
+.lab-btn{
+  font:inherit;font-size:15px;color:var(--ink);background:transparent;cursor:pointer;
+  border:1px solid rgba(240,230,216,.35);border-radius:999px;padding:8px 18px;
+  min-height:44px; /* thumb-sized on every phone */
+}
+.lab-btn[aria-pressed="true"]{background:var(--ink);color:#0a0705;border-color:var(--ink)}
+
+.lab-pill{display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:6px;background:var(--fest-sun);color:#fff;font-size:17px;letter-spacing:.06em;text-transform:uppercase}
+.lab-pill--ghost{background:transparent;border:1px solid rgba(240,230,216,.6);color:var(--ink)}
+
+.lab-demo{margin:96px 0 0}
+.lab-demo-head{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:start;margin-bottom:24px}
+.lab-num{font-size:40px;line-height:1;color:var(--accent)}
+.lab-demo-head h2{margin:0;font-size:clamp(26px,4vw,38px);line-height:1.1}
+.lab-demo-head p{margin:.4em 0 0;color:var(--muted);max-width:68ch;font-size:16px}
+.lab-tags{grid-column:2;list-style:none;margin:6px 0 0;padding:0;display:flex;gap:6px;flex-wrap:wrap}
+.lab-tags li{font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:rgba(176,122,63,.18);color:var(--ink)}
+
+/* ---- split text (shared) ---- */
+/* The readable copy of a split headline, for screen readers only. */
+.lab-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.split-word{display:inline-block;white-space:nowrap}
+.split-char{display:inline-block;will-change:auto}
+/* "Rise" slides letters up out of a mask. Extra room so splatter glyphs and
+   descenders are not clipped by it. */
+.split-mask .split-word{overflow:hidden;padding:.08em .04em .14em;margin:-.08em -.04em -.14em;vertical-align:top}
+
+/* ---- 01 scene stage ---- */
+.scene-stage{
+  position:relative;
+  margin:0 auto;
+  width:min(1100px,calc(100% - 32px));
+  aspect-ratio:16/9;
+  max-height:78svh;
+  border-radius:14px;
+  overflow:hidden;
+  background:#050302;
+  outline:none;
+  touch-action:pan-y; /* vertical swipes still scroll the page */
+}
+.scene-stage:focus-visible{box-shadow:0 0 0 2px var(--accent)}
+.scene{position:absolute;inset:0;display:flex;align-items:flex-end;transform-origin:50% 60%}
+.scene[hidden]{display:flex;visibility:hidden}
+.scene-bg,.scene-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.scene::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.78),rgba(0,0,0,.1) 60%)}
+.scene-copy{position:relative;z-index:1;padding:clamp(18px,4vw,48px)}
+.scene-kicker{margin:0;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-size:clamp(12px,1.4vw,15px)}
+.scene-title{margin:.1em 0 .3em;font-size:clamp(34px,7vw,92px);line-height:1}
+.scene-cta{display:flex;gap:10px;flex-wrap:wrap}
+.scene-controls{position:absolute;right:14px;bottom:14px;z-index:2;display:flex;align-items:center;gap:10px;color:var(--ink);font-size:14px}
+.scene-arrow{width:44px;height:44px;border-radius:50%;border:1px solid rgba(240,230,216,.5);background:rgba(0,0,0,.35);color:var(--ink);font-size:18px;cursor:pointer}
+
+/* ---- 02 split variants ---- */
+.split-variants{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.split-stage{text-align:center;padding:40px 16px 20px}
+.split-title{font-size:clamp(40px,min(13vw,28svh),150px);line-height:.95;margin:0}
+.split-sub{font-size:clamp(18px,2.6vw,26px);color:var(--muted);max-width:30ch;margin:.8em auto 0}
+
+/* ---- 03 pointer depth ---- */
+.depth-frame{perspective:1100px;width:min(1100px,calc(100% - 32px));margin:0 auto}
+.depth-card{
+  position:relative;aspect-ratio:16/9;max-height:78svh;width:100%;
+  border-radius:14px;overflow:hidden;background:#050302;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  transform-style:preserve-3d;touch-action:pan-y;
+}
+.depth-layer{position:relative;z-index:1}
+/* Oversized so shifting it never exposes an edge. */
+.depth-bg{position:absolute;inset:-6%;z-index:0}
+.depth-bg img{width:100%;height:100%;object-fit:cover}
+.depth-shade{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,.15),rgba(0,0,0,.7));z-index:0}
+.depth-logo{width:min(70%,640px);height:auto}
+.depth-caption{margin:0;letter-spacing:.16em;text-transform:uppercase;font-size:clamp(14px,2vw,20px)}
+.depth-caption span{color:var(--accent);margin-right:.4em}
+
+/* ---- 04 deck ---- */
+.deck{position:relative}
+.deck-card{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.deck-card-inner{position:absolute;inset:0;transform-origin:50% 0;border-radius:0;overflow:hidden;background:#050302}
+.deck-bg,.deck-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.deck-card-inner::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.8),rgba(0,0,0,.25) 55%,rgba(0,0,0,.5))}
+.deck-copy{
+  position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+  padding:calc(var(--hdr) + 12px) calc(20px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));
+}
+.deck-copy h3{font-size:clamp(30px,min(9vw,14svh),72px);line-height:1;margin:.2em 0 .1em}
+.deck-copy p{margin:0}
+.deck-kicker{letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-size:14px}
+.deck-wordmark{width:min(86vw,560px);height:auto}
+.deck-cover{width:min(62vw,40svh,340px);height:auto;border-radius:6px;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.deck-date{font-size:clamp(56px,min(22vw,30svh),150px)!important}
+.deck-shade{position:absolute;inset:0;z-index:2;background:#000;opacity:0;pointer-events:none}
+
+/* ---- 05 kinetic ----
+   Display sizes are capped by svh as well as vw: sized by width alone, one
+   word fills a 300px-tall landscape phone screen. */
+.kinetic{padding:40px 0;overflow:hidden}
+.k-line{
+  margin:0;text-align:center;text-transform:uppercase;line-height:.9;
+  font-size:clamp(48px,min(24vw,38svh),240px);
+  transform-origin:50% 100%;
+}
+.k-line--accent{color:var(--fest-sun)}
+.k-marquee-wrap{transform-origin:50% 50%;margin:24px 0;border-top:1px solid rgba(240,230,216,.25);border-bottom:1px solid rgba(240,230,216,.25)}
+.k-marquee{white-space:nowrap;font-size:clamp(22px,6vw,48px);letter-spacing:.08em;text-transform:uppercase;padding:.2em 0;width:max-content}
+
+/* ---- 06 grit ---- */
+.grit{position:relative;height:300vh;height:300svh}
+.grit-screen{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.grit-panel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.grit-bg,.grit-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.grit-panel::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.42)}
+.grit-title.is-glitching{text-shadow:4px 0 rgba(234,57,42,.85),-4px 0 rgba(0,190,255,.7)}
+.grit-title{
+  position:relative;z-index:1;margin:0;padding:0 20px;text-align:center;text-transform:uppercase;
+  font-size:clamp(36px,min(13vw,22svh),140px);line-height:.95;
+  text-shadow:0 4px 30px rgba(0,0,0,.6);
+}
+/* Film grain: one static noise tile, moved in steps on the compositor. Never a
+   per-frame filter. */
+.grit-grain{
+  position:absolute;inset:-50%;z-index:5;pointer-events:none;opacity:.14;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:lab-grain .5s steps(4) infinite;
+}
+@keyframes lab-grain{
+  0%{transform:translate(0,0)}
+  25%{transform:translate(-4%,3%)}
+  50%{transform:translate(3%,-5%)}
+  75%{transform:translate(-2%,-2%)}
+  100%{transform:translate(0,0)}
+}
+
+/* ---- 07 record ---- */
+.lp{position:relative;height:220vh;height:220svh}
+.lp-screen{
+  position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+  padding-top:var(--hdr);
+}
+.lp-object{position:relative;width:min(64vw,46svh,420px);aspect-ratio:1}
+.lp-sleeve{position:relative;z-index:1;width:100%;height:100%;display:block;border-radius:4px;box-shadow:0 30px 70px rgba(0,0,0,.7)}
+.lp-disc{
+  position:absolute;inset:3%;border-radius:50%;z-index:0;
+  background:
+    radial-gradient(circle,transparent 0 31%,rgba(255,255,255,.07) 31.5% 32%,transparent 32.5%),
+    repeating-radial-gradient(circle,#0b0b0b 0 1.6px,#1c1c1c 1.6px 2.6px);
+  box-shadow:0 20px 50px rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;
+}
+/* The sheen reads as the record turning; it rotates with the disc. */
+.lp-disc::before{content:'';position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 20deg,transparent 0 10%,rgba(255,255,255,.12) 14%,transparent 20% 60%,rgba(255,255,255,.08) 64%,transparent 70%)}
+.lp-label{width:32%;height:32%;border-radius:50%;object-fit:cover;position:relative}
+.lp-copy{text-align:center}
+.lp-copy h3{margin:.1em 0;font-size:clamp(34px,8vw,64px);line-height:1}
+.lp-copy p{margin:0;color:var(--muted)}
+.lp-flag{color:var(--fest-sun)!important;letter-spacing:.16em;text-transform:uppercase;font-size:14px}
+
+/* ---- 08 flip grid ---- */
+.flip-grid{
+  display:grid;gap:clamp(14px,3vw,28px);
+  grid-template-columns:repeat(auto-fill,minmax(min(42vw,220px),1fr));
+  width:min(1100px,calc(100% - 32px));margin:0 auto;
+}
+.flip-card{perspective:900px}
+.flip-tilt{transform-style:preserve-3d}
+.flip-inner{position:relative;aspect-ratio:1;transform-style:preserve-3d}
+.flip-face{
+  position:absolute;inset:0;border-radius:8px;
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;
+}
+/* backface-visibility is only a hint here: js/lab.js hides whichever face is
+   turned away, because some WebKit builds ignore the property. */
+.flip-front{padding:0;border:0;background:#111;cursor:pointer;display:block;width:100%;height:100%}
+.flip-front img{width:100%;height:100%;object-fit:cover;display:block;border-radius:8px}
+.flip-back{
+  transform:rotateY(180deg);background:#140d08;border:1px solid rgba(176,122,63,.5);
+  display:flex;flex-direction:column;justify-content:center;gap:8px;padding:14px;text-align:center;
+}
+.flip-back h3{margin:0;font-size:clamp(18px,3.4vw,24px);line-height:1.1}
+.flip-back p{margin:0;color:var(--muted);font-size:14px}
+.flip-back a{color:#fff;background:#1db954;border-radius:999px;padding:10px 14px;text-decoration:none;font-size:15px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.flip-close{font:inherit;font-size:14px;background:none;border:0;color:var(--muted);cursor:pointer;min-height:44px;text-decoration:underline}
+.flip-caption{margin:10px 0 0;font-size:16px;text-align:center}
+
+/* ---- frame meter ---- */
+.fps-meter{
+  position:fixed;left:calc(12px + env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom));z-index:2000;
+  background:rgba(0,0,0,.8);color:#7fd07f;font:13px/1 ui-monospace,Menlo,monospace;padding:8px 10px;border-radius:8px;border:1px solid #333;
+}
+.fps-meter.is-bad{color:#ff8080}
+
+/* ---- flow mode ----
+   js/lab.js puts .lab-flow on <html> for short landscape phones (about
+   300-430px tall once the browser and header take their share, which leaves
+   almost nothing to read on a pinned full-screen card) and for reduced motion
+   (where a pinned stack would only ever show its top layer). The pinned demos
+   become plain scrolling sections. */
+.lab-flow .deck-card,.lab-flow .grit-screen,.lab-flow .lp-screen{position:relative;height:auto;min-height:100svh}
+.lab-flow .deck-card-inner{position:relative;min-height:100svh}
+.lab-flow .grit,.lab-flow .lp{height:auto}
+.lab-flow .grit-panel{position:relative;min-height:100svh}
+
+@media (orientation:landscape) and (max-height:500px){
+  .lp-screen{flex-direction:row;padding:calc(var(--hdr) + 12px) 24px 24px}
+  .lp-object{width:min(36vw,70svh)}
+  .scene-stage,.depth-card{max-height:none;aspect-ratio:auto;height:calc(100svh - var(--hdr) - 24px)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .grit-grain{animation:none}
+}

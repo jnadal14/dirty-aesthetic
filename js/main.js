@@ -113,6 +113,10 @@ window.addEventListener('beforeprint', () => {
 ;(function scrollMotion(){
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
   const spatialMotion = window.matchMedia('(min-width: 1081px) and (min-height: 680px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)')
+  // Section snapping (see refreshState): touch screens, but not a phone held
+  // sideways, which is too short for a section to fill and still be read.
+  const touchScreen = window.matchMedia('(pointer: coarse)')
+  const shortLandscape = window.matchMedia('(orientation: landscape) and (max-height: 500px)')
 
   const chapters = Array.from(document.querySelectorAll('[data-scroll-chapter]'))
 
@@ -124,20 +128,19 @@ window.addEventListener('beforeprint', () => {
     { selector: 'body:not(.music-page-bg) .page', speed: 0.03 }
   ]
 
-  const cameraPaths = [
-    { x:0, y:0, scale:1, rotate:0, origin:'center center' },
-    { x:14, y:11, scale:.78, rotate:2.4, origin:'left bottom' },
-    { x:-14, y:8, scale:.82, rotate:-2.2, origin:'right bottom' },
-    { x:0, y:12, scale:.68, rotate:.4, origin:'center bottom' },
-    { x:16, y:-2, scale:.84, rotate:1.8, origin:'left center' },
-    { x:-15, y:10, scale:.76, rotate:-1.7, origin:'right bottom' },
-    { x:0, y:14, scale:.7, rotate:.7, origin:'center bottom' }
-  ]
+  // Spatial hand-over: the incoming section slides straight up from the bottom
+  // with the scroll, over the outgoing one, which is held at the top of the
+  // viewport (the scroll underneath still moves, which keeps the wheel engine
+  // and anchors honest) and sinks back and darkens as it is covered. Progress
+  // comes from the scroll position, so the same pose plays forwards or in
+  // reverse.
+  const STAGE_OUT = { scale: .9, opacity: .25 }   // where a covered section ends up
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
   const ease = value => value * value * (3 - 2 * value)
 
   let spatialEnabled = false
+  let snapEnabled = false
   let parallaxEnabled = false
   let frame = 0
   let frameRequestedAt = 0
@@ -303,9 +306,18 @@ window.addEventListener('beforeprint', () => {
     const start = performance.now()
     if (arm) animatingUntil = start + SECTION_DURATION
 
+    // Once Motion has loaded it supplies a spring for the curve (see
+    // sectionSpring in the Motion block below): the section lands with a slight
+    // settle instead of an even ease. It runs a little longer than
+    // SECTION_DURATION, but is visually home by then, so the input deadline
+    // stays where it was. Until Motion arrives the original curve is used.
+    const spring = window.__sectionSpring
+    const duration = spring ? spring.duration : SECTION_DURATION
+    const curve = spring ? spring.ease : easeInOutCubic
+
     const step = (now) => {
-      const t = Math.min(1, (now - start) / SECTION_DURATION)
-      window.scrollTo(0, Math.round(from + distance * easeInOutCubic(t)))
+      const t = Math.min(1, (now - start) / duration)
+      window.scrollTo(0, Math.round(from + distance * curve(t)))
       tweenFrame = t < 1 ? requestAnimationFrame(step) : 0
     }
     tweenFrame = requestAnimationFrame(step)
@@ -455,6 +467,12 @@ window.addEventListener('beforeprint', () => {
     }
     const section = chapters[clamp(index, 0, chapters.length - 1)]
     if (!section) return
+    // Under snapping only the browser's own smooth scroll knows where the snap
+    // points are; Lenis animating the scroll position would fight them.
+    if (snapEnabled) {
+      section.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth' })
+      return
+    }
     const top = index === 0 ? 0 : (chapterMetrics[index]?.top ?? section.offsetTop)
     if (window.__lenis) window.__lenis.scrollTo(top, { duration: 1.05 })
     else window.scrollTo({ top, behavior: reduceMotion.matches ? 'auto' : 'smooth' })
@@ -493,10 +511,23 @@ window.addEventListener('beforeprint', () => {
       document.body.style.setProperty('--home-header-h', `${Math.round(headerEl.offsetHeight)}px`)
     }
 
-    chapterMetrics = chapters.map(section => ({
-      top: section.offsetTop,
-      height: section.offsetHeight
-    }))
+    // Natural positions, not where things currently sit. In the torn-paper
+    // layout (Motion block below) sections are sticky, and a stuck element's
+    // offsetTop reports where it is pinned — measured mid-page, every link
+    // to a section would aim at the wrong place.
+    // Margins count too: the torn edges overlap each section onto the one
+    // before it with a negative margin.
+    const margins = el => {
+      const style = getComputedStyle(el)
+      return (parseFloat(style.marginTop) || 0) + (parseFloat(style.marginBottom) || 0)
+    }
+    chapterMetrics = chapters.map(section => {
+      let top = section.parentElement.offsetTop + (parseFloat(getComputedStyle(section).marginTop) || 0)
+      for (let el = section.parentElement.firstElementChild; el && el !== section; el = el.nextElementSibling) {
+        top += el.offsetHeight + margins(el)
+      }
+      return { top, height: section.offsetHeight }
+    })
 
     // Stops the wheel steps between. The footer sits after <main>, so add the
     // page bottom as a final stop or it becomes unreachable once JS owns the
@@ -542,26 +573,28 @@ window.addEventListener('beforeprint', () => {
       const flowTop = metrics.top - scrollY
 
       if (spatialEnabled) {
-        const path = cameraPaths[index] || cameraPaths[cameraPaths.length - 1]
         const hasNext = index + 1 < chapters.length
         const nextFlowTop = hasNext ? chapterMetrics[index + 1].top - scrollY : viewportHeight
-        const entry = ease(clamp(1 - flowTop / viewportHeight, 0, 1))
-        const exit = hasNext ? ease(clamp(1 - nextFlowTop / viewportHeight, 0, 1)) : 0
-        const entryRemaining = 1 - entry
-        const exitDirection = index % 2 === 0 ? -1 : 1
-        const x = path.x * entryRemaining + exitDirection * 6 * exit
-        const y = path.y * entryRemaining - 3.5 * exit
-        const scale = 1 - (1 - path.scale) * entryRemaining - .1 * exit
-        const rotate = path.rotate * entryRemaining + exitDirection * 1.1 * exit
-        const opacity = 1 - .28 * entryRemaining - .22 * exit
+        // How far the NEXT section has come up over this one, 0 to 1. The
+        // incoming section itself needs nothing: the scroll slides it up.
+        const leaving = hasNext && nextFlowTop > 0 && nextFlowTop < viewportHeight
+        let scale = 1, opacity = 1, hold = 0
 
-        // One string write instead of four, and both properties are
-        // compositor-only. The previous version also animated blur(),
-        // brightness() and border-radius here — a filter pass plus a re-clip
-        // on five stacked full-viewport layers, every single frame.
-        section.style.setProperty('--scene-transform',
-          `translate3d(${x.toFixed(3)}vw, ${y.toFixed(3)}vh, 0) rotate(${rotate.toFixed(3)}deg) scale(${scale.toFixed(4)})`)
-        section.style.setProperty('--scene-opacity', opacity.toFixed(3))
+        if (leaving) {
+          const covered = ease(1 - nextFlowTop / viewportHeight)
+          scale = 1 - (1 - STAGE_OUT.scale) * covered
+          opacity = 1 - (1 - STAGE_OUT.opacity) * covered
+          hold = -flowTop
+        }
+
+        // `hold` cancels the scroll so the covered section stays at the top of
+        // the viewport for the whole hand-over. It goes on the section itself,
+        // not its inner scene, because the photo backdrops are painted on the
+        // section box. One string write per section, compositor-only properties.
+        section.style.setProperty('--stage-transform', hold || scale !== 1
+          ? `translate3d(0, ${hold.toFixed(1)}px, 0) scale(${scale.toFixed(4)})`
+          : 'none')
+        section.style.setProperty('--stage-opacity', opacity.toFixed(3))
       } else {
         const sectionCenter = flowTop + metrics.height / 2
         const normalized = clamp((sectionCenter - viewportHeight / 2) / (viewportHeight * .9), -1, 1)
@@ -652,6 +685,16 @@ window.addEventListener('beforeprint', () => {
 
     document.body.classList.toggle('spatial-scroll-active', spatialEnabled)
 
+    // On touch screens every other layout snaps section by section: each fills
+    // the screen and one swipe moves exactly one, so a hard fling cannot carry
+    // past a section unseen. A section longer than the screen (the album's
+    // tracklist, the contact form) still scrolls through its content before
+    // the next one snaps in — browsers let you scroll freely inside a snap
+    // area taller than the screen. CSS does the snapping (styles.css,
+    // .snap-sections); the class has to be on <html>, the element that scrolls.
+    snapEnabled = chapters.length > 0 && !spatialEnabled && touchScreen.matches && !shortLandscape.matches
+    document.documentElement.classList.toggle('snap-sections', snapEnabled)
+
     // The root element's scroll-behavior has to be auto while the engine owns
     // the wheel. The two-argument window.scrollTo() the tween calls every frame
     // resolves to the computed scroll-behavior, so with `smooth` in effect each
@@ -684,12 +727,12 @@ window.addEventListener('beforeprint', () => {
       lastLiveIndex = -1
     }
 
-    chapters.forEach((section, index) => {
-      section.style.zIndex = spatialEnabled ? String(index + 1) : ''
-      // transform-origin is fixed per chapter — no reason to rewrite it 120
-      // times a second along with the animated values.
-      const path = cameraPaths[index] || cameraPaths[cameraPaths.length - 1]
-      section.style.setProperty('--scene-origin', path.origin)
+    chapters.forEach(section => {
+      section.style.zIndex = spatialEnabled ? String(chapters.indexOf(section) + 1) : ''
+      if (!spatialEnabled) {
+        section.style.removeProperty('--stage-transform')
+        section.style.removeProperty('--stage-opacity')
+      }
     })
 
     measure()
@@ -725,6 +768,8 @@ window.addEventListener('beforeprint', () => {
   })
   if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', refreshState)
   if (spatialMotion.addEventListener) spatialMotion.addEventListener('change', refreshState)
+  if (touchScreen.addEventListener) touchScreen.addEventListener('change', refreshState)
+  if (shortLandscape.addEventListener) shortLandscape.addEventListener('change', refreshState)
 
   // Late-loading images change section offsets; re-measure once they settle
   // rather than re-reading layout on every frame to stay correct.
@@ -794,7 +839,11 @@ function bindVideoScrollLink(){
     if(link.dataset.videoScrollBound) return
     link.dataset.videoScrollBound = 'true'
     link.addEventListener('click', (e) => {
+      // The section engine owns this on the spatial layout, and under
+      // snapping the plain anchor jump lands on the video's snap point, which
+      // is already the composed screen this handler exists to produce.
       if(document.body.classList.contains('spatial-scroll-active')) return
+      if(document.documentElement.classList.contains('snap-sections')) return
       const section = document.getElementById('modern-nostalgia-video-section')
       if(!section) return
       e.preventDefault()
@@ -1004,6 +1053,97 @@ bindIrrationalScrollLinks()
 
   observeReveal()
   window.__observeReveal = observeReveal
+})()
+
+// ===== Hero timelapse =====
+// The homepage hero's background is a 1.9s looping timelapse. What paints
+// first is its first frame (the section's CSS background, preloaded in
+// index.html), and the video only starts once the page has loaded, so it never
+// competes with that first paint or with the logo. It fades in only once it is
+// actually playing, over an identical frame, so the switch is invisible except
+// for the motion starting.
+//
+// Left as the still: under reduced motion; when the visitor has asked to save
+// data or is on a 2G-class connection (a looping video is pure decoration);
+// and whenever the browser refuses to autoplay — iOS low power mode does — in
+// which case play() rejects and nothing else happens. Off screen it pauses,
+// so it costs nothing while the rest of the page is being read.
+;(function heroVideo(){
+  const video = document.querySelector('.hero-video')
+  if (!video) return
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const connection = navigator.connection
+  if (connection && (connection.saveData || /(^|-)2g$/.test(connection.effectiveType || ''))) return
+
+  const phone = window.matchMedia('(max-width: 640px)')
+  const hero = video.closest('section') || video.parentElement
+  let started = false
+  let onScreen = true
+
+  const sourceFor = () => (phone.matches ? video.dataset.srcMobile : video.dataset.src)
+  const play = () => { if (onScreen) video.play().catch(() => {}) }
+
+  video.addEventListener('playing', () => video.classList.add('is-playing'))
+
+  function start(){
+    if (started) return
+    started = true
+    video.src = sourceFor()
+    video.preload = 'auto'
+    play()
+  }
+
+  // Load, or 2.5s in, whichever comes first: on a slow phone `load` also waits
+  // for images further down the page, and the hero should not wait for those.
+  if (document.readyState === 'complete') start()
+  else {
+    window.addEventListener('load', start, { once: true })
+    setTimeout(start, 2500)
+  }
+
+  // Rotating past the phone breakpoint swaps to the matching cut.
+  phone.addEventListener('change', () => {
+    if (!started) return
+    video.classList.remove('is-playing')
+    video.src = sourceFor()
+    play()
+  })
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(entries => {
+      onScreen = entries[0].isIntersecting
+      if (!started) return
+      if (onScreen) play()
+      else video.pause()
+    }).observe(hero)
+  }
+})()
+
+// ===== Deferred section backgrounds =====
+// A CSS background on a section downloads as soon as the stylesheet applies,
+// however far down the page the section is — every visitor would pay for the
+// video section's photo while still looking at the hero. Elements marked
+// data-lazy-bg get .bg-ready, which is what the stylesheet hangs the image on,
+// once they are within three quarters of a screen of the viewport, so the
+// photo is fetched in time to be there when the section arrives and never
+// sooner. Not a full screen: on the desktop slides every section is exactly
+// one screen tall, so a full screen of margin touches the section two slides
+// down at load, and a touching edge counts as intersecting.
+;(function lazyBackgrounds(){
+  const targets = document.querySelectorAll('[data-lazy-bg]')
+  if (!targets.length) return
+  if (!('IntersectionObserver' in window)) {
+    targets.forEach(el => el.classList.add('bg-ready'))
+    return
+  }
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return
+      entry.target.classList.add('bg-ready')
+      observer.unobserve(entry.target)
+    })
+  }, { rootMargin: '75% 0px' })
+  targets.forEach(el => observer.observe(el))
 })()
 
 // ===== Release streaming links =====
@@ -1716,9 +1856,15 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   if(!galleryRoot && !lineupPhotos.length) return
 
   const EPK_ASSET_VERSION = '20260914-small'
-  const GALLERY_EAGER = 6
+  // No photo is fetched with the page. The gallery sits far below the fold,
+  // and the six "eager" ones (three at high priority) were competing with the
+  // top of the page for bandwidth on every visit, including the ones that
+  // never scroll that far. Each photo starts loading once it is a screen and
+  // a half away, measured from the viewport rather than a fixed 500px, so it
+  // is ready by the time it arrives on a phone or a large monitor alike.
+  const GALLERY_EAGER = 0
   const GALLERY_SIZES = '(min-width:769px) 31vw, 50vw'
-  const LAZY_ROOT_MARGIN = '500px 0px'
+  const LAZY_ROOT_MARGIN = '150% 0px'
   const IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
   function versionAsset(path){
@@ -1839,7 +1985,11 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
         revealGallery(root)
         observer.disconnect()
       })
-    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' })
+    // As soon as the top edge of the gallery reaches the screen. A threshold
+    // here is a fraction of the WHOLE gallery — about 8,000px tall — so the
+    // old 8% left roughly 640px of empty space under the heading before
+    // anything appeared.
+    }, { threshold: 0, rootMargin: '0px 0px -5% 0px' })
     observer.observe(root)
   }
 
@@ -1965,4 +2115,330 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   }).catch(() => {
     if(galleryRoot) galleryRoot.innerHTML = '<p class="epk-gallery-fallback">Gallery photos loading soon.</p>'
   })
+})()
+
+// ===== Motion =====
+// vendor/motion.min.js (motion.dev, MIT) drives the effects below. It is 48 KB
+// gzipped, so it is fetched only on pages that use it, and only after the
+// page's own `load` — it never competes with the hero image for bandwidth.
+// Everything here is an enhancement: until Motion arrives, or if it never
+// does, the page looks and works exactly as it did without it. Under reduced
+// motion none of it runs.
+//
+// What lives here, and where it applies:
+//  - the spring the desktop section engine eases with   (homepage, spatial)
+//  - scatter-in section headlines, once each            (home, music, EPK)
+//  - pointer depth on the wordmark logo                  (home hero, EPK intro; mouse only)
+//  - record sliding out of the album sleeve              (music)
+//  - covers that toss in and flip over for details      (music)
+//  - torn edges on the EPK divider photo                 (EPK)
+;(function motionEffects(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const wanted = document.querySelector('[data-scroll-chapter], .music-feature, .release-grid, .epk-page')
+  if (!wanted) return
+
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v))
+  const rand = (min, max) => min + Math.random() * (max - min)
+  const spring = (visualDuration, bounce) => ({ type: 'spring', visualDuration, bounce })
+  // Entrances animate one `transform` string rather than separate x / y /
+  // rotate / scale values. Motion runs a transform string through the
+  // browser's own animation engine (the spring becomes a linear() easing), so
+  // it plays on the compositor and cannot hold up scrolling; separate values
+  // are recomputed in JavaScript on every frame.
+  const pose = (x, y, rotate, scale) => `translate(${x}, ${y}) rotate(${rotate}deg) scale(${scale})`
+  const REST = pose('0px', '0px', 0, 1)
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)')
+
+  function loadMotion(){
+    if (window.Motion) return Promise.resolve(window.Motion)
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = 'vendor/motion.min.js'
+      script.async = true
+      script.onload = () => (window.Motion ? resolve(window.Motion) : reject(new Error('Motion missing')))
+      script.onerror = reject
+      document.head.appendChild(script)
+    })
+  }
+
+  // A deterministic ragged edge, so the EPK divider keeps the same tear every
+  // visit and every resize rather than reshuffling.
+  function raggedEdge(seed, points, depth){
+    let s = seed * 9301 + 49297
+    const next = () => { s = (s * 9301 + 49297) % 233280; return s / 233280 }
+    return Array.from({ length: points + 1 }, (_, k) => ({ x: k / points * 100, y: next() * depth }))
+  }
+  const bothTears = (seed, depth = 16) => {
+    const top = raggedEdge(seed, 28, depth).map(p => `${p.x.toFixed(2)}% ${p.y.toFixed(1)}px`)
+    const bottom = raggedEdge(seed + 7, 28, depth).reverse().map(p => `${p.x.toFixed(2)}% calc(100% - ${p.y.toFixed(1)}px)`)
+    return `polygon(${top.join(',')},${bottom.join(',')})`
+  }
+
+  // Splits a heading into per-letter spans. Screen readers get the text once
+  // from a visually hidden copy; the letters are hidden from them, because read
+  // as separate elements a headline is spelled out letter by letter. Motion's
+  // own splitText is part of its paid tier, and this needs very little of it.
+  function splitLetters(el){
+    const text = el.textContent.trim().replace(/\s+/g, ' ')
+    el.textContent = ''
+    const label = document.createElement('span')
+    label.className = 'visually-hidden'
+    label.textContent = text
+    el.appendChild(label)
+    const letters = []
+    text.split(' ').forEach((word, i, words) => {
+      const w = document.createElement('span')
+      w.className = 'split-word'
+      w.setAttribute('aria-hidden', 'true')
+      for (const ch of Array.from(word)) {
+        const c = document.createElement('span')
+        c.className = 'split-char'
+        c.textContent = ch
+        w.appendChild(c)
+        letters.push(c)
+      }
+      el.appendChild(w)
+      if (i < words.length - 1) el.appendChild(document.createTextNode(' '))
+    })
+    return letters
+  }
+
+  const features = []
+
+  // ---- Section engine spring (desktop homepage) ----
+  // Sampled once into a plain easing function the engine can call per frame.
+  // No bounce: any overshoot carries the whole page a few pixels past the
+  // section and back, which reads as a jolt on landing, not as weight.
+  features.push(M => {
+    if (!document.querySelector('[data-scroll-chapter]')) return
+    const generator = M.spring({ keyframes: [0, 1], visualDuration: .62, bounce: 0 })
+    const duration = M.calcGeneratorDuration ? M.calcGeneratorDuration(generator) : 1000
+    window.__sectionSpring = {
+      duration,
+      ease: t => (t >= 1 ? 1 : generator.next(t * duration).value)
+    }
+  })
+
+  // ---- Scatter-in headlines (once each) ----
+  // Only the main heading of each section. Body copy, buttons and track lists
+  // keep their quieter fades, so the page never has everything flying at once.
+  features.push(M => {
+    const headings = Array.from(document.querySelectorAll([
+      '.album-tracklist-copy h2', '.video-feature-title', '#shows-feature-heading',
+      '.ep-release-title', '.home-contact h2',
+      '.music-header h1', '.music-catalog-heading',
+      '.epk-section-title'
+    ].join(',')))
+    headings.forEach(heading => {
+      // Already on screen by the time Motion arrived: it has had its
+      // entrance, so leave it alone rather than make it play twice.
+      const box = heading.getBoundingClientRect()
+      if (box.top < window.innerHeight && box.bottom > 0) return
+      // Take the heading over from the CSS fade so the two do not fight.
+      heading.classList.remove('reveal')
+      heading.style.opacity = '0'
+      M.inView(heading, () => {
+        // Split at the last moment: the shows heading's text comes from data
+        // and may have changed since the page loaded.
+        const letters = splitLetters(heading)
+        letters.forEach(c => { c.style.opacity = '0' })
+        heading.style.opacity = ''
+        letters.forEach((c, i) => M.animate(c,
+          { opacity: [0, 1], transform: [pose(`${rand(-90, 90).toFixed(0)}px`, `${rand(-70, 70).toFixed(0)}px`, rand(-70, 70).toFixed(0), rand(.5, 1.5).toFixed(2)), REST] },
+          { ...spring(.8, .3), delay: i * .022 }))
+      }, { amount: .6 })
+    })
+  })
+
+  // ---- Wordmark depth (mouse only) ----
+  // Only the logo moves — the photo behind it stays put. It tilts toward the
+  // cursor and drifts a few pixels, eased by a spring so it trails the hand.
+  features.push(M => {
+    if (!finePointer.matches) return
+    const pairs = [['.hero-logo', '.hero'], ['.epk-logo', '.epk-intro']]
+    pairs.forEach(([logoSel, areaSel]) => {
+      const logo = document.querySelector(logoSel)
+      const area = document.querySelector(areaSel)
+      if (!logo || !area) return
+      const px = M.motionValue(0), py = M.motionValue(0)
+      const sx = M.springValue(px, { stiffness: 110, damping: 18, mass: .7 })
+      const sy = M.springValue(py, { stiffness: 110, damping: 18, mass: .7 })
+      const render = () => {
+        const x = sx.get(), y = sy.get()
+        logo.style.transform = `perspective(900px) translate3d(${(x * 14).toFixed(1)}px, ${(y * 10).toFixed(1)}px, 0) rotateX(${(-y * 9).toFixed(2)}deg) rotateY(${(x * 12).toFixed(2)}deg)`
+      }
+      sx.on('change', render)
+      sy.on('change', render)
+      area.addEventListener('pointermove', e => {
+        const r = area.getBoundingClientRect()
+        px.set(clamp((e.clientX - r.left) / r.width * 2 - 1, -1, 1))
+        py.set(clamp((e.clientY - r.top) / r.height * 2 - 1, -1, 1))
+      })
+      area.addEventListener('pointerleave', () => { px.set(0); py.set(0) })
+    })
+  })
+
+  // ---- Record pull-out (music page) ----
+  // The record is added here rather than in the HTML: it is pure decoration,
+  // and without Motion the cover stands on its own as it always has. It slides
+  // out of the sleeve once, then turns with the page as you scroll.
+  features.push(M => {
+    const art = document.querySelector('.music-feature-art')
+    if (!art) return
+    const cover = art.querySelector('img')
+    const stage = document.createElement('div')
+    stage.className = 'record-stage'
+    const disc = document.createElement('div')
+    disc.className = 'record-disc'
+    disc.setAttribute('aria-hidden', 'true')
+    const vinyl = document.createElement('div')
+    vinyl.className = 'record-vinyl'
+    const label = document.createElement('img')
+    label.className = 'record-label'
+    label.src = cover.currentSrc || cover.src
+    label.alt = ''
+    label.decoding = 'async'
+    vinyl.appendChild(label)
+    disc.appendChild(vinyl)
+    art.parentNode.insertBefore(stage, art)
+    stage.append(disc, art)
+
+    M.animate(art, { transform: [pose('0px', '0px', -6, .92), REST] }, spring(.8, .25))
+    M.animate(stage, { transform: ['translateX(0%)', 'translateX(-16%)'] }, { ...spring(1.1, .15), delay: .25 })
+    M.animate(disc, { transform: ['translateX(0%)', 'translateX(40%)'] }, { ...spring(1.1, .18), delay: .25 })
+    M.animate(vinyl, { transform: ['rotate(0deg)', 'rotate(320deg)'] }, { duration: 1.6, ease: [.16, 1, .3, 1], delay: .25 })
+      .then(() => {
+        // Then the record keeps turning with the page.
+        M.scroll(M.animate(vinyl, { transform: ['rotate(320deg)', 'rotate(860deg)'] }, { ease: 'linear' }),
+          { target: stage, offset: ['start start', 'end start'] })
+      })
+  })
+
+  // ---- Cover flips (music page) ----
+  // Each release cover becomes a card that turns over to show the release
+  // date and a listen link. The caption under the cover stays exactly as it
+  // was. Without Motion the cover is still the plain link it always was.
+  features.push(M => {
+    const releases = Array.from(document.querySelectorAll('.release-grid .release'))
+    if (!releases.length) return
+
+    releases.forEach(release => {
+      const link = release.querySelector('.release-link')
+      const picture = link && link.querySelector('picture')
+      const title = release.querySelector('h3')
+      const meta = release.querySelector('p')
+      if (!link || !picture || !title) return
+      const name = title.textContent.trim()
+      const service = /spotify/.test(link.hostname) ? 'Spotify' : link.hostname.replace(/^www\./, '')
+
+      const tilt = document.createElement('div')
+      tilt.className = 'flip-tilt'
+      const inner = document.createElement('div')
+      inner.className = 'flip-inner'
+      const front = document.createElement('button')
+      front.type = 'button'
+      front.className = 'flip-face flip-front'
+      front.setAttribute('aria-pressed', 'false')
+      front.setAttribute('aria-label', `Show details for ${name}`)
+      front.appendChild(picture)
+      const back = document.createElement('div')
+      back.className = 'flip-face flip-back'
+      back.inert = true
+      back.innerHTML = `<p class="flip-back-title"></p><p class="flip-back-meta"></p><a target="_blank" rel="noopener"></a><button type="button" class="flip-close">Flip back</button>`
+      back.querySelector('.flip-back-title').textContent = name
+      back.querySelector('.flip-back-meta').innerHTML = meta ? meta.innerHTML : ''
+      const listen = back.querySelector('a')
+      listen.href = link.href
+      listen.textContent = `Listen on ${service}`
+      inner.append(front, back)
+      tilt.appendChild(inner)
+      link.replaceWith(tilt)
+      release.classList.add('flip-card')
+
+      // The face turned away is hidden by script as the card passes 90°.
+      // backface-visibility alone is not reliable across WebKit builds — some
+      // show the back mirrored straight through the front.
+      const angle = M.motionValue(0)
+      let focusNext = null
+      back.style.visibility = 'hidden'
+      angle.on('change', v => {
+        inner.style.transform = `rotateY(${v.toFixed(2)}deg)`
+        const backUp = Math.abs(v % 360) > 90 && Math.abs(v % 360) < 270
+        front.style.visibility = backUp ? 'hidden' : ''
+        back.style.visibility = backUp ? 'visible' : 'hidden'
+        // Focus follows the card over once the new face is showing; a hidden
+        // element cannot take it.
+        if (focusNext && (focusNext === front) !== backUp) {
+          focusNext.focus({ preventScroll: true })
+          focusNext = null
+        }
+      })
+      function flip(open){
+        front.setAttribute('aria-pressed', String(open))
+        back.inert = !open
+        front.inert = open
+        focusNext = open ? listen : front
+        M.animate(angle, open ? 180 : 0, { type: 'spring', stiffness: 170, damping: 18 })
+      }
+      front.addEventListener('click', () => flip(true))
+      back.querySelector('.flip-close').addEventListener('click', () => flip(false))
+
+      // A squash under the thumb on press.
+      M.press(tilt, () => {
+        M.animate(tilt, { scale: .95 }, spring(.2, .3))
+        return () => M.animate(tilt, { scale: 1 }, spring(.35, .5))
+      })
+
+      // With a mouse, the cover leans toward the cursor.
+      if (finePointer.matches) {
+        release.addEventListener('pointermove', e => {
+          const r = tilt.getBoundingClientRect()
+          const x = (e.clientX - r.left) / r.width - .5
+          const y = (e.clientY - r.top) / r.height - .5
+          M.animate(tilt, { rotateY: x * 16, rotateX: -y * 16 }, { type: 'spring', stiffness: 300, damping: 25 })
+        })
+        release.addEventListener('pointerleave', () => {
+          M.animate(tilt, { rotateY: 0, rotateX: 0 }, { type: 'spring', stiffness: 200, damping: 18 })
+        })
+      }
+    })
+
+    // Covers still below the fold toss in as they arrive, staggered across
+    // each row. Ones already revealed are left as they are.
+    const grid = document.querySelector('.release-grid')
+    const columns = getComputedStyle(grid).gridTemplateColumns.split(' ').length || 1
+    releases.forEach((release, i) => {
+      if (release.classList.contains('in-view')) return
+      release.classList.remove('reveal-scale')
+      release.style.opacity = '0'
+      M.inView(release, () => {
+        M.animate(release,
+          { opacity: [0, 1], transform: [pose('0px', '60px', rand(-10, 10).toFixed(1), .75), REST] },
+          { ...spring(.7, .35), delay: (i % columns) * .07 })
+      }, { amount: .25 })
+    })
+  })
+
+  // ---- Torn divider photo (EPK) ----
+  // The band photo between the bio and the members gets ragged top and bottom
+  // edges, and pushes in slightly as it crosses the screen.
+  features.push(M => {
+    const divider = document.querySelector('.epk-divider-photo')
+    if (!divider) return
+    divider.style.clipPath = bothTears(3)
+    divider.classList.add('is-torn')
+    const img = divider.querySelector('img')
+    if (img) M.scroll(M.animate(img, { transform: ['scale(1.18)', 'scale(1)'] }, { ease: 'linear' }),
+      { target: divider, offset: ['start end', 'end start'] })
+  })
+
+  function start(){
+    loadMotion().then(M => {
+      features.forEach(feature => {
+        try { feature(M) } catch (err) { console.error('[motion]', err) }
+      })
+    }).catch(err => console.error('[motion] not loaded', err))
+  }
+  if (document.readyState === 'complete') start()
+  else window.addEventListener('load', start, { once: true })
 })()

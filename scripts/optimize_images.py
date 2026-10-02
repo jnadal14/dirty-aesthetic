@@ -10,13 +10,14 @@ Gallery: numbered files 1.jpg, 2.png, … in assets/images/GALLERY/.
 """
 
 import json
+import os
 import re
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
 
-from PIL import Image, ImageFilter, ImageOps
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 # Full-resolution masters live in _source/ and are never committed; assets/
@@ -435,6 +436,100 @@ if _album_master.exists():
         report(_variant_webp)
 else:
     print(f"  SKIP modern-nostalgia-album-bg (missing {_album_master_name})")
+
+# Homepage hero: a 1.9s looping timelapse from a show (_source/video). Encoded
+# with ffmpeg, which is looked up on PATH, then $FFMPEG, then the copy the
+# local test harness installs (tools/node_modules/ffmpeg-static). Without it
+# this step is skipped and the committed files stay as they are.
+#
+# H.264 only. Nearly every frame of this clip is a new grainy shot, so AV1 and
+# VP9 came out no smaller (1.3 MB AV1, 1.6 MB VP9 against 0.87 MB H.264 at
+# 1600px), and H.264 is the one format every browser here plays, including
+# iOS Safari and Instagram's in-app browser. Audio is dropped (a background
+# has to be muted to autoplay anyway) and the index moved to the front of the
+# file (+faststart) so playback can begin before the download finishes.
+#
+# Each screen shape gets its own cut, chosen in main.js (heroVideo): 16:9 at
+# 1600px for anything wider than 640px, and a 9:16 slice for phones, centred
+# at 62% across, where the guitarist stands in every shot. The first frame of
+# each is also written as a still: it is what paints first (and what stays for
+# reduced motion, data saver or low power mode), so the hero never waits on
+# the video.
+def find_ffmpeg():
+    found = shutil.which("ffmpeg") or os.environ.get("FFMPEG")
+    if found:
+        return found
+    bundled = ROOT / "tools" / "node_modules" / "ffmpeg-static" / "ffmpeg"
+    return str(bundled) if bundled.exists() else None
+
+
+OUT_VIDEO = ROOT / "assets" / "video"
+_timelapse_master = SRC / "video" / "hero-timelapse.mp4"
+_ffmpeg = find_ffmpeg()
+if _timelapse_master.exists() and _ffmpeg:
+    OUT_VIDEO.mkdir(parents=True, exist_ok=True)
+    for _label, _filter, _crf, _suffix in (
+        ("desktop", "scale=1600:-2", 30, ""),
+        ("phone", "crop=ih*9/16:ih:iw*0.62-ih*9/32:0,scale=540:960", 30, "-mobile"),
+    ):
+        _out = OUT_VIDEO / f"hero-timelapse{_suffix}.mp4"
+        subprocess.run([
+            _ffmpeg, "-v", "error", "-y", "-i", str(_timelapse_master), "-an",
+            "-vf", _filter, "-c:v", "libx264", "-preset", "slow", "-profile:v", "high",
+            "-crf", str(_crf), "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(_out),
+        ], check=True)
+        print(f"  hero-timelapse{_suffix} ({_label})")
+        report(_out)
+
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as _handle:
+            _frame_path = Path(_handle.name)
+        try:
+            subprocess.run([
+                _ffmpeg, "-v", "error", "-y", "-i", str(_out), "-frames:v", "1", str(_frame_path),
+            ], check=True)
+            with Image.open(_frame_path) as _frame:
+                _still = _frame.convert("RGB")
+        finally:
+            _frame_path.unlink(missing_ok=True)
+        _still_jpg = OUT_BACKGROUNDS / f"hero-timelapse-poster{_suffix}.jpg"
+        _still_webp = OUT_BACKGROUNDS / f"hero-timelapse-poster{_suffix}.webp"
+        save_jpeg(_still, _still_jpg, quality=76)
+        save_webp_from_image(_still, _still_webp, quality=72)
+        report(_still_jpg)
+        report(_still_webp)
+elif _timelapse_master.exists():
+    print("  SKIP hero-timelapse (ffmpeg not found; set $FFMPEG or run npm i in tools/)")
+else:
+    print("  SKIP hero-timelapse (missing video/hero-timelapse.mp4)")
+
+# Homepage video section backdrop: a live shot from the Aug 14 album release
+# (photo: @micahpattern, 7008x3942). It only ever shows under a dark overlay
+# with the video player on top, so part of that darkening and a slight
+# softening are baked in here: a grainy crowd shot at full brightness came out
+# at 246 KB / 382 KB (desktop / phone WebP), and darker, softer pixels compress
+# far better while looking the same once the overlay is on. The phone slice is
+# centred just right of middle, on the singer and the two guitarists.
+_video_master_name = "backgrounds/video-bg-live-aug14.jpg"
+_video_master = SRC / _video_master_name
+if _video_master.exists():
+    with Image.open(_video_master) as _video_src:
+        _video_photo = ImageOps.exif_transpose(_video_src).convert("RGB")
+
+    for _label, _aspect, _width, _suffix, _focus_x in (
+        ("desktop", 16 / 10, 1920, "", .5),
+        ("phone", 9 / 16, 1080, "-mobile", .56),
+    ):
+        _variant = resize_to_width(crop_to_aspect(_video_photo, _aspect, focus_x=_focus_x), _width)
+        _variant = ImageEnhance.Brightness(_variant.filter(ImageFilter.GaussianBlur(1.2))).enhance(.55)
+        _variant_jpg = OUT_BACKGROUNDS / f"video-bg{_suffix}.jpg"
+        _variant_webp = OUT_BACKGROUNDS / f"video-bg{_suffix}.webp"
+        save_jpeg(_variant, _variant_jpg, quality=72)
+        save_webp_from_image(_variant, _variant_webp, quality=66)
+        print(f"  video-bg{_suffix} {_variant.width}x{_variant.height} ({_label})")
+        report(_variant_jpg)
+        report(_variant_webp)
+else:
+    print(f"  SKIP video-bg (missing {_video_master_name})")
 
 print("Featured show artwork")
 # Upcoming-show artwork, driven by data/shows.json rather than named here, so

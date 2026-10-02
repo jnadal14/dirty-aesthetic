@@ -14,3 +14,10 @@ _source/
 **/.DS_Store
 __pycache__/
 *.pyc
+
+# Claude Code instructions, kept local
+CLAUDE.md
+
+# Local test harness (Playwright, Lighthouse). Never deployed; the site itself
+# has no npm dependencies.
+tools/

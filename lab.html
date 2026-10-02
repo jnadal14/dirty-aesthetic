@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Motion Lab • Dirty Aesthetic</title>
+<!-- Unlisted sandbox for trying animation ideas before they reach the real
+     pages. Not in the nav or sitemap, never indexed, and no analytics. -->
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0705">
+<link rel="icon" type="image/png" href="assets/images/favicon.png">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/lab.css">
+</head>
+<body class="lab-page">
+  <header class="site-header">
+    <div class="brand-container">
+      <a class="brand" href="/"><img src="assets/images/logos/da-splat.png" alt="Dirty Aesthetic"></a>
+      <a class="brand-subtitle brand-ticket" data-show-ticket href="/#upcoming-section">
+        <span class="brand-ticket-long" data-show-label>Nov 14 at The Roxy</span>
+        <span class="brand-ticket-short" data-show-label-short>Nov 14 Roxy</span>
+      </a>
+    </div>
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav class="nav" id="nav">
+      <a href="music.html">Music</a>
+      <a href="watch.html">Watch</a>
+      <a href="store.html">Store</a>
+      <a href="epk.html">EPK</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+<main class="lab">
+  <section class="lab-intro">
+    <p class="lab-kicker">Unlisted &middot; not linked anywhere</p>
+    <h1>Motion Lab</h1>
+    <p>Animation ideas built with Motion, using the real artwork. Each one is tagged with the screen it is meant for. Try them on your phone, in Safari and Chrome, and through the Instagram bio link, then pick the ones that should go live.</p>
+    <p class="lab-reduced-note" hidden>Reduced motion is on for this device, so every demo shows its finished state without moving. That is exactly what visitors with that setting will see.</p>
+    <ol class="lab-index">
+      <li><a href="#d1"><span>01</span>Spring scene transitions <em>Desktop</em></a></li>
+      <li><a href="#d2"><span>02</span>Split-text headlines <em>Desktop + Mobile</em></a></li>
+      <li><a href="#d3"><span>03</span>Pointer depth <em>Desktop</em></a></li>
+      <li><a href="#d4"><span>04</span>Stacked card deck <em>Mobile home</em></a></li>
+      <li><a href="#d5"><span>05</span>Kinetic typography <em>Mobile home</em></a></li>
+      <li><a href="#d6"><span>06</span>Gritty transitions <em>Mobile home</em></a></li>
+      <li><a href="#d7"><span>07</span>Record pull-out <em>Music page</em></a></li>
+      <li><a href="#d8"><span>08</span>Cover flip grid <em>Music page</em></a></li>
+    </ol>
+    <button class="lab-btn" type="button" data-fps-toggle aria-pressed="false">Show frame meter</button>
+  </section>
+
+  <!-- 01 -->
+  <section class="lab-demo" id="d1">
+    <header class="lab-demo-head">
+      <span class="lab-num">01</span>
+      <div>
+        <h2>Spring scene transitions</h2>
+        <p>The homepage keeps its one-scroll-one-section navigation. Only the move between sections changes: the old one falls back and away while the new one springs in, in layers (photo, then headline, then buttons). Scroll the mouse wheel over the box, use the arrows, or swipe.</p>
+      </div>
+      <ul class="lab-tags"><li>Desktop</li></ul>
+    </header>
+    <div class="scene-stage" tabindex="0" data-lenis-prevent-wheel aria-roledescription="carousel" aria-label="Homepage section preview">
+      <article class="scene is-active" aria-label="1 of 3">
+        <picture class="scene-bg"><source type="image/webp" srcset="assets/images/backgrounds/modern-nostalgia-album-bg.webp"><img src="assets/images/backgrounds/modern-nostalgia-album-bg.jpg" alt="" decoding="async"></picture>
+        <div class="scene-copy">
+          <p class="scene-kicker">Out Now &middot; Debut Album</p>
+          <h3 class="scene-title" data-split>Modern Nostalgia</h3>
+          <div class="scene-cta"><span class="lab-pill">Listen Now</span><span class="lab-pill lab-pill--ghost">Tracklist</span></div>
+        </div>
+      </article>
+      <article class="scene" aria-label="2 of 3" hidden>
+        <picture class="scene-bg"><source type="image/webp" srcset="assets/images/backgrounds/shows-bg.webp"><img src="assets/images/backgrounds/shows-bg.jpg" alt="" decoding="async" loading="lazy"></picture>
+        <div class="scene-copy">
+          <p class="scene-kicker">Next Show &middot; Nov 14</p>
+          <h3 class="scene-title" data-split>The Roxy</h3>
+          <div class="scene-cta"><span class="lab-pill">Details</span><span class="lab-pill lab-pill--ghost">Poster Archive</span></div>
+        </div>
+      </article>
+      <article class="scene" aria-label="3 of 3" hidden>
+        <picture class="scene-bg"><source type="image/webp" srcset="assets/images/backgrounds/back-ep.webp"><img src="assets/images/backgrounds/back-ep.jpg" alt="" decoding="async" loading="lazy"></picture>
+        <div class="scene-copy">
+          <p class="scene-kicker">EP &middot; 2026</p>
+          <h3 class="scene-title" data-split>Sugar on the Rocks</h3>
+          <div class="scene-cta"><span class="lab-pill">Listen</span><span class="lab-pill lab-pill--ghost">Read More</span></div>
+        </div>
+      </article>
+      <div class="scene-controls">
+        <button type="button" class="scene-arrow" data-scene-step="-1" aria-label="Previous section">&larr;</button>
+        <span class="scene-count" aria-live="polite">1 / 3</span>
+        <button type="button" class="scene-arrow" data-scene-step="1" aria-label="Next section">&rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="lab-demo" id="d2">
+    <header class="lab-demo-head">
+      <span class="lab-num">02</span>
+      <div>
+        <h2>Split-text headlines</h2>
+        <p>Headlines broken into letters that spring into place. Three styles to compare. Tap one to replay the headline with it.</p>
+      </div>
+      <ul class="lab-tags"><li>Desktop</li><li>Mobile</li></ul>
+    </header>
+    <div class="split-variants" role="group" aria-label="Headline style">
+      <button type="button" class="lab-btn" data-split-variant="rise" aria-pressed="true">Rise</button>
+      <button type="button" class="lab-btn" data-split-variant="scatter" aria-pressed="false">Scatter</button>
+      <button type="button" class="lab-btn" data-split-variant="smear" aria-pressed="false">Smear</button>
+    </div>
+    <div class="split-stage">
+      <h3 class="split-title" data-split>Modern Nostalgia</h3>
+      <p class="split-sub" data-split="words">Eleven tracks about grief, longing, and moving forward anyway.</p>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="lab-demo" id="d3">
+    <header class="lab-demo-head">
+      <span class="lab-num">03</span>
+      <div>
+        <h2>Pointer depth</h2>
+        <p>The hero reacts to the mouse: photo, logo and caption sit at different depths and shift against each other, and the button pulls toward the cursor. On a phone, drag a finger across it.</p>
+      </div>
+      <ul class="lab-tags"><li>Desktop</li></ul>
+    </header>
+    <div class="depth-frame">
+      <div class="depth-card">
+        <picture class="depth-layer depth-bg" data-depth="-14"><source type="image/webp" srcset="assets/images/backgrounds/header-desktop.webp"><img src="assets/images/backgrounds/header-desktop.jpg" alt="" decoding="async" loading="lazy"></picture>
+        <div class="depth-shade"></div>
+        <img class="depth-layer depth-logo" data-depth="16" src="assets/images/logos/da-wordmark.png" alt="Dirty Aesthetic" decoding="async" loading="lazy">
+        <p class="depth-layer depth-caption" data-depth="28"><span>Out Now</span> Modern Nostalgia</p>
+        <span class="depth-layer depth-magnet-wrap" data-depth="34"><span class="lab-pill depth-magnet">Listen Now</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="lab-demo lab-demo--bleed" id="d4">
+    <header class="lab-demo-head">
+      <span class="lab-num">04</span>
+      <div>
+        <h2>Stacked card deck</h2>
+        <p>Each homepage section pins in place and the next one slides up over it like a card, while the one underneath sinks back and darkens. It is ordinary scrolling, nothing hijacked. On a phone held sideways the cards stop pinning (the screen is too short) and simply scroll.</p>
+      </div>
+      <ul class="lab-tags"><li>Mobile home</li></ul>
+    </header>
+    <div class="deck">
+      <article class="deck-card">
+        <div class="deck-card-inner">
+          <picture class="deck-bg"><source type="image/webp" srcset="assets/images/backgrounds/header-mobile.webp"><img src="assets/images/backgrounds/header-mobile.jpg" alt="" decoding="async" loading="lazy"></picture>
+          <div class="deck-copy">
+            <img class="deck-wordmark" src="assets/images/logos/da-wordmark.png" alt="Dirty Aesthetic" decoding="async" loading="lazy">
+            <p class="deck-kicker">Out Now &middot; Modern Nostalgia</p>
+          </div>
+          <div class="deck-shade"></div>
+        </div>
+      </article>
+      <article class="deck-card">
+        <div class="deck-card-inner">
+          <picture class="deck-bg"><source type="image/webp" srcset="assets/images/backgrounds/modern-nostalgia-album-bg-mobile.webp"><img src="assets/images/backgrounds/modern-nostalgia-album-bg-mobile.jpg" alt="" decoding="async" loading="lazy"></picture>
+          <div class="deck-copy">
+            <img class="deck-cover" src="assets/images/covers/cover_LP_modern_nostalgia.webp" alt="Modern Nostalgia album cover" decoding="async" loading="lazy" width="1200" height="1200">
+            <h3>Modern Nostalgia</h3>
+            <p class="deck-kicker">11 Tracks &middot; 43:29</p>
+          </div>
+          <div class="deck-shade"></div>
+        </div>
+      </article>
+      <article class="deck-card">
+        <div class="deck-card-inner">
+          <picture class="deck-bg"><source type="image/webp" srcset="assets/images/backgrounds/shows-bg-mobile.webp"><img src="assets/images/backgrounds/shows-bg-mobile.jpg" alt="" decoding="async" loading="lazy"></picture>
+          <div class="deck-copy">
+            <p class="deck-kicker">Next Show</p>
+            <h3 class="deck-date">Nov 14</h3>
+            <p>The Roxy Cabaret &middot; 932 Granville St</p>
+          </div>
+          <div class="deck-shade"></div>
+        </div>
+      </article>
+      <article class="deck-card">
+        <div class="deck-card-inner">
+          <picture class="deck-bg"><source type="image/webp" srcset="assets/images/backgrounds/back-ep.webp"><img src="assets/images/backgrounds/back-ep.jpg" alt="" decoding="async" loading="lazy"></picture>
+          <div class="deck-copy">
+            <img class="deck-cover" src="assets/images/covers/cover_sugar_on_the_rocks.webp" alt="Sugar on the Rocks EP cover" decoding="async" loading="lazy" width="800" height="800">
+            <h3>Sugar on the Rocks</h3>
+            <p class="deck-kicker">EP &middot; 2026</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="lab-demo lab-demo--bleed" id="d5">
+    <header class="lab-demo-head">
+      <span class="lab-num">05</span>
+      <div>
+        <h2>Kinetic typography</h2>
+        <p>Words slam in letter by letter as they arrive. The faster you scroll, the more the type leans and the banners stretch, then they spring back upright when you stop.</p>
+      </div>
+      <ul class="lab-tags"><li>Mobile home</li><li>Desktop too</li></ul>
+    </header>
+    <div class="kinetic">
+      <div class="k-marquee-wrap"><div class="k-marquee" aria-hidden="true">Dirty Aesthetic &bull; Garage Rock &bull; Vancouver &bull; Dirty Aesthetic &bull; Garage Rock &bull; Vancouver &bull;</div></div>
+      <p class="k-line" data-split>Loud</p>
+      <p class="k-line k-line--accent" data-split>Sweaty</p>
+      <p class="k-line" data-split>Five Piece</p>
+      <div class="k-marquee-wrap"><div class="k-marquee k-marquee--reverse" aria-hidden="true">Modern Nostalgia &bull; Out Now &bull; Modern Nostalgia &bull; Out Now &bull; Modern Nostalgia &bull; Out Now &bull;</div></div>
+      <p class="k-line" data-split>Garage</p>
+      <p class="k-line k-line--accent" data-split>Rock</p>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section class="lab-demo lab-demo--bleed" id="d6">
+    <header class="lab-demo-head">
+      <span class="lab-num">06</span>
+      <div>
+        <h2>Gritty transitions</h2>
+        <p>Sections tear open over each other with a ragged paper edge as you scroll, under a film-grain layer, and each headline glitches once when it lands.</p>
+      </div>
+      <ul class="lab-tags"><li>Mobile home</li><li>Desktop too</li></ul>
+    </header>
+    <div class="grit">
+      <div class="grit-screen">
+        <article class="grit-panel">
+          <picture class="grit-bg"><source type="image/webp" srcset="assets/images/backgrounds/watch-bg-mobile.webp"><img src="assets/images/backgrounds/watch-bg-mobile.jpg" alt="" decoding="async" loading="lazy"></picture>
+          <h3 class="grit-title">Watch the Video</h3>
+        </article>
+        <article class="grit-panel">
+          <picture class="grit-bg"><source type="image/webp" srcset="assets/images/backgrounds/shows-bg-mobile.webp"><img src="assets/images/backgrounds/shows-bg-mobile.jpg" alt="" decoding="async" loading="lazy"></picture>
+          <h3 class="grit-title">Nov 14 &middot; The Roxy</h3>
+        </article>
+        <article class="grit-panel">
+          <picture class="grit-bg"><source type="image/webp" srcset="assets/images/backgrounds/members-bg-mobile.webp"><img src="assets/images/backgrounds/members-bg-mobile.jpg" alt="" decoding="async" loading="lazy"></picture>
+          <h3 class="grit-title">Get In Touch</h3>
+        </article>
+        <div class="grit-grain" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section class="lab-demo lab-demo--bleed" id="d7">
+    <header class="lab-demo-head">
+      <span class="lab-num">07</span>
+      <div>
+        <h2>Record pull-out</h2>
+        <p>For the top of the music page. As you scroll, the album cover settles into place and the record slides out of the sleeve, spinning.</p>
+      </div>
+      <ul class="lab-tags"><li>Music page</li></ul>
+    </header>
+    <div class="lp">
+      <div class="lp-screen">
+        <div class="lp-object">
+          <div class="lp-disc" aria-hidden="true">
+            <img class="lp-label" src="assets/images/covers/cover_LP_modern_nostalgia.webp" alt="" decoding="async" loading="lazy">
+          </div>
+          <img class="lp-sleeve" src="assets/images/covers/cover_LP_modern_nostalgia.webp" alt="Modern Nostalgia album cover" decoding="async" loading="lazy" width="1200" height="1200">
+        </div>
+        <div class="lp-copy">
+          <p class="lp-flag">Out Now</p>
+          <h3>Modern Nostalgia</h3>
+          <p>Debut Album &bull; 11 Tracks &bull; 43:29</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 -->
+  <section class="lab-demo" id="d8">
+    <header class="lab-demo-head">
+      <span class="lab-num">08</span>
+      <div>
+        <h2>Cover flip grid</h2>
+        <p>Covers toss into place as you reach them. Tap one to flip it over for the release details and a listen link. With a mouse, they tilt toward the cursor.</p>
+      </div>
+      <ul class="lab-tags"><li>Music page</li></ul>
+    </header>
+    <div class="flip-grid">
+      <!-- Filled from the list in js/lab.js so the eight cards stay identical in structure. -->
+    </div>
+  </section>
+</main>
+
+<div class="fps-meter" hidden aria-hidden="true"><span data-fps>--</span> fps &middot; <span data-drops>0</span> dropped</div>
+
+<footer class="site-footer">
+  <div class="social">
+    <a href="https://instagram.com/dirtyaestheticband" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://tiktok.com/@dirty_aesthetic" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://open.spotify.com/artist/6LJB3zSDmtQ3NxA6GjUwlt" target="_blank" rel="noopener">Spotify</a>
+    <a href="https://music.apple.com/ca/artist/dirty-aesthetic/1773260865" target="_blank" rel="noopener">Apple Music</a>
+    <a href="https://dirtyaesthetic.bandcamp.com/" target="_blank" rel="noopener">Bandcamp</a>
+    <a href="https://www.youtube.com/@dirtyaesthetic" target="_blank" rel="noopener">YouTube</a>
+  </div>
+  <div class="legal">
+    <a href="privacy.html">Privacy</a>
+    <span class="footer-logo">© <img src="assets/images/logos/da-wordmark.png" alt="Dirty Aesthetic"></span>
+  </div>
+</footer>
+
+<script src="js/main.js" defer></script>
+<script src="vendor/motion.min.js" defer></script>
+<script src="js/lab.js" defer></script>
+</body>
+</html>
