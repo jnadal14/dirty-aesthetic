@@ -4278,9 +4278,11 @@ a.show-row[href]{cursor:pointer}
    main.js (refreshState) puts .snap-sections on <html> on touch screens
    whenever the spatial desktop layout is off, except a phone held sideways.
    Every section fills the screen and snaps to its top; scroll-snap-stop makes
-   a hard fling stop at the next section instead of skipping it. A section
-   taller than the screen is still read in full: browsers scroll freely inside
-   a snap area larger than the viewport before moving on.
+   a hard fling stop at the next section instead of skipping it. Each section
+   has to fit the screen: WebKit (iOS Safari, the Instagram in-app browser)
+   does not scroll freely inside a taller snap area, it pulls straight back to
+   the section's top, so anything past the fold is unreachable. Contact is
+   the exception — the footer's end snap below it reaches the rest of it.
    Selectors start with html.snap-sections so they outrank the
    body:not(.spatial-scroll-active) rules for the free-scrolling layout. */
 html.snap-sections{scroll-snap-type:y mandatory}
@@ -4312,6 +4314,54 @@ html.snap-sections .shows-feature-heading{font-size:clamp(1.6em,7vw,2.2em)}
 html.snap-sections .show-row-month{font-size:clamp(1.05em,5vw,1.4em)}
 html.snap-sections .show-row-day{font-size:clamp(.85em,3.6vw,1em)}
 html.snap-sections .show-row--next .show-row-venue{font-size:clamp(.95em,4.4vw,1.15em)}
+
+/* The two release sections are the ones with the most stacked content, and
+   at phone sizes both ran a screen and a bit — the last tracks hung below the
+   fold and the snap pulled them straight back out of view. Sized off the
+   screen height (svh) so they compact further on short in-app viewports. */
+html.snap-sections main > #sugar-on-the-rocks-section,
+html.snap-sections main > #modern-nostalgia-album-section{
+  padding-top:calc(var(--home-header-h,64px) + clamp(8px,1.6svh,16px));
+  padding-bottom:clamp(14px,3svh,32px);
+}
+html.snap-sections .ep-release-content{gap:clamp(10px,2svh,18px)}
+html.snap-sections .ep-release-cover{width:clamp(110px,24svh,220px);max-width:none}
+html.snap-sections .ep-release-header{margin-bottom:clamp(6px,1.2svh,12px)}
+html.snap-sections .ep-stream-btn{padding:clamp(7px,1.2svh,10px)}
+html.snap-sections .ep-stream-btn svg{width:20px;height:20px}
+html.snap-sections .ep-release-title{margin-bottom:4px}
+html.snap-sections .ep-release-meta{margin-bottom:clamp(8px,1.6svh,16px)}
+html.snap-sections .ep-tracklist-full{
+  grid-template-columns:1fr 1fr;
+  max-width:none;
+  margin:0;
+  padding:clamp(6px,1.2svh,12px) 12px;
+  gap:0 14px;
+}
+html.snap-sections .ep-track{padding:clamp(5px,1.1svh,9px) 0;gap:8px}
+html.snap-sections .ep-track .track-num{min-width:18px;font-size:.78em}
+html.snap-sections .ep-track .track-title{font-size:.92em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+html.snap-sections .album-tracklist-layout{gap:clamp(10px,2svh,22px)}
+html.snap-sections .album-tracklist-intro{grid-template-columns:clamp(84px,15svh,120px) minmax(0,1fr)}
+html.snap-sections .album-tracklist-panel{padding-top:clamp(6px,1.2svh,10px);padding-bottom:clamp(4px,1svh,8px)}
+html.snap-sections .album-tracklist-heading{padding-bottom:clamp(4px,1svh,8px)}
+html.snap-sections .album-track{min-height:clamp(24px,4.2svh,36px);padding-top:3px;padding-bottom:3px}
+/* On the narrowest phones the copy column beside the cover is too thin for
+   the two streaming buttons, which wrapped to two rows. Hand the copy's
+   children to the intro grid so the buttons get a full-width row of their
+   own under the cover and title. */
+@media (max-width:380px){
+  html.snap-sections .album-tracklist-intro{column-gap:14px;row-gap:0;align-items:end}
+  html.snap-sections .album-tracklist-copy{display:contents}
+  html.snap-sections .album-tracklist-cover{grid-column:1;grid-row:1 / span 3}
+  html.snap-sections .album-tracklist-kicker,
+  html.snap-sections .album-tracklist-copy h2,
+  html.snap-sections .album-tracklist-copy p{grid-column:2}
+  html.snap-sections .album-tracklist-copy h2{font-size:1.6em}
+  html.snap-sections .album-tracklist-copy p{margin:6px 0 0}
+  html.snap-sections .album-cta-row{grid-column:1 / -1;margin-top:clamp(8px,1.6svh,12px)}
+}
 
 /* Video section backdrop: a live shot from the Aug 14 album release. The
    image is attached only once the section is near (.bg-ready, added by the
@@ -4345,6 +4395,52 @@ html .video-feature.bg-ready{
       image-set(
         url('../assets/images/backgrounds/video-bg-mobile.webp') type('image/webp'),
         url('../assets/images/backgrounds/video-bg-mobile.jpg') type('image/jpeg')
+      );
+  }
+}
+
+/* Contact backdrop: the drummer from above, on the homepage's last section
+   and behind the contact page. The shot is bright and busy (lit snare, big
+   cymbal), so the scrim is heavy — the form has to read first. On the
+   homepage it is attached only once the section is near, like the video. */
+html .home-contact.bg-ready{
+  background-color:#000;
+  background-image:
+    linear-gradient(180deg,rgba(6,4,8,.9) 0%,rgba(8,5,10,.82) 45%,rgba(4,3,5,.94) 100%),
+    image-set(
+      url('../assets/images/backgrounds/contact-bg.webp') type('image/webp'),
+      url('../assets/images/backgrounds/contact-bg.jpg') type('image/jpeg')
+    );
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+body.contact-page-bg{isolation:isolate}
+body.contact-page-bg::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background-image:
+    linear-gradient(180deg,rgba(6,4,8,.9) 0%,rgba(8,5,10,.82) 45%,rgba(4,3,5,.94) 100%),
+    image-set(
+      url('../assets/images/backgrounds/contact-bg.webp') type('image/webp'),
+      url('../assets/images/backgrounds/contact-bg.jpg') type('image/jpeg')
+    );
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  transform:translateZ(0);
+}
+@media (max-width:768px){
+  html .home-contact.bg-ready,
+  body.contact-page-bg::after{
+    background-image:
+      linear-gradient(180deg,rgba(6,4,8,.9) 0%,rgba(8,5,10,.82) 45%,rgba(4,3,5,.94) 100%),
+      image-set(
+        url('../assets/images/backgrounds/contact-bg-mobile.webp') type('image/webp'),
+        url('../assets/images/backgrounds/contact-bg-mobile.jpg') type('image/jpeg')
       );
   }
 }

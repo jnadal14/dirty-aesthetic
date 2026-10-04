@@ -766,6 +766,66 @@ window.addEventListener('beforeprint', () => {
     window.scrollTo(0, top)
     schedule()
   })
+  // Hold a fresh arrival where it was meant to land until the visitor touches
+  // the page. Opened from an Instagram ad, the page jumped straight to the
+  // contact form: Meta's in-app browser injects its own script, which reaches
+  // for form fields, and iOS scrolls a focused field into view. Nothing here
+  // asked for that move, so for the first moments after landing any scroll
+  // the visitor did not make is undone. A reload is already reset to the top
+  // (resetScrollOnReload); back/forward keeps the browser's own restore.
+  ;(function guardLanding(){
+    if (!chapters.length) return
+    const entry = typeof performance.getEntriesByType === 'function'
+      ? performance.getEntriesByType('navigation')[0]
+      : null
+    if (entry && entry.type !== 'navigate') return
+
+    const id = (window.location.hash || '').slice(1)
+    const index = id ? chapters.findIndex(section => section.id === id) : -1
+    // A hash that names no chapter has nothing to land on.
+    if (id && index < 0) {
+      history.replaceState(history.state, '', `${window.location.pathname}${window.location.search}`)
+    }
+    const landingTop = () => index > 0 ? (sectionTargets[index] ?? 0) : 0
+
+    const GUARD_MS = 2500
+    const inputs = ['touchstart', 'pointerdown', 'wheel', 'keydown']
+    let done = false
+
+    function release(){
+      if (done) return
+      done = true
+      inputs.forEach(type => window.removeEventListener(type, release, true))
+      window.removeEventListener('scroll', hold)
+      window.removeEventListener('load', hold)
+      document.removeEventListener('focusin', hold)
+    }
+
+    function hold(){
+      if (done) return
+      const active = document.activeElement
+      if (active && active !== document.body && active.closest && active.closest('#contact-section')) active.blur()
+      const top = landingTop()
+      if (Math.abs(window.scrollY - top) > SNAP_EPSILON) {
+        const root = document.documentElement
+        const previous = root.style.scrollBehavior
+        root.style.scrollBehavior = 'auto'
+        window.scrollTo(0, top)
+        root.style.scrollBehavior = previous
+      }
+    }
+
+    inputs.forEach(type => window.addEventListener(type, release, { capture: true, passive: true }))
+    window.addEventListener('scroll', hold, { passive: true })
+    window.addEventListener('load', hold)
+    document.addEventListener('focusin', hold)
+    // Counted from load, not from parsing: the injected script runs once the
+    // page has loaded, which on a slow connection is well after this point.
+    const startTimer = () => setTimeout(release, GUARD_MS)
+    if (document.readyState === 'complete') startTimer()
+    else window.addEventListener('load', startTimer, { once: true })
+  })()
+
   if (reduceMotion.addEventListener) reduceMotion.addEventListener('change', refreshState)
   if (spatialMotion.addEventListener) spatialMotion.addEventListener('change', refreshState)
   if (touchScreen.addEventListener) touchScreen.addEventListener('change', refreshState)
@@ -1044,10 +1104,33 @@ bindIrrationalScrollLinks()
     rootMargin: '0px 0px -8% 0px'
   })
 
+  // Under section snapping a whole screen arrives at once and each section is
+  // sized to fit it, so the last rows sit right at the bottom edge. Before
+  // its reveal a row is pushed further down, past the section's clipped
+  // bottom, where no observer can ever see it — the album's last tracks never
+  // appeared. So a snapped section reveals everything in it as it comes in.
+  const snapping = document.documentElement.classList.contains('snap-sections')
+  const revealAll = section => section.querySelectorAll('.reveal,.reveal-fade,.reveal-scale')
+    .forEach(el => el.classList.add('in-view'))
+  const shownSections = new WeakSet()
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return
+      shownSections.add(entry.target)
+      revealAll(entry.target)
+      sectionObserver.unobserve(entry.target)
+    })
+  }, { threshold: 0.3 })
+
   function observeReveal(scope){
     const root = scope || document
     root.querySelectorAll('.reveal,.reveal-fade,.reveal-scale').forEach(el => {
-      if (!el.classList.contains('in-view')) observer.observe(el)
+      if (el.classList.contains('in-view')) return
+      const section = snapping && el.closest('main > [data-scroll-chapter]')
+      if (!section) return observer.observe(el)
+      // Rows added later (shows from JSON) into a section already on screen.
+      if (shownSections.has(section)) el.classList.add('in-view')
+      else sectionObserver.observe(section)
     })
   }
 

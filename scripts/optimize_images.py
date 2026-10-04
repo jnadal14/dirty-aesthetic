@@ -631,6 +631,13 @@ for cfg in [
     {"src": "band members.jpg", "out": "members-bg",
      "focus": 0.42, "focus_x": 0.60, "wide_ar": 16 / 9, "wide_w": 1920,
      "tall_ar": 3 / 4, "tall_w": 900, "blur": 0.6, "highlights": None},
+    # Behind the contact form, on the homepage's last slide and the contact
+    # page. Shot from above the kit: the drummer and snare sit left of centre,
+    # so the phone crop is pulled left to keep them rather than the big cymbal.
+    # It sits under form fields, so it is softened more than the others.
+    {"src": "contact-drums.png", "out": "contact-bg",
+     "focus": 0.50, "focus_x": 0.40, "wide_ar": 16 / 9, "wide_w": 1920,
+     "tall_ar": 9 / 16, "tall_w": 1000, "blur": 1.2, "highlights": None},
     {"src": "band from drums.jpg", "out": "epk-bg",
      "focus": 0.50, "wide_ar": 4 / 5, "wide_w": 1800, "blur": 0.3, "highlights": (95, 0.30),
      "q": 62},

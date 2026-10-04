@@ -15,9 +15,9 @@ from reportlab.platypus import Paragraph
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "assets" / "downloads" / "dirtyaesthetic_epk.pdf"
-GROUP_PHOTO = ROOT / "assets" / "images" / "optimized" / "header-desktop.jpg"
-ALBUM_COVER = ROOT / "assets" / "images" / "optimized" / "covers" / "cover_LP_modern_nostalgia.jpg"
-WORDMARK = ROOT / "assets" / "logos" / "FULL_NAME" / "FULL-OFF_WHITE.png"
+GROUP_PHOTO = ROOT / "assets" / "images" / "backgrounds" / "header-desktop.jpg"
+ALBUM_COVER = ROOT / "assets" / "images" / "covers" / "cover_LP_modern_nostalgia.jpg"
+WORDMARK = ROOT / "_source" / "logos" / "FULL_NAME" / "FULL-OFF_WHITE.png"
 
 PAGE_W, PAGE_H = A4
 BLACK = HexColor("#060504")

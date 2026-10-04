@@ -1,9 +1,9 @@
 User-agent: *
 Allow: /
 
-# Block backup files
-Disallow: /*.backup.html
-Disallow: /*.backup.css
-Disallow: /dirtyaesthetic_epk.txt
+# Build scripts and the plain-text EPK copy they use, and the unlisted
+# animation sandbox. None of these are pages.
+Disallow: /scripts/
+Disallow: /lab.html
 
 Sitemap: https://www.dirtyaesthetic.com/sitemap.xml
