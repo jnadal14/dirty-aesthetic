@@ -4152,17 +4152,17 @@ a.show-row[href]{cursor:pointer}
 .poster-archive-intro p + p{margin-top:.9em}
 .poster-archive-grid{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:clamp(24px,3vw,42px) clamp(18px,2.5vw,34px);
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:clamp(18px,2vw,28px) clamp(14px,1.6vw,22px);
   margin-top:clamp(28px,4vw,48px);
 }
 .poster-archive-card{
   min-width:0;
   overflow:hidden;
   border:1px solid rgba(255,255,255,.09);
-  border-radius:16px;
+  border-radius:12px;
   background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
-  box-shadow:0 18px 48px rgba(0,0,0,.32);
+  box-shadow:0 14px 36px rgba(0,0,0,.3);
   transition:
     opacity 1s cubic-bezier(.2,.7,.2,1) var(--reveal-delay,0s),
     transform .45s cubic-bezier(.2,.8,.2,1),
@@ -4171,9 +4171,9 @@ a.show-row[href]{cursor:pointer}
     box-shadow .35s ease;
 }
 .poster-archive-card.in-view:hover{
-  transform:translateY(-7px);
+  transform:translateY(-6px);
   border-color:rgba(176,122,63,.38);
-  box-shadow:0 26px 64px rgba(0,0,0,.48),0 0 0 1px rgba(176,122,63,.08);
+  box-shadow:0 22px 52px rgba(0,0,0,.46),0 0 0 1px rgba(176,122,63,.08);
 }
 .poster-archive-art{
   display:block;
@@ -4202,11 +4202,14 @@ a.show-row[href]{cursor:pointer}
   filter:brightness(1.08);
 }
 .poster-archive-art:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
-.poster-archive-details{
-  position:relative;
-  min-height:220px;
-  padding:clamp(18px,2.4vw,28px);
-}
+/* The grid card carries only the date and venue; the full details (city,
+   lineup, note) open with the poster in the lightbox, which clones them. */
+.poster-archive-card .poster-archive-details{padding:12px 14px 14px}
+.poster-archive-card .poster-archive-location,
+.poster-archive-card .poster-archive-lineup,
+.poster-archive-card .poster-archive-note{display:none}
+.poster-archive-card .poster-archive-date{margin-bottom:5px;font-size:.66em;letter-spacing:1.5px}
+.poster-archive-card .poster-archive-details h2{font-size:clamp(.9em,1.1vw,1.05em);line-height:1.2}
 .poster-archive-date{
   margin:0 0 8px;
   color:var(--accent);
@@ -4263,14 +4266,42 @@ a.show-row[href]{cursor:pointer}
 }
 .poster-archive-back--bottom{margin:clamp(52px,7vw,88px) auto 0}
 
-@media (max-width:920px){
-  .poster-archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* Poster lightbox: poster beside its details on wide screens, above them on
+   narrow ones. */
+.lightbox-overlay.has-caption{gap:clamp(18px,3vw,44px);padding:56px clamp(64px,7vw,96px)}
+.lightbox-overlay.has-caption img{max-width:min(60vw,720px);max-height:86vh}
+.lightbox-overlay.has-caption .lightbox-nav{z-index:2}
+.lightbox-caption{
+  width:min(340px,30vw);
+  max-height:86vh;
+  overflow-y:auto;
+  cursor:auto;
+  text-align:left;
+  animation:fadeUp .3s ease .05s both;
+}
+.lightbox-caption .poster-archive-details{padding:0}
+.lightbox-caption .poster-archive-details h2{font-size:clamp(1.3em,2.2vw,1.8em)}
+
+@media (max-width:1180px){
+  .poster-archive-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (max-width:820px){
+  .poster-archive-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 10px}
+  .lightbox-overlay.has-caption{flex-direction:column;justify-content:center;padding:52px 16px 20px;gap:14px}
+  .lightbox-overlay.has-caption img{max-width:100%;max-height:58svh}
+  .lightbox-caption{width:min(100%,460px);max-height:32svh;text-align:center}
+  .lightbox-caption .poster-archive-lineup{align-items:center}
+  .lightbox-caption .poster-archive-location{margin-bottom:12px}
+  .lightbox-caption .poster-archive-note{margin-top:10px}
+  .lightbox-overlay.has-caption .lightbox-nav{top:calc(52px + 29svh)}
 }
 @media (max-width:580px){
-  .poster-archive-main{padding-left:14px;padding-right:14px}
-  .poster-archive-grid{grid-template-columns:1fr;gap:24px}
-  .poster-archive-card{width:min(100%,430px);margin:0 auto}
-  .poster-archive-details{min-height:0}
+  .poster-archive-main{padding-left:12px;padding-right:12px}
+  .poster-archive-grid{gap:12px 8px}
+  .poster-archive-card{border-radius:8px}
+  .poster-archive-card .poster-archive-details{padding:7px 7px 9px}
+  .poster-archive-card .poster-archive-date{margin-bottom:3px;font-size:.56em;letter-spacing:1px}
+  .poster-archive-card .poster-archive-details h2{font-size:.76em;line-height:1.18;overflow-wrap:anywhere}
   .poster-archive-back--sticky{top:10px}
 }
 
@@ -4325,20 +4356,24 @@ html.snap-sections main > #modern-nostalgia-album-section{
   padding-bottom:clamp(14px,3svh,32px);
 }
 html.snap-sections .ep-release-content{gap:clamp(10px,2svh,18px)}
-html.snap-sections .ep-release-cover{width:clamp(110px,24svh,220px);max-width:none}
+html.snap-sections .ep-release-cover{width:clamp(96px,20svh,200px);max-width:none}
 html.snap-sections .ep-release-header{margin-bottom:clamp(6px,1.2svh,12px)}
 html.snap-sections .ep-stream-btn{padding:clamp(7px,1.2svh,10px)}
 html.snap-sections .ep-stream-btn svg{width:20px;height:20px}
 html.snap-sections .ep-release-title{margin-bottom:4px}
 html.snap-sections .ep-release-meta{margin-bottom:clamp(8px,1.6svh,16px)}
+/* One column of six; rows are sized off the screen height so the whole list
+   still fits the snapped screen on short in-app viewports. */
 html.snap-sections .ep-tracklist-full{
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:1fr;
+  grid-template-rows:none;
+  width:min(100%,280px);
   max-width:none;
-  margin:0;
-  padding:clamp(6px,1.2svh,12px) 12px;
-  gap:0 14px;
+  margin:0 auto;
+  padding:clamp(4px,.9svh,10px) 16px;
+  gap:0;
 }
-html.snap-sections .ep-track{padding:clamp(5px,1.1svh,9px) 0;gap:8px}
+html.snap-sections .ep-track{padding:clamp(3px,.85svh,8px) 0;gap:10px}
 html.snap-sections .ep-track .track-num{min-width:18px;font-size:.78em}
 html.snap-sections .ep-track .track-title{font-size:.92em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 

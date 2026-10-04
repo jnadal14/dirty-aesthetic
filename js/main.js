@@ -1604,9 +1604,9 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const image = document.createElement('img')
       image.src = optimized.webp || optimized.src
       image.alt = `${title} show poster, ${show.date}`
-      image.loading = index < 3 ? 'eager' : 'lazy'
+      image.loading = index < 10 ? 'eager' : 'lazy'
       image.decoding = 'async'
-      if(index < 2) image.fetchPriority = 'high'
+      if(index < 5) image.fetchPriority = 'high'
       if(optimized.width && optimized.height){
         image.width = optimized.width
         image.height = optimized.height
@@ -1683,12 +1683,22 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
   const prevBtn = overlay.querySelector('.lightbox-prev')
   const nextBtn = overlay.querySelector('.lightbox-next')
   const closeBtn = overlay.querySelector('.lightbox-close')
+  // Optional details panel (posters.html): filled with a copy of the card's
+  // details for whichever poster is showing.
+  const caption = overlay.querySelector('.lightbox-caption')
   let current = 0
   let srcs = []
+  let captions = []
+  let alts = []
 
   function show(idx){
     current = (idx + srcs.length) % srcs.length
     lbImg.src = srcs[current]
+    if(alts[current]) lbImg.alt = alts[current]
+    if(!caption) return
+    const details = captions[current]
+    caption.replaceChildren(...(details ? [details.cloneNode(true)] : []))
+    overlay.classList.toggle('has-caption', !!details)
   }
 
   function close(){
@@ -1717,6 +1727,10 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     srcs = Array.from(items).map(el =>
       el.dataset.fullWebp || el.dataset.fullSrc || el.querySelector('img')?.src || ''
     )
+    captions = Array.from(items).map(el =>
+      el.closest('.poster-archive-card')?.querySelector('.poster-archive-details') || null
+    )
+    alts = Array.from(items).map(el => el.querySelector('img')?.alt || '')
     items.forEach((item, i) => {
       if(item.dataset.lightboxBound) return
       item.dataset.lightboxBound = 'true'
