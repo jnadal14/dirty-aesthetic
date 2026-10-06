@@ -508,7 +508,7 @@ body.store-page-bg{
   display:flex;
   flex-direction:column;
   min-height:100vh;
-  min-height:100dvh;
+  min-height:100svh;
 }
 body.contact-page-bg{
   background:#000;
@@ -832,13 +832,40 @@ a,button,.btn,.hamburger,input,textarea,select,[role="button"]{
 .credit-name{color:var(--ink);opacity:.86}
 .credit-role{opacity:.8}
 .credit-sep{padding:0 6px;opacity:.4}
-.album-credits-source{
-  margin:clamp(22px,3vw,30px) 0 0;
+/* The shared catalog heading carries its own side padding; inside this
+   already-padded section it sat indented from the projects under it. */
+.album-credits .music-catalog-heading{padding-left:0;padding-right:0}
+/* One block per project: album, EP, then the early singles together. */
+.credits-project + .credits-project{
+  margin-top:clamp(30px,4vw,44px);
+  padding-top:clamp(26px,3.5vw,38px);
+  border-top:1px solid rgba(255,255,255,.05);
+}
+.credits-project-title{
+  margin:0 0 10px;
+  font-size:clamp(1.25em,2.6vw,1.6em);
+  letter-spacing:1px;
+  color:var(--ink);
+}
+.credits-project-meta{
+  margin-left:10px;
+  color:var(--accent);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  font-size:.5em;
+  vertical-align:.25em;
+  white-space:nowrap;
+}
+.album-credit-track .credits-project-meta{font-size:.68em;margin-left:8px;opacity:.85;white-space:normal}
+.album-credit-first{
+  margin:-4px 0 9px;
   color:var(--muted);
-  opacity:.7;
   font-size:.8em;
   letter-spacing:.5px;
+  opacity:.8;
 }
+/* The singles are each one track, so their credits sit open. */
+.credits-project > .album-credits-list{margin-top:clamp(14px,2vw,20px)}
 .music-catalog-heading{
   max-width:1100px;
   margin:0 auto clamp(18px,3vw,28px);
@@ -3201,7 +3228,7 @@ a.show-row[href]{cursor:pointer}
   scroll-margin-top:24px;
   box-sizing:border-box;
   min-height:100vh;
-  min-height:100dvh;
+  min-height:100svh;
   padding-bottom:clamp(120px,14vh,180px);
 }
 @media (max-width:768px){
@@ -4333,7 +4360,16 @@ html.snap-sections main > [data-scroll-chapter]:not(.hero){
   padding-top:calc(var(--home-header-h,64px) + clamp(16px,4vw,28px));
   padding-bottom:clamp(28px,6vw,48px);
 }
-html.snap-sections .site-footer{scroll-snap-align:end}
+/* The contact form and the footer are the one stretch longer than a screen.
+   It used to be reached through an end-aligned snap on the footer, but that
+   snap point sits at "page height minus viewport height", and iOS Safari
+   changes the viewport height every time its toolbar shows or hides — which
+   it does on its own at the bottom of the page. The point moved under the
+   reader's finger and WebKit re-snapped: the page jumped at the bottom. Once
+   the reader has come to rest on the contact section, main.js adds
+   .snap-tail and the rest of the page scrolls freely; it comes off again
+   when they rest anywhere above it. */
+html.snap-sections.snap-tail{scroll-snap-type:none}
 /* The dark wipe band across each section's top edge belongs to the free
    scroll; on a section that lands flush it is just a smudge under the header. */
 html.snap-sections .chapter-wipe{display:none}
@@ -4526,13 +4562,23 @@ body.contact-page-bg::after{
 .flip-front:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .flip-back{
   transform:rotateY(180deg);
-  background:#140d08;
-  border:1px solid rgba(176,122,63,.5);
+  overflow:hidden;
+  background:#0a0705;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
   padding:clamp(10px,2vw,18px);text-align:center;
+  cursor:pointer;
 }
-.flip-back-title{margin:0;font-size:clamp(1em,2.4vw,1.35em);line-height:1.1;color:var(--ink)}
-.flip-back-meta{margin:0;color:var(--muted);font-size:clamp(.8em,1.5vw,.95em)}
+/* The cover again, dimmed right down, with a vignette so the text reads on
+   any artwork. */
+.flip-back-art{display:block;position:absolute;inset:0;z-index:0}  /* picture is display:contents site-wide */
+.flip-back-art img{width:100%;height:100%;object-fit:cover;border:0;border-radius:0;filter:brightness(.32) saturate(.8)}
+.flip-back::after{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,.15) 0%,rgba(0,0,0,.55) 100%);
+}
+.flip-back > :not(.flip-back-art){position:relative;z-index:1}
+.flip-back-title{margin:0;font-size:clamp(1em,2.4vw,1.35em);line-height:1.1;color:var(--ink);text-shadow:0 2px 12px rgba(0,0,0,.8)}
+.flip-back-meta{margin:0;color:rgba(255,255,255,.78);font-size:clamp(.8em,1.5vw,.95em);text-shadow:0 1px 8px rgba(0,0,0,.8)}
 .flip-back a{
   display:inline-flex;align-items:center;justify-content:center;min-height:44px;
   padding:8px 16px;border-radius:999px;background:#1db954;color:#fff;text-decoration:none;
@@ -4654,3 +4700,43 @@ body.contact-page-bg::after{
   box-shadow:none;
 }
 .show-row:hover .show-row-poster.show-row-poster--logo img{opacity:1}
+
+/* ===== Phones held sideways =====
+   A landscape phone is wide enough to pick up tablet and desktop rules but
+   only ~320–430px tall, so anything sized off the width alone ends up taller
+   than the screen. These keep each block within one screen height. svh is the
+   height with Safari's toolbar showing, so nothing changes size when the
+   toolbar slides away. */
+@media (orientation:landscape) and (max-height:500px){
+  /* The homepage header is fixed. Sections scroll freely here (no snapping),
+     so each one clears the header itself or its heading lands underneath. */
+  .home-experience main > [data-scroll-chapter]:not(.hero){
+    padding-top:calc(var(--home-header-h,56px) + 14px);
+  }
+  .home-page .site-header{padding-top:calc(6px + env(safe-area-inset-top));padding-bottom:6px}
+  .home-page .site-header .nav a{padding-top:6px;padding-bottom:6px}
+  .home-experience .ep-release:not(#irrational-section){min-height:0}
+  .home-experience .shows-feature{min-height:0}
+  /* The chapter index is a desktop affordance; sideways it sits on the photos. */
+  .chapter-nav{display:none}
+
+  .video-feature .video-embed-large,
+  .watch-feature .video-embed-large,
+  .single-release-video .video-embed-large{
+    max-width:calc((100svh - var(--home-header-h,56px) - 40px) * 16 / 9);
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .release-grid{grid-template-columns:repeat(4,1fr)}
+  .release-grid .release:last-child:nth-child(odd){grid-column:auto;max-width:none;margin:0}
+  .member-photo{max-width:min(360px,48svh)}
+  /* Cover beside the copy, as on desktop, rather than a screen of cover
+     with the title and tracks a screen further down. */
+  .ep-release-content{grid-template-columns:min(62svh,40%) 1fr;gap:clamp(18px,4vw,36px);align-items:start;text-align:left}
+  .ep-release-cover{width:100%;max-width:none;margin:0}
+  .ep-release-header,.ep-stream-buttons{justify-content:flex-start}
+  .ep-tracklist-full{margin-left:0}
+  .album-tracklist-cover{max-width:40svh}
+  .store-product-image{max-width:min(400px,42vw,72svh)}
+  .lightbox-overlay img{max-height:86svh}
+}

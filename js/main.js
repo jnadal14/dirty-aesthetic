@@ -739,7 +739,28 @@ window.addEventListener('beforeprint', () => {
     schedule()
   }
 
-  window.addEventListener('scroll', () => { schedule(); scheduleSettle() }, { passive: true })
+  // ---- Snap tail (touch homepage) ----
+  // Contact and the footer are longer than a screen. Once the reader comes to
+  // rest on them, snapping is switched off for the rest of the page (CSS,
+  // html.snap-tail) — the end-of-page snap it replaces moved every time iOS
+  // Safari's toolbar showed or hid, and the page jumped at the bottom. Toggled
+  // only at rest, never mid-gesture, so it cannot cut a snap animation short;
+  // coming back to rest above the contact section turns snapping back on.
+  let tailTimer = 0
+  function syncSnapTail(){
+    const root = document.documentElement
+    const last = chapterMetrics[chapterMetrics.length - 1]
+    const inTail = snapEnabled && !!last && window.scrollY >= last.top - SNAP_EPSILON
+    if (root.classList.contains('snap-tail') !== inTail) root.classList.toggle('snap-tail', inTail)
+  }
+  function scheduleSnapTail(){
+    if (!snapEnabled && !document.documentElement.classList.contains('snap-tail')) return
+    clearTimeout(tailTimer)
+    tailTimer = setTimeout(syncSnapTail, 160)
+  }
+  window.__syncSnapTail = syncSnapTail
+
+  window.addEventListener('scroll', () => { schedule(); scheduleSettle(); scheduleSnapTail() }, { passive: true })
   // Only the homepage has chapters for these to drive, and a non-passive wheel
   // listener makes the browser wait for JS before it can scroll — on all eight
   // pages it was doing that for a handler whose first line returns immediately.
@@ -747,7 +768,25 @@ window.addEventListener('beforeprint', () => {
     window.addEventListener('wheel', handleWheel, { passive: false })
     window.addEventListener('keydown', handleKey)
   }
-  window.addEventListener('resize', refreshState, { passive: true })
+  // A phone's browser resizes the viewport's height, and only its height,
+  // each time its toolbar slides in or out — on iOS several times on the way
+  // down a page and again at the bottom. Nothing here is sized by that
+  // (sections are svh, which ignores the toolbar), so re-measuring then only
+  // shifts the hero drift a few pixels mid-scroll. Rotations, window resizes
+  // and anything bigger than a toolbar still re-measure.
+  let lastWidth = window.innerWidth
+  let lastHeight = window.innerHeight
+  function onResize(){
+    const width = window.innerWidth
+    const height = window.innerHeight
+    const toolbarOnly = width === lastWidth && Math.abs(height - lastHeight) < 160 && touchScreen.matches
+    lastWidth = width
+    lastHeight = height
+    if (toolbarOnly) return
+    refreshState()
+    syncSnapTail()
+  }
+  window.addEventListener('resize', onResize, { passive: true })
   window.addEventListener('load', refreshState)
 
   // Arriving from another page with a chapter hash — the nav's festival button
@@ -838,6 +877,93 @@ window.addEventListener('beforeprint', () => {
   window.__remeasureScroll = () => { measure(); schedule() }
 
   refreshState()
+})()
+
+// ===== Keep the reader's place through a rotation =====
+// Turning a phone keeps the same scroll offset in pixels, but the page has
+// just re-flowed to a new width, so the same offset is somewhere else
+// entirely: three sections up on the homepage, a different row of covers on
+// the music page. Whenever scrolling comes to rest, this notes which block is
+// at the top of the screen and how far into it the reader is; when the width
+// changes it puts that block back. The note has to be taken before the
+// rotation — by the time `resize` fires the old layout is gone.
+;(function keepPlaceOnRotate(){
+  const chapters = document.querySelectorAll('main > [data-scroll-chapter]')
+  // The homepage is placed by section; other pages by the finest block that
+  // is reliably there, so a long page lands on the right row, not just the
+  // right half.
+  const selector = chapters.length
+    ? 'main > [data-scroll-chapter], .site-footer'
+    : 'main h1, main h2, main h3, main section, main form, main .release, main .watch-clip, main .member-card, main .gallery-item, main .poster-archive-card, main .contact-aside-block, .site-footer'
+  let anchor = null
+  let restoring = 0
+  let width = window.innerWidth
+
+  // The reading line: just under the header when it is fixed over the page.
+  const line = () => {
+    const header = document.querySelector('.site-header')
+    if (!header || getComputedStyle(header).position !== 'fixed') return 1
+    return Math.round(header.getBoundingClientRect().bottom) + 1
+  }
+
+  function capture(){
+    if (restoring) return
+    const y = line()
+    let best = null
+    let next = null
+    document.querySelectorAll(selector).forEach(el => {
+      const r = el.getBoundingClientRect()
+      if (!r.height) return
+      // Smallest block crossing the reading line wins — the most precise.
+      if (r.top <= y && r.bottom > y) {
+        if (!best || r.height < best.rect.height) best = { el, rect: r }
+      } else if (r.top > y && (!next || r.top < next.rect.top)) next = { el, rect: r }
+    })
+    const pick = best || next
+    if (!pick || window.scrollY < 2) { anchor = null; return }
+    anchor = { el: pick.el, fraction: Math.max(0, (y - pick.rect.top) / pick.rect.height) }
+  }
+
+  function restore(){
+    if (!anchor || !anchor.el.isConnected) return
+    const root = document.documentElement
+    const isChapter = anchor.el.hasAttribute('data-scroll-chapter')
+    const snapping = root.classList.contains('snap-sections')
+    const lastChapter = chapters[chapters.length - 1]
+    // Under section snapping a section is only ever seen from its top, except
+    // the last one, which scrolls freely (see .snap-tail).
+    let fraction = anchor.fraction
+    if (snapping && isChapter && anchor.el !== lastChapter) fraction = 0
+    if (snapping) root.classList.toggle('snap-tail', anchor.el === lastChapter || !isChapter)
+    const r = anchor.el.getBoundingClientRect()
+    const top = Math.max(0, Math.round(window.scrollY + r.top + fraction * r.height - (snapping && isChapter ? 0 : line())))
+    if (window.__lenis && typeof window.__lenis.scrollTo === 'function') window.__lenis.scrollTo(top, { immediate: true, force: true })
+    window.scrollTo({ top, behavior: 'instant' })
+  }
+
+  let restTimer = 0
+  window.addEventListener('scroll', () => {
+    clearTimeout(restTimer)
+    restTimer = setTimeout(capture, 180)
+  }, { passive: true })
+  window.addEventListener('load', capture)
+
+  window.addEventListener('resize', () => {
+    const w = window.innerWidth
+    if (w === width) return
+    width = w
+    if (!anchor) return
+    // Re-place now and again as the new layout settles: iOS reports the final
+    // size late, and images and the section engine re-measure after this.
+    clearTimeout(restoring)
+    restoring = setTimeout(() => {
+      restore()
+      restoring = 0
+      capture()
+    }, 450)
+    requestAnimationFrame(() => requestAnimationFrame(restore))
+    setTimeout(restore, 150)
+  }, { passive: true })
 })()
 
 // Scroll in-page single sections so they land centered in the viewport.
@@ -2229,9 +2355,11 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
 //  - record sliding out of the album sleeve              (music)
 //  - covers that toss in and flip over for details      (music)
 //  - torn edges on the EPK divider photo                 (EPK)
+//  - cards tossed in as they arrive                      (posters, watch, contact)
+//  - lean toward the cursor / squash under the thumb     (store tee, watch videos)
 ;(function motionEffects(){
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  const wanted = document.querySelector('[data-scroll-chapter], .music-feature, .release-grid, .epk-page')
+  const wanted = document.querySelector('[data-scroll-chapter], .music-feature, .release-grid, .epk-page, #poster-archive-grid, .watch-clips, .store-product, .contact-aside')
   if (!wanted) return
 
   const clamp = (v, min, max) => Math.min(max, Math.max(min, v))
@@ -2324,7 +2452,8 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       '.album-tracklist-copy h2', '.video-feature-title', '#shows-feature-heading',
       '.ep-release-title', '.home-contact h2',
       '.music-header h1', '.music-catalog-heading',
-      '.epk-section-title'
+      '.epk-section-title',
+      '.watch-clips-heading', '.contact-aside-block h2'
     ].join(',')))
     headings.forEach(heading => {
       // Already on screen by the time Motion arrived: it has had its
@@ -2397,18 +2526,36 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     label.decoding = 'async'
     vinyl.appendChild(label)
     disc.appendChild(vinyl)
-    art.parentNode.insertBefore(stage, art)
-    stage.append(disc, art)
 
-    M.animate(art, { transform: [pose('0px', '0px', -6, .92), REST] }, spring(.8, .25))
-    M.animate(stage, { transform: ['translateX(0%)', 'translateX(-16%)'] }, { ...spring(1.1, .15), delay: .25 })
-    M.animate(disc, { transform: ['translateX(0%)', 'translateX(40%)'] }, { ...spring(1.1, .18), delay: .25 })
-    M.animate(vinyl, { transform: ['rotate(0deg)', 'rotate(320deg)'] }, { duration: 1.6, ease: [.16, 1, .3, 1], delay: .25 })
-      .then(() => {
-        // Then the record keeps turning with the page.
-        M.scroll(M.animate(vinyl, { transform: ['rotate(320deg)', 'rotate(860deg)'] }, { ease: 'linear' }),
-          { target: stage, offset: ['start start', 'end start'] })
-      })
+    // The cover already has its own entrance (the stylesheet's reveal), so it
+    // is not animated again here: re-posing it after it had landed read as
+    // the cover popping in a second time. The record waits for that entrance
+    // to finish completely, too. Wrapping the cover in the stage mid-fade
+    // cancels the fade, and on a phone the cover jumped straight from
+    // invisible to shown.
+    function revealSettled(){
+      const revealed = art.classList.contains('in-view') || !art.classList.contains('reveal-scale')
+      const running = typeof art.getAnimations === 'function' && art.getAnimations().length > 0
+      return revealed && !running
+    }
+    const startedAt = performance.now()
+    function whenSettled(cb){
+      if (revealSettled() || performance.now() - startedAt > 4000) return cb()
+      setTimeout(() => whenSettled(cb), 80)
+    }
+
+    whenSettled(() => {
+      art.parentNode.insertBefore(stage, art)
+      stage.append(disc, art)
+      M.animate(stage, { transform: ['translateX(0%)', 'translateX(-16%)'] }, { ...spring(1.1, .15), delay: .1 })
+      M.animate(disc, { transform: ['translateX(0%)', 'translateX(40%)'] }, { ...spring(1.1, .18), delay: .1 })
+      M.animate(vinyl, { transform: ['rotate(0deg)', 'rotate(320deg)'] }, { duration: 1.6, ease: [.16, 1, .3, 1], delay: .1 })
+        .then(() => {
+          // Then the record keeps turning with the page.
+          M.scroll(M.animate(vinyl, { transform: ['rotate(320deg)', 'rotate(860deg)'] }, { ease: 'linear' }),
+            { target: stage, offset: ['start start', 'end start'] })
+        })
+    })
   })
 
   // ---- Cover flips (music page) ----
@@ -2441,7 +2588,16 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       const back = document.createElement('div')
       back.className = 'flip-face flip-back'
       back.inert = true
-      back.innerHTML = `<p class="flip-back-title"></p><p class="flip-back-meta"></p><a target="_blank" rel="noopener"></a><button type="button" class="flip-close">Flip back</button>`
+      back.innerHTML = `<p class="flip-back-title"></p><p class="flip-back-meta"></p><a target="_blank" rel="noopener"></a><button type="button" class="flip-close visually-hidden">Flip back</button>`
+      // The back is the same cover, dimmed, under the details. A copy of the
+      // front's <picture> picks the same source the browser already has, so
+      // nothing new downloads.
+      const art = picture.cloneNode(true)
+      art.classList.add('flip-back-art')
+      art.setAttribute('aria-hidden', 'true')
+      const artImg = art.querySelector('img')
+      if (artImg) { artImg.alt = ''; artImg.loading = 'lazy' }
+      back.prepend(art)
       back.querySelector('.flip-back-title').textContent = name
       back.querySelector('.flip-back-meta').innerHTML = meta ? meta.innerHTML : ''
       const listen = back.querySelector('a')
@@ -2479,6 +2635,11 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
       }
       front.addEventListener('click', () => flip(true))
       back.querySelector('.flip-close').addEventListener('click', () => flip(false))
+      // Tapping anywhere on the back turns it over again, except the link.
+      back.addEventListener('click', e => {
+        if (e.target.closest('a, .flip-close')) return
+        flip(false)
+      })
 
       // A squash under the thumb on press.
       M.press(tilt, () => {
@@ -2527,6 +2688,98 @@ fetch('data/shows.json', { cache: 'no-store' }).then(r=>r.json()).then(data=>{
     const img = divider.querySelector('img')
     if (img) M.scroll(M.animate(img, { transform: ['scale(1.18)', 'scale(1)'] }, { ease: 'linear' }),
       { target: divider, offset: ['start end', 'end start'] })
+  })
+
+  // ---- Toss-in cards (posters, watch, contact) ----
+  // The same arrival the music page's covers make: each card still below the
+  // fold drops in from a little lower, tilted, and settles with a spring,
+  // staggered across its row. Anything already revealed is left alone. Once
+  // settled the inline pose is cleared so the stylesheet's hover lift works.
+  function tossIn(M, items, columnsOf){
+    items.forEach((item, i) => {
+      if (item.dataset.tossed) return
+      item.dataset.tossed = '1'
+      const box = item.getBoundingClientRect()
+      if (item.classList.contains('in-view') || (box.top < window.innerHeight && box.bottom > 0)) return
+      // The cards' own CSS transitions (opacity, transform) would otherwise
+      // restart underneath when the inline pose is handed back, and the card
+      // would dip and fade in a second time after it landed.
+      // Same for a CSS entrance of its own (the watch clips' fadeUp): its
+      // filled end state outranks the inline opacity, so the card showed,
+      // vanished when its turn came, and popped in a second time.
+      item.style.transition = 'none'
+      item.style.animation = 'none'
+      item.classList.remove('reveal-scale', 'reveal')
+      item.style.opacity = '0'
+      M.inView(item, () => {
+        const columns = Math.max(1, columnsOf ? columnsOf() : 1)
+        // A lazy image that lands mid-entrance is a second pop of its own, so
+        // wait for the card's pictures to be ready, but never more than 600ms.
+        const images = Array.from(item.querySelectorAll('img')).map(img => img.decode().catch(() => {}))
+        const ready = Promise.race([Promise.all(images), new Promise(r => setTimeout(r, 600))])
+        ready.then(() => M.animate(item,
+          { opacity: [0, 1], transform: [pose('0px', '60px', rand(-8, 8).toFixed(1), .8), REST] },
+          { ...spring(.7, .35), delay: (i % columns) * .07 })
+          .then(() => {
+            item.style.transform = ''
+            item.style.opacity = ''
+            item.classList.add('in-view')
+            void getComputedStyle(item).opacity
+            item.style.transition = ''
+          }))
+      }, { amount: .2 })
+    })
+  }
+  const columnCount = grid => () => getComputedStyle(grid).gridTemplateColumns.split(' ').length || 1
+
+  features.push(M => {
+    // Poster cards are built from shows.json, so they may arrive after Motion.
+    const posters = document.getElementById('poster-archive-grid')
+    if (posters) {
+      const run = () => tossIn(M, Array.from(posters.querySelectorAll('.poster-archive-card')), columnCount(posters))
+      run()
+      new MutationObserver(run).observe(posters, { childList: true })
+    }
+    const clips = document.querySelector('.watch-clips-grid')
+    if (clips) tossIn(M, Array.from(clips.querySelectorAll('.watch-clip')), columnCount(clips))
+    const aside = document.querySelector('.contact-aside')
+    if (aside) {
+      // The aside fades in as one block; hand its blocks the entrance instead.
+      const blocks = Array.from(aside.querySelectorAll('.contact-aside-block'))
+      const box = aside.getBoundingClientRect()
+      if (blocks.length && !(box.top < window.innerHeight && box.bottom > 0)) {
+        aside.classList.remove('reveal')
+        aside.classList.add('in-view')
+        tossIn(M, blocks, () => getComputedStyle(aside).gridTemplateColumns.split(' ').length || 1)
+      }
+    }
+  })
+
+  // ---- Lean and squash (store tee, watch videos) ----
+  // With a mouse the piece leans toward the cursor; under a thumb it gives a
+  // little on press. Rotation only, on the element's own layer.
+  features.push(M => {
+    const targets = Array.from(document.querySelectorAll('.store-product-image, .watch-feature .video-embed-large, .watch-clip .video-embed'))
+    targets.forEach(el => {
+      // Their stylesheet transition on transform would chase every spring
+      // frame and turn it to mush; the spring is the easing now.
+      el.style.transitionProperty = 'box-shadow, opacity'
+      M.press(el, () => {
+        M.animate(el, { scale: .97 }, spring(.2, .3))
+        return () => M.animate(el, { scale: 1 }, spring(.35, .5))
+      })
+      if (!finePointer.matches) return
+      const strength = el.classList.contains('store-product-image') ? 14 : 6
+      el.addEventListener('pointermove', e => {
+        const r = el.getBoundingClientRect()
+        const x = (e.clientX - r.left) / r.width - .5
+        const y = (e.clientY - r.top) / r.height - .5
+        M.animate(el, { rotateY: x * strength, rotateX: -y * strength, transformPerspective: 900 }, { type: 'spring', stiffness: 300, damping: 25 })
+      })
+      el.addEventListener('pointerleave', () => {
+        M.animate(el, { rotateY: 0, rotateX: 0 }, { type: 'spring', stiffness: 200, damping: 18 })
+      })
+    })
   })
 
   function start(){

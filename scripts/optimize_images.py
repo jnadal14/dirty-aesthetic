@@ -531,6 +531,28 @@ if _video_master.exists():
 else:
     print(f"  SKIP video-bg (missing {_video_master_name})")
 
+# Music video covers. YouTube's own thumbnail at the size an embed facade can
+# use (hqdefault) is 480x360 with letterbox bars and looked soft on any large
+# screen, so the official stills are cut here instead: 16:9, at three widths for
+# a srcset (phones, the grid clips and a 2x desktop feature). Masters live in
+# _source/video/thumbs/<slug>-mv-thumb.*; the slug is the output name.
+print("Music video covers")
+OUT_VIDEO = OUT / "video"
+OUT_VIDEO.mkdir(parents=True, exist_ok=True)
+for _thumb in sorted((SRC / "video" / "thumbs").glob("*-mv-thumb.*")):
+    _slug = _thumb.stem.replace("-mv-thumb", "")
+    with Image.open(_thumb) as _thumb_src:
+        _still = crop_to_aspect(ImageOps.exif_transpose(_thumb_src).convert("RGB"), 16 / 9)
+    for _width in (640, 1280, 1920):
+        _variant = resize_to_width(_still, _width)
+        _variant_jpg = OUT_VIDEO / f"{_slug}-{_width}.jpg"
+        _variant_webp = OUT_VIDEO / f"{_slug}-{_width}.webp"
+        save_jpeg(_variant, _variant_jpg, quality=82)
+        save_webp_from_image(_variant, _variant_webp, quality=80)
+        print(f"  {_slug} {_variant.width}x{_variant.height}")
+        report(_variant_jpg)
+        report(_variant_webp)
+
 print("Featured show artwork")
 # Upcoming-show artwork, driven by data/shows.json rather than named here, so
 # adding a show is a data edit. Each entry needs posterSource (a path under
