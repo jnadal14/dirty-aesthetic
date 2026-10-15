@@ -1,5 +1,5 @@
 {
-  "_readme": "Dirty Aesthetic's official credits for the whole catalog, one entry per project, newest first. Songwriter, performer and engineering credits match the band's Apple Music listings (each song's credits page); production credits on Blue Roses, While I Wonder and Run come from the band, as Apple lists none. Names are given as the band uses them (Josh, not Joshua). Singles that were later collected on the album or the EP appear once, under that project, with a firstReleased note. The Credits section of music.html mirrors this file; change both together.",
+  "_readme": "Dirty Aesthetic's official credits for the whole catalog, one entry per project, newest first. Songwriter, performer and engineering credits match the band's Apple Music listings (each song's credits page); production credits on Blue Roses, While I Wonder and Run come from the band, as Apple lists none. Names are given as the band uses them (Josh, not Joshua). Connor Wilkinson, listed by Apple as a songwriter on Run, is left off at the band's request. Singles that were later collected on the album or the EP appear once, under that project, with a firstReleased note. The Credits section of music.html mirrors this file; change both together.",
   "projects": [
     {
       "title": "Modern Nostalgia",
@@ -1061,8 +1061,7 @@
           "appleId": "1773507806",
           "songwriters": [
             "Dylan Iwaschuk",
-            "Josh Seaman",
-            "Connor Wilkinson"
+            "Josh Seaman"
           ],
           "engineering": [
             {
