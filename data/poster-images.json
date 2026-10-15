@@ -6,6 +6,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1125,
+    "webpSmall": "assets/images/posters/archive/sep-30-2026-the-roxy-cabaret-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/sep-30-2026-the-roxy-cabaret.webp",
     "fullWidth": 1080,
     "fullHeight": 1350
@@ -17,6 +19,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1125,
+    "webpSmall": "assets/images/posters/archive/sep-23-2026-hestia-kitchen-bar-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/sep-23-2026-hestia-kitchen-bar.webp",
     "fullWidth": 1600,
     "fullHeight": 1600
@@ -28,6 +32,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1125,
+    "webpSmall": "assets/images/posters/archive/sep-11-2026-the-roxy-cabaret-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/sep-11-2026-the-roxy-cabaret.webp",
     "fullWidth": 1536,
     "fullHeight": 1920
@@ -39,6 +45,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1125,
+    "webpSmall": "assets/images/posters/archive/aug-22-2026-name-it-yourself-music-festival-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/aug-22-2026-name-it-yourself-music-festival.webp",
     "fullWidth": 1280,
     "fullHeight": 1600
@@ -50,6 +58,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1112,
+    "webpSmall": "assets/images/posters/archive/aug-14-2026-the-biltmore-cabaret-modern-nostalgia-album-release-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/aug-14-2026-the-biltmore-cabaret-modern-nostalgia-album-release.webp",
     "fullWidth": 1600,
     "fullHeight": 1976
@@ -61,6 +71,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1125,
+    "webpSmall": "assets/images/posters/archive/aug-1-2026-the-roxy-cabaret-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/aug-1-2026-the-roxy-cabaret.webp",
     "fullWidth": 960,
     "fullHeight": 1200
@@ -72,6 +84,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1260,
+    "webpSmall": "assets/images/posters/archive/jul-30-2026-red-gate-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/jul-30-2026-red-gate.webp",
     "fullWidth": 1089,
     "fullHeight": 1525
@@ -83,6 +97,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1120,
+    "webpSmall": "assets/images/posters/archive/jun-27-2026-pangea-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/jun-27-2026-pangea.webp",
     "fullWidth": 926,
     "fullHeight": 1152
@@ -94,6 +110,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1200,
+    "webpSmall": "assets/images/posters/archive/may-29-2026-the-biltmore-cabaret-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/may-29-2026-the-biltmore-cabaret.webp",
     "fullWidth": 1600,
     "fullHeight": 2133
@@ -105,6 +123,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1125,
+    "webpSmall": "assets/images/posters/archive/apr-18-2026-green-auto-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/apr-18-2026-green-auto.webp",
     "fullWidth": 1080,
     "fullHeight": 1350
@@ -116,6 +136,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1200,
+    "webpSmall": "assets/images/posters/archive/apr-4-2026-green-auto-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/apr-4-2026-green-auto.webp",
     "fullWidth": 900,
     "fullHeight": 1200
@@ -127,6 +149,8 @@
     "type": "jpeg",
     "width": 750,
     "height": 1000,
+    "webpSmall": "assets/images/posters/archive/apr-3-2026-red-gate-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/apr-3-2026-red-gate.webp",
     "fullWidth": 750,
     "fullHeight": 1000
@@ -138,6 +162,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1125,
+    "webpSmall": "assets/images/posters/archive/mar-27-2026-leo-s-clothing-supply-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/mar-27-2026-leo-s-clothing-supply.webp",
     "fullWidth": 1080,
     "fullHeight": 1350
@@ -149,6 +175,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1125,
+    "webpSmall": "assets/images/posters/archive/mar-1-2026-red-gate-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/mar-1-2026-red-gate.webp",
     "fullWidth": 1080,
     "fullHeight": 1350
@@ -160,6 +188,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1137,
+    "webpSmall": "assets/images/posters/archive/feb-22-2026-green-auto-new-and-known-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/feb-22-2026-green-auto-new-and-known.webp",
     "fullWidth": 950,
     "fullHeight": 1200
@@ -171,6 +201,8 @@
     "type": "jpeg",
     "width": 900,
     "height": 1125,
+    "webpSmall": "assets/images/posters/archive/jan-16-2026-the-biltmore-cabaret-sugar-on-the-rocks-ep-release-480.webp",
+    "smallWidth": 480,
     "fullWebp": "assets/images/posters/archive/full/jan-16-2026-the-biltmore-cabaret-sugar-on-the-rocks-ep-release.webp",
     "fullWidth": 960,
     "fullHeight": 1200

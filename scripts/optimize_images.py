@@ -289,7 +289,7 @@ def save_variant(img, out_dir, out_base, jpeg_q, webp_q):
 
 
 def process_raster(src_path, out_dir, out_base, target_width, jpeg_q=82, webp_q=80,
-                   lightbox_width=None, display_aspect=None):
+                   lightbox_width=None, display_aspect=None, small_width=None):
     """Display-sized variant, plus an optional lightbox-sized one.
 
     Without lightbox_width the manifest's "full" points at the untouched
@@ -299,6 +299,10 @@ def process_raster(src_path, out_dir, out_base, target_width, jpeg_q=82, webp_q=
     `display_aspect` crops the display variant only. The lightbox keeps the
     whole picture, because cropping to fit a card is a layout decision and the
     full artwork is the thing someone clicked to see.
+
+    `small_width` adds a `<out_base>-<w>.webp` the page offers through srcset
+    (manifest "webpSmall"/"smallWidth"), for places that usually draw the
+    picture well under target_width.
     """
     img = Image.open(src_path)
     img = ImageOps.exif_transpose(img)
@@ -314,6 +318,14 @@ def process_raster(src_path, out_dir, out_base, target_width, jpeg_q=82, webp_q=
         "width": resized.width,
         "height": resized.height,
     }
+
+    if small_width:
+        small = resize_to_width(display, small_width)
+        out_small = out_dir / f"{out_base}-{small_width}.webp"
+        save_webp_from_image(small.convert("RGB") if kind == "jpeg" else small, out_small, webp_q,
+                             alpha=kind != "jpeg")
+        meta["webpSmall"] = rel(out_small)
+        meta["smallWidth"] = small.width
 
     if lightbox_width:
         full_dir = out_dir / "full"
@@ -345,14 +357,14 @@ def process(src_name, out_name, target_width, jpeg_q=82, webp_q=80, out_dir=None
     return meta
 
 
-def process_cover(src_name, out_name=None, target=1200, jpeg_q=85, webp_q=82, lightbox=1600):
+def process_cover(src_name, out_name=None, target=1200, jpeg_q=85, webp_q=82, lightbox=1600, small=None):
     src = SRC / "covers" / src_name
     if not src.exists():
         print(f"  SKIP covers/{src_name} (missing)")
         return None
     out_base = Path(out_name or src_name).stem
     meta = process_raster(src, OUT_COVERS, out_base, target, jpeg_q, webp_q,
-                          lightbox_width=lightbox)
+                          lightbox_width=lightbox, small_width=small)
     report(OUT_COVERS / Path(meta["src"]).name)
     report(OUT_COVERS / Path(meta["webp"]).name)
     return meta
@@ -841,8 +853,11 @@ for src_name in [
     "cover_while_i_wonder.jpg",
     "cover_run.jpg",
 ]:
+    # Covers draw at 300-420 CSS px (340 in the music grid, 45vw on phones),
+    # so most screens take the 600 through srcset (coverSet() in
+    # components/Picture.tsx) and only 2x desktops reach for the big one.
     process_cover(src_name, target=1200, jpeg_q=85, webp_q=82,
-                  lightbox=1600 if src_name in COVERS_WITH_LIGHTBOX else None)
+                  lightbox=1600 if src_name in COVERS_WITH_LIGHTBOX else None, small=600)
 
 print("Lineup portraits")
 lineup_manifest = {}
@@ -882,11 +897,12 @@ if shows_path.exists():
         # posterCardAspect ("W / H") on the show crops the card variant to fill
         # instead. The lightbox still opens the whole poster.
         card_aspect = parse_aspect(show.get("posterCardAspect"))
-        # Grid thumbnails render about 430px wide in a 3-column layout, and a
-        # full-size version is one click away in the lightbox, so these do not
-        # need archival quality.
+        # Grid cards are 110-280 CSS px wide (5 columns on desktop, 3 on a
+        # phone), so the grid takes the 480 through srcset and only big
+        # screens reach for the 900. The full-size version is one click away
+        # in the lightbox, so these do not need archival quality.
         meta = process_raster(src, OUT_POSTERS, out_base, 900, jpeg_q=78, webp_q=72,
-                              lightbox_width=1600, display_aspect=card_aspect)
+                              lightbox_width=1600, display_aspect=card_aspect, small_width=480)
         poster_manifest[poster_path] = meta
         report(OUT_POSTERS / Path(meta["src"]).name)
         report(OUT_POSTERS / Path(meta["webp"]).name)
