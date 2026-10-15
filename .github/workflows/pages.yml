@@ -1,12 +1,12 @@
-# Publishes the site with a shallow checkout.
+# Builds the Next.js static export and publishes it to GitHub Pages.
 #
-# The built-in Pages builder clones the full repository, and this one carries
-# close to a gigabyte of history from years of committed camera originals. That
-# clone stopped fitting inside the builder's 15 minute limit, so every build was
-# cancelled before it could deploy. actions/checkout takes only the tip commit,
-# which is about 60 MB, so the deploy no longer depends on the size of history.
+# The checkout stays shallow. This repository carries close to a gigabyte of
+# history from years of committed camera originals; the built-in Pages
+# builder had to clone all of it and stopped fitting inside its 15 minute
+# limit. actions/checkout with fetch-depth 1 takes only the tip commit.
 #
-# Requires Settings -> Pages -> Source = "GitHub Actions".
+# Requires Settings -> Pages -> Source = "GitHub Actions". The site is served
+# at the custom domain root (public/CNAME), so no base path is set.
 
 name: Deploy site to Pages
 
@@ -26,25 +26,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout (tip commit only)
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
+
+      - run: npm ci
+
+      # `next build` writes the static site to out/; postbuild adds folder
+      # index pages (scripts/postbuild.mjs).
+      - run: npm run build
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: out
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

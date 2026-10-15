@@ -15,9 +15,16 @@ _source/
 __pycache__/
 *.pyc
 
-# Claude Code instructions, kept local
+# Local editor/assistant notes
 CLAUDE.md
+AGENTS.md
 
-# Local test harness (Playwright, Lighthouse). Never deployed; the site itself
-# has no npm dependencies.
+# Local test harness (Playwright, Lighthouse). Never deployed.
 tools/
+
+# Next.js build output and dependencies
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo

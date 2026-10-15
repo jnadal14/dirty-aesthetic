@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-
-# Build scripts and the plain-text EPK copy they use, and the unlisted
-# animation sandbox. None of these are pages.
-Disallow: /scripts/
-Disallow: /lab.html
-
-Sitemap: https://www.dirtyaesthetic.com/sitemap.xml

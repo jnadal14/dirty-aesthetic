@@ -6,40 +6,48 @@ Official website for Dirty Aesthetic, an indie garage rock band from Vancouver, 
 
 ## Pages
 
-- **Home** (`index.html`): hero timelapse, *Modern Nostalgia* tracklist, video, upcoming shows, *Sugar on the Rocks* EP and contact form
-- **Music** (`music.html`): discography with streaming links
-- **Watch** (`watch.html`): music videos and live footage
-- **Store** (`store.html`): merch and physical media
-- **EPK** (`epk.html`): press kit with bio, lineup, gallery, stage plot and downloads
-- **Poster Archive** (`posters.html`): past show posters
-- **Contact** (`contact.html`): contact form (Formspree)
-- **Privacy** (`privacy.html`): privacy policy
-- `lab.html`: unlisted, noindex animation sandbox, not linked from anywhere
+- **Home** (`/`): hero timelapse, *Modern Nostalgia* tracklist, video, upcoming shows, *Sugar on the Rocks* EP and contact form
+- **Music** (`/music`): discography with streaming links and credits
+- **Watch** (`/watch`): music videos and live footage
+- **Store** (`/store`): merch preorder
+- **EPK** (`/epk`): press kit with bio, lineup, gallery, stage plot and downloads
+- **Poster Archive** (`/posters`): past show posters
+- **Contact** (`/contact`): contact form (Formspree)
+- **Privacy** (`/privacy`): privacy policy
 
-The pages stay at the repo root on purpose: their URLs are linked from ads,
-socials and search results, so moving them would break those links.
+Every page is also published at its old `.html` address (`/music.html` etc.),
+which is what ads, bios, search results and the sitemap link to.
 
 ## Tech Stack
 
-Static site with no framework and no build step.
+- Next.js (App Router) + React, exported as a static site (`output: 'export'`)
+- Tailwind CSS v4, Motion for animation, Lenis for smooth scroll
+- Custom font: Nafta Light (`app/fonts/`, loaded with `next/font`)
+- Hosted on GitHub Pages at the custom domain in `public/CNAME`
 
-- HTML / CSS / vanilla JS, one shared `css/styles.css` and `js/main.js`
-- Custom font: Nafta Light (`assets/fonts/`)
-- Vendored libraries in `vendor/` (Lenis smooth scroll, Motion animations), no runtime CDN
-- Hosted on GitHub Pages with the custom domain in `CNAME`
+```
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # static site in out/
+npm run lint && npx tsc --noEmit
+```
 
 ## Structure
 
 ```
-index.html … privacy.html   # The pages (see above). Must stay at the root.
-css/styles.css               # All site styles (lab.css: sandbox only)
-js/main.js                   # All site behaviour (lab.js: sandbox only)
-vendor/                      # lenis.min.js, motion.min.js
-data/                        # Content fetched at runtime (shows, release
+app/                         # One folder per page (page.tsx), plus the shared
+                             #   layout, global CSS and the font
+components/                  # UI, grouped by page (home/, music/, epk/ ...);
+                             #   motion/ holds the shared animation pieces
+lib/                         # Site config, metadata, typed data readers
+content/jsonld/              # Structured data per page
+data/                        # Content read at build time (shows, release
                              #   links, gallery order, credits) plus the two
                              #   generated image manifests
+public/                      # Copied as-is: CNAME, robots.txt, sitemap.xml,
+                             #   and assets/ (a link to the folder below)
 assets/                      # Only what the browser loads. All committed.
-  fonts/  video/  downloads/ #   woff2, hero timelapse, EPK + stage plot PDFs
+  video/  downloads/         #   hero timelapse, EPK + stage plot PDFs
   images/
     backgrounds/             #   section and page backdrops (+ -mobile crops)
     covers/   full/          #   grid size + lightbox size
@@ -49,6 +57,7 @@ assets/                      # Only what the browser loads. All committed.
     logos/  merch/           #   plus favicons at the top level
 scripts/
   optimize_images.py         # _source/ masters → assets/ + image manifests
+  postbuild.mjs              # adds <page>/index.html copies to the export
   generate_epk_pdf.py        # builds assets/downloads/dirtyaesthetic_epk.pdf
   epk-copy.txt               # plain-text EPK copy (bio also lives in the PDF
                              #   script; keep the two in sync)
@@ -64,8 +73,8 @@ _source/                     # Full-resolution masters. GITIGNORED, never
   posters/  press/  social/  video/  fonts/
 ```
 
-Masters never go in the repo root or `assets/`: anything committed there is
-published to the live site.
+Masters never go in the repo root, `assets/` or `public/`: anything committed
+there is published to the live site.
 
 ## Images
 
@@ -109,9 +118,9 @@ streaming services once the release is live.
 
 ## Shows
 
-Upcoming shows live in `data/shows.json` under `upcoming`. The homepage only renders `upcoming` (via `js/main.js`).
+Upcoming shows live in `data/shows.json` under `upcoming`. The first entry drives the ticket button in the menu and leads the homepage shows section.
 
-**Past archive:** The same file includes a `past` array. Shows with a `poster` are displayed automatically on `posters.html`; keep the newest past dates first. After moving a show into `past`, run `python3 scripts/optimize_images.py` to refresh its poster thumbnail.
+**Past archive:** The same file includes a `past` array. Shows with a `poster` are displayed automatically on `/posters`; keep the newest past dates first. After moving a show into `past`, run `python3 scripts/optimize_images.py` to refresh its poster thumbnail.
 
 Each show entry may include:
 
@@ -129,6 +138,8 @@ Each show entry may include:
 
 ## Deployment
 
-Push to `main`. `.github/workflows/pages.yml` does a shallow checkout and
-publishes the repo root. (The full history carries about 1 GB of old camera
+Push to `main`. `.github/workflows/pages.yml` does a shallow checkout, runs
+`npm ci && npm run build`, and publishes `out/`. Content edits in `data/`
+deploy the same way; the site is live a minute or two after the build passes
+(check the Actions tab). Settings → Pages → Source must be "GitHub Actions". (The full history carries about 1 GB of old camera
 originals, too much for GitHub's built-in Pages builder.)

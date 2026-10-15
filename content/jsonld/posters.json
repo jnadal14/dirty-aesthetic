@@ -1,0 +1,66 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "MusicGroup",
+      "@id": "https://www.dirtyaesthetic.com/#band",
+      "name": "Dirty Aesthetic",
+      "alternateName": "Dirty Aesthetic Band",
+      "url": "https://www.dirtyaesthetic.com/",
+      "description": "Dirty Aesthetic is a five piece indie garage rock band from Vancouver, British Columbia, formed in the summer of 2024. Their debut album, Modern Nostalgia, was released in August 2026.",
+      "genre": [
+        "Indie rock",
+        "Garage rock",
+        "Alternative rock"
+      ],
+      "foundingDate": "2024",
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "Vancouver, British Columbia, Canada"
+      },
+      "location": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Vancouver",
+          "addressRegion": "BC",
+          "addressCountry": "CA"
+        }
+      },
+      "email": "dirtyaestheticmusic@gmail.com",
+      "image": "https://www.dirtyaesthetic.com/assets/images/backgrounds/header-desktop.jpg",
+      "logo": "https://www.dirtyaesthetic.com/assets/images/logos/da-wordmark.png",
+      "member": [
+        {
+          "@type": "Person",
+          "name": "Dylan Iwaschuk"
+        },
+        {
+          "@type": "Person",
+          "name": "Bardia Tarjoman"
+        },
+        {
+          "@type": "Person",
+          "name": "Jacob Nadal"
+        },
+        {
+          "@type": "Person",
+          "name": "Josh Seaman"
+        },
+        {
+          "@type": "Person",
+          "name": "Josh Chapman"
+        }
+      ],
+      "sameAs": [
+        "https://open.spotify.com/artist/6LJB3zSDmtQ3NxA6GjUwlt",
+        "https://music.apple.com/ca/artist/dirty-aesthetic/1773260865",
+        "https://dirtyaesthetic.bandcamp.com/",
+        "https://www.youtube.com/@dirtyaesthetic",
+        "https://instagram.com/dirtyaestheticband",
+        "https://tiktok.com/@dirty_aesthetic",
+        "https://linktr.ee/dirtyaesthetic"
+      ]
+    }
+  ]
+}
