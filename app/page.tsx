@@ -3,6 +3,7 @@ import { coverSet } from '@/components/Picture'
 import Artwork from '@/components/Artwork'
 import Button from '@/components/Button'
 import ContactForm from '@/components/ContactForm'
+import Footer from '@/components/Footer'
 import JsonLd from '@/components/JsonLd'
 import SectionBg from '@/components/SectionBg'
 import StreamButtons from '@/components/StreamButtons'
@@ -78,7 +79,7 @@ export default function Home() {
           <div className="mx-auto max-w-[1000px] px-[clamp(16px,4vw,32px)] text-center">
             <Reveal><span className="kicker tracking-[.3em]">Official Music Video</span></Reveal>
             <SplitText text={release.video.title} by="char" stagger={0.03} className="display mt-2 mb-8 text-giant" />
-            <Reveal delay={0.15} scale={0.94} blur={false}>
+            <Reveal delay={0.15} scale={0.94}>
               <YouTubeFacade id={release.video.youtubeId} cover="modern-nostalgia" sizes="(min-width: 1100px) 1000px, 92vw"
                 title="Dirty Aesthetic, Modern Nostalgia (Official Music Video)" label="Play the Modern Nostalgia music video" />
             </Reveal>
@@ -116,14 +117,18 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="contact-section" className="relative isolate overflow-clip py-[clamp(80px,12vw,150px)]">
-          <SectionBg image="contact-bg" scrim="linear-gradient(180deg,rgba(6,4,8,.9) 0%,rgba(8,5,10,.82) 45%,rgba(4,3,5,.94) 100%)" />
-          <div className="container-x text-center">
-            <SplitText text="Get In Touch" by="char" stagger={0.03} className="display text-giant text-accent" />
-            <Reveal delay={0.1}><p className="mt-3 text-sand">Bookings, collaborations, and general inquiries.</p></Reveal>
-            <ContactForm className="mt-10" />
-          </div>
-        </section>
+        {/* The contact photo runs on behind the footer (the layout skips its own here). */}
+        <div className="relative isolate overflow-clip">
+          <SectionBg image="contact-bg" scrim="linear-gradient(180deg,rgba(6,4,8,.9) 0%,rgba(8,5,10,.82) 40%,rgba(4,3,5,.9) 100%)" />
+          <section id="contact-section" className="py-[clamp(80px,12vw,150px)]">
+            <div className="container-x text-center">
+              <SplitText text="Get In Touch" by="char" stagger={0.03} className="display text-giant text-accent" />
+              <Reveal delay={0.1}><p className="mt-3 text-sand">Bookings, collaborations, and general inquiries.</p></Reveal>
+              <ContactForm className="mt-10" />
+            </div>
+          </section>
+          <Footer transparent />
+        </div>
       </div>
     </>
   )

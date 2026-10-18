@@ -64,9 +64,9 @@
     },
     {
       "@type": "MusicAlbum",
-      "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia",
+      "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia",
       "name": "Modern Nostalgia",
-      "url": "https://www.dirtyaesthetic.com/music.html",
+      "url": "https://www.dirtyaesthetic.com/music",
       "byArtist": {
         "@id": "https://www.dirtyaesthetic.com/#band"
       },
@@ -100,7 +100,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626417",
               "recordingOf": {
@@ -142,7 +142,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626418",
               "recordingOf": {
@@ -184,7 +184,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626419",
               "recordingOf": {
@@ -226,7 +226,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626420",
               "recordingOf": {
@@ -268,7 +268,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626421",
               "recordingOf": {
@@ -310,7 +310,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626422",
               "recordingOf": {
@@ -336,7 +336,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626423",
               "recordingOf": {
@@ -378,7 +378,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626424",
               "recordingOf": {
@@ -420,7 +420,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626425",
               "recordingOf": {
@@ -450,7 +450,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626426",
               "recordingOf": {
@@ -492,7 +492,7 @@
                 "@id": "https://www.dirtyaesthetic.com/#band"
               },
               "inAlbum": {
-                "@id": "https://www.dirtyaesthetic.com/music.html#modern-nostalgia"
+                "@id": "https://www.dirtyaesthetic.com/music#modern-nostalgia"
               },
               "url": "https://music.apple.com/us/song/6796626427",
               "recordingOf": {

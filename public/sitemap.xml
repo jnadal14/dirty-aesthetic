@@ -6,37 +6,37 @@
     <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://www.dirtyaesthetic.com/music.html</loc>
+    <loc>https://www.dirtyaesthetic.com/music</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.dirtyaesthetic.com/watch.html</loc>
+    <loc>https://www.dirtyaesthetic.com/watch</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.dirtyaesthetic.com/posters.html</loc>
+    <loc>https://www.dirtyaesthetic.com/posters</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.dirtyaesthetic.com/epk.html</loc>
+    <loc>https://www.dirtyaesthetic.com/epk</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.dirtyaesthetic.com/contact.html</loc>
+    <loc>https://www.dirtyaesthetic.com/contact</loc>
     <priority>0.7</priority>
     <changefreq>yearly</changefreq>
   </url>
   <url>
-    <loc>https://www.dirtyaesthetic.com/store.html</loc>
+    <loc>https://www.dirtyaesthetic.com/store</loc>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://www.dirtyaesthetic.com/privacy.html</loc>
+    <loc>https://www.dirtyaesthetic.com/privacy</loc>
     <priority>0.3</priority>
     <changefreq>yearly</changefreq>
   </url>

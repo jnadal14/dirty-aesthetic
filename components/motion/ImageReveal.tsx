@@ -4,39 +4,26 @@ import { motion } from 'motion/react'
 import { EASE } from '@/lib/motion'
 
 /**
- * Artwork reveal: the clip opens from the bottom while the picture inside
- * un-zooms and un-blurs. For covers and product shots, not full-screen layers.
- * On mount it runs in CSS (.enter-clip / .enter-unzoom) from the first paint.
+ * Artwork reveal: a short fade and rise, so the cover is readable almost at
+ * once. Transform and opacity only (no blur or clip, which repaint the image
+ * every frame). For covers and product shots, not full-screen layers.
+ * On mount it runs in CSS (.enter-art) from the first paint.
  */
 export default function ImageReveal({ children, className = '', delay = 0, onMount }: {
   children: React.ReactNode; className?: string; delay?: number; onMount?: boolean
 }) {
   if (onMount) {
-    const d = { '--d': `${delay}s` } as React.CSSProperties
-    return (
-      <div className={`enter-clip overflow-hidden ${className}`} style={d}>
-        <div className="enter-unzoom h-full w-full" style={d}>{children}</div>
-      </div>
-    )
+    return <div className={`enter-art overflow-hidden ${className}`} style={{ '--d': `${delay}s` } as React.CSSProperties}>{children}</div>
   }
-  const view = { once: true, margin: '0px 0px -10% 0px' }
   return (
     <motion.div
       className={`overflow-hidden ${className}`}
-      initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
-      whileInView={{ clipPath: 'inset(0% 0% 0% 0%)' }}
-      viewport={view}
-      transition={{ duration: 1.1, ease: EASE, delay }}
+      initial={{ opacity: 0, y: 20, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+      transition={{ duration: 0.55, ease: EASE, delay }}
     >
-      <motion.div
-        className="h-full w-full"
-        initial={{ scale: 1.18, filter: 'blur(10px)' }}
-        whileInView={{ scale: 1, filter: 'blur(0px)' }}
-        viewport={view}
-        transition={{ duration: 1.4, ease: EASE, delay }}
-      >
-        {children}
-      </motion.div>
+      {children}
     </motion.div>
   )
 }

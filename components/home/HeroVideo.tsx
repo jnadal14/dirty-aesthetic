@@ -5,12 +5,14 @@ import { useEffect, useRef, useState } from 'react'
 /**
  * The hero timelapse. Picks the phone or desktop cut, starts after the page
  * has loaded (or 2.5s in), skips itself for reduced motion, data saver and 2G,
- * and pauses while the hero is off screen. The section's own background is
+ * and pauses while `active` is false (the hero is covered; see Hero). The section's own background is
  * the clip's first frame, so nothing changes if the video never plays.
  */
-export default function HeroVideo() {
+export default function HeroVideo({ active }: { active: boolean }) {
   const ref = useRef<HTMLVideoElement>(null)
   const [playing, setPlaying] = useState(false)
+  const started = useRef(false)
+  const shown = useRef(true)
 
   useEffect(() => {
     const video = ref.current
@@ -21,36 +23,33 @@ export default function HeroVideo() {
 
     const phone = matchMedia('(max-width: 640px)')
     const src = () => (phone.matches ? '/assets/video/hero-timelapse-mobile.mp4' : '/assets/video/hero-timelapse.mp4')
-    let started = false
-    let onScreen = true
-    const play = () => { if (onScreen) video.play().catch(() => {}) }
     const start = () => {
-      if (started) return
-      started = true
+      if (started.current) return
+      started.current = true
       video.src = src()
       video.preload = 'auto'
-      play()
+      if (shown.current) video.play().catch(() => {})
     }
-    const swap = () => { if (!started) return; setPlaying(false); video.src = src(); play() }
+    const swap = () => { if (!started.current) return; setPlaying(false); video.src = src(); if (shown.current) video.play().catch(() => {}) }
 
     let timer: ReturnType<typeof setTimeout> | undefined
     if (document.readyState === 'complete') start()
     else { addEventListener('load', start, { once: true }); timer = setTimeout(start, 2500) }
     phone.addEventListener('change', swap)
-    const io = new IntersectionObserver(([e]) => {
-      onScreen = e.isIntersecting
-      if (!started) return
-      if (onScreen) play()
-      else video.pause()
-    })
-    io.observe(video)
     return () => {
       clearTimeout(timer)
       removeEventListener('load', start)
       phone.removeEventListener('change', swap)
-      io.disconnect()
     }
   }, [])
+
+  useEffect(() => {
+    shown.current = active
+    const video = ref.current
+    if (!video || !started.current) return
+    if (active) video.play().catch(() => {})
+    else video.pause()
+  }, [active])
 
   return (
     <video

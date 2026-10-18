@@ -1,0 +1,11 @@
+# Read by the Cloudflare Worker (not served). Without these every file goes out
+# with max-age=0, so each visit re-checks every script, font and photo.
+
+# Hashed build files: the name changes whenever the content does.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Photos, video, PDFs. Names are stable, so a replaced file can be up to a day
+# stale in a returning visitor's browser (then refreshed in the background).
+/assets/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

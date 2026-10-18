@@ -10,11 +10,11 @@ export const ALBUM_TRACKS: [string, string][] = [
 ]
 
 const row: Variants = {
-  hidden: { opacity: 0, y: 14, filter: 'blur(6px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: SPRING },
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: SPRING },
 }
 
-/** Modern Nostalgia's tracklist panel. Rows blur up one after another. */
+/** Modern Nostalgia's tracklist panel. Rows rise one after another. */
 export default function Tracklist({ className = '' }: { className?: string }) {
   return (
     <div className={`rounded-md border border-bone/10 bg-black/45 p-[clamp(16px,2.4vw,28px)] backdrop-blur-sm ${className}`}>

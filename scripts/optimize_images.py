@@ -869,12 +869,15 @@ for slug, names in LINEUP_SOURCES.items():
         continue
     print(f"  {slug} <= {src.relative_to(SRC)}")
     who, _ = credit_slug(src.stem)
+    # Cards draw at about 42vw on phones (≈170 CSS px), 380 on desktop: the
+    # 500 covers phones at 2-3x, the 900 desktop retina.
     meta = process_raster(src, OUT_LINEUP, f"{who}--{slug}", 900, jpeg_q=84, webp_q=82,
-                          lightbox_width=1600)
+                          lightbox_width=1600, small_width=500)
     meta["credit"] = (photo_credits.get(f"lineup/{src.name}") or {}).get("photographer")
     lineup_manifest[slug] = meta
     report(OUT_LINEUP / Path(meta["src"]).name)
     report(OUT_LINEUP / Path(meta["webp"]).name)
+    report(OUT_LINEUP / Path(meta["webpSmall"]).name)
 
 print("Archived show posters")
 poster_manifest = {}

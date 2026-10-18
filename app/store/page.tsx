@@ -10,7 +10,7 @@ import jsonLd from '@/content/jsonld/store.json'
 export const metadata = pageMeta({
   title: 'Store • Dirty Aesthetic',
   description: 'Dirty Aesthetic merch preorder. First drop tee, $35.',
-  path: '/store.html',
+  path: '/store',
   image: '/assets/images/merch/merch-1.jpg',
 })
 

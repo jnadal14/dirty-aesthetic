@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { site } from './site'
 
 /**
- * Per-page metadata. Canonicals keep the .html URLs the site has always used
- * (and that GitHub Pages still serves), so search results and ad links are
- * unchanged by the rebuild.
+ * Per-page metadata. Canonicals use the extensionless URLs (/music); the
+ * Cloudflare host redirects the old /music.html links that ads, bios and
+ * search results still carry.
  */
 export function pageMeta({ title, description, ogDescription, path, image = '/assets/images/backgrounds/header-desktop.jpg', imageSize, robots }: {
   title: string

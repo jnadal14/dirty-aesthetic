@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useScroll, useTransform } from 'motion/react'
+import { motion, useInView, useScroll, useTransform } from 'motion/react'
 import { useLenis } from 'lenis/react'
 import { useRef } from 'react'
 import HeroVideo from './HeroVideo'
@@ -23,6 +23,10 @@ export default function Hero() {
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.85])
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.3])
   const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '-18%'])
+  // Once the marker has scrolled away, the sections have covered the hero
+  // completely (it stays stuck behind them to the end of the page), so the
+  // stage stops painting and the timelapse pauses.
+  const showing = useInView(ref, { initial: true })
   const spotify = streamLink('spotify')
   const apple = streamLink('apple')
 
@@ -40,8 +44,8 @@ export default function Hero() {
     <>
     <div ref={ref} aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-svh min-h-[560px] short:min-h-[360px]" />
     <section id="top" className="sticky top-0 h-svh min-h-[560px] overflow-clip short:min-h-[360px]" aria-label="Modern Nostalgia, out now">
-      <motion.div className="hero-still absolute inset-0 bg-umber" style={{ scale, opacity }}>
-        <HeroVideo />
+      <motion.div className="hero-still absolute inset-0 bg-umber" style={{ scale, opacity, visibility: showing ? 'visible' : 'hidden' }}>
+        <HeroVideo active={showing} />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(33,26,19,.4)_0%,rgba(33,26,19,.65)_50%,rgba(33,26,19,.9)_100%)]" />
 
         <motion.div style={{ y: contentY }} className="absolute inset-0 flex flex-col items-center justify-center px-[clamp(16px,5vw,40px)] text-center">

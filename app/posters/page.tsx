@@ -10,7 +10,7 @@ export const metadata = pageMeta({
   title: 'Poster Archive • Dirty Aesthetic',
   description: 'Dirty Aesthetic show poster archive. Past Vancouver shows, venues, dates, and billed artists.',
   ogDescription: 'Past Dirty Aesthetic shows, posters, venues, and billed artists.',
-  path: '/posters.html',
+  path: '/posters',
 })
 
 // shows.json points at masters under _source/, which are never published.

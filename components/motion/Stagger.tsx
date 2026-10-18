@@ -5,8 +5,8 @@ import { LEAD_IN, SPRING, STAGGER } from '@/lib/motion'
 
 const parent: Variants = { hidden: {}, show: {} }
 export const staggerItem: Variants = {
-  hidden: { opacity: 0, y: 28, filter: 'blur(6px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: SPRING },
+  hidden: { opacity: 0, y: 28 },
+  show: { opacity: 1, y: 0, transition: SPRING },
 }
 
 type Tag = 'div' | 'ul' | 'ol' | 'section'

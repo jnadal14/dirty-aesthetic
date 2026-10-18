@@ -64,7 +64,7 @@
     },
     {
       "@type": "Product",
-      "@id": "https://www.dirtyaesthetic.com/store.html#tee",
+      "@id": "https://www.dirtyaesthetic.com/store#tee",
       "name": "Dirty Aesthetic Tee",
       "description": "The first Dirty Aesthetic merch drop. Sizes XS to XXL, with local pickup in Vancouver or shipping.",
       "image": "https://www.dirtyaesthetic.com/assets/images/merch/merch-1.jpg",
@@ -72,10 +72,10 @@
         "@type": "Brand",
         "name": "Dirty Aesthetic"
       },
-      "url": "https://www.dirtyaesthetic.com/store.html",
+      "url": "https://www.dirtyaesthetic.com/store",
       "offers": {
         "@type": "Offer",
-        "url": "https://www.dirtyaesthetic.com/store.html",
+        "url": "https://www.dirtyaesthetic.com/store",
         "price": "35.00",
         "priceCurrency": "CAD",
         "availability": "https://schema.org/PreOrder",

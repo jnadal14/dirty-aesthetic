@@ -165,8 +165,13 @@
     z-index: -1;
     pointer-events: none;
     background: linear-gradient(180deg, rgba(6,4,3,.86) 0%, rgba(6,4,3,.6) 55%, rgba(6,4,3,0) 100%);
-    backdrop-filter: blur(9px) saturate(.85);
     mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 100%);
+  }
+  /* The frosted blur only on desktop: on phones a masked backdrop-filter on a
+     bar that slides away re-samples the page every frame and flickers in
+     mobile Chrome. */
+  @media (min-width: 768px) and (pointer: fine) {
+    .nav-scrim::before { backdrop-filter: blur(9px) saturate(.85) }
   }
 
   .link-underline { position: relative }
@@ -244,7 +249,7 @@
    hero). Same curves and offsets as the Motion versions used further down
    the page; `--d` is the delay. Under reduced motion only the fade is kept,
    matching MotionConfig reducedMotion="user". */
-.enter-rise, .enter-up, .enter-wordmark, .enter-backdrop, .enter-clip, .enter-unzoom {
+.enter-rise, .enter-up, .enter-wordmark, .enter-backdrop, .enter-art {
   animation-duration: .9s;
   animation-timing-function: var(--ease-out-expo);
   animation-fill-mode: both;
@@ -252,24 +257,20 @@
 }
 .enter-rise { animation-name: enter-rise; transform-origin: bottom left }
 .enter-up { animation-name: enter-up }
-.enter-up.enter-blur { animation-name: enter-up-blur }
 .enter-wordmark { animation-name: enter-wordmark; animation-duration: 1.3s }
 .enter-backdrop { animation-name: enter-backdrop; animation-duration: 1.6s }
-.enter-clip { animation-name: enter-clip; animation-duration: 1.1s }
-.enter-unzoom { animation-name: enter-unzoom; animation-duration: 1.4s }
+.enter-art { animation-name: enter-art; animation-duration: .55s }
 @keyframes enter-rise { from { transform: translateY(110%) rotate(4deg) } }
 @keyframes enter-up { from { opacity: 0; transform: translateY(var(--y, 24px)) scale(var(--s, 1)) } }
-@keyframes enter-up-blur { from { opacity: 0; transform: translateY(var(--y, 24px)) scale(var(--s, 1)); filter: blur(8px) } }
 @keyframes enter-wordmark { from { opacity: 0; transform: scale(1.08); filter: blur(12px) } }
 @keyframes enter-backdrop { from { opacity: 0; transform: scale(1.08) } }
-@keyframes enter-clip { from { clip-path: inset(100% 0 0 0) } }
-@keyframes enter-unzoom { from { transform: scale(1.18); filter: blur(10px) } }
+@keyframes enter-art { from { opacity: 0; transform: translateY(20px) scale(.98) } }
 @keyframes enter-fade { from { opacity: 0 } }
 .scroll-bob { animation: scroll-bob 1.8s ease-in-out infinite }
 @keyframes scroll-bob { 50% { transform: translateY(6px) } }
 @media (prefers-reduced-motion: reduce) {
-  .enter-rise, .enter-clip, .enter-unzoom, .scroll-bob { animation: none }
-  .enter-up, .enter-up.enter-blur, .enter-wordmark, .enter-backdrop { animation-name: enter-fade }
+  .enter-rise, .scroll-bob { animation: none }
+  .enter-up, .enter-wordmark, .enter-backdrop, .enter-art { animation-name: enter-fade }
 }
 
 .page-backdrop-img { background-image: var(--bg-d) }

@@ -13,7 +13,7 @@ export const metadata = pageMeta({
   title: 'Contact • Dirty Aesthetic',
   description: "Contact Dirty Aesthetic. Get in touch with Vancouver's indie garage rock band for bookings and inquiries.",
   ogDescription: "Get in touch with Vancouver's indie garage rock band for bookings and inquiries.",
-  path: '/contact.html',
+  path: '/contact',
 })
 
 export default function Contact() {

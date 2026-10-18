@@ -15,15 +15,15 @@ Official website for Dirty Aesthetic, an indie garage rock band from Vancouver, 
 - **Contact** (`/contact`): contact form (Formspree)
 - **Privacy** (`/privacy`): privacy policy
 
-Every page is also published at its old `.html` address (`/music.html` etc.),
-which is what ads, bios, search results and the sitemap link to.
+The old `.html` addresses (`/music.html` etc.), which older ads, bios and
+search results link to, redirect to these.
 
 ## Tech Stack
 
 - Next.js (App Router) + React, exported as a static site (`output: 'export'`)
 - Tailwind CSS v4, Motion for animation, Lenis for smooth scroll
 - Custom font: Nafta Light (`app/fonts/`, loaded with `next/font`)
-- Hosted on GitHub Pages at the custom domain in `public/CNAME`
+- Hosted on Cloudflare (a static-assets Worker, `wrangler.jsonc`) at www.dirtyaesthetic.com
 
 ```
 npm install
@@ -44,7 +44,7 @@ content/jsonld/              # Structured data per page
 data/                        # Content read at build time (shows, release
                              #   links, gallery order, credits) plus the two
                              #   generated image manifests
-public/                      # Copied as-is: CNAME, robots.txt, sitemap.xml,
+public/                      # Copied as-is: robots.txt, sitemap.xml,
                              #   and assets/ (a link to the folder below)
 assets/                      # Only what the browser loads. All committed.
   video/  downloads/         #   hero timelapse, EPK + stage plot PDFs
@@ -61,7 +61,8 @@ scripts/
   generate_epk_pdf.py        # builds assets/downloads/dirtyaesthetic_epk.pdf
   epk-copy.txt               # plain-text EPK copy (bio also lives in the PDF
                              #   script; keep the two in sync)
-.github/workflows/pages.yml  # deploy (shallow checkout, see below)
+wrangler.jsonc               # Cloudflare Worker: serves out/, custom domains
+.github/workflows/deploy.yml # deploy (shallow checkout, see below)
 
 _source/                     # Full-resolution masters. GITIGNORED, never
                              #   published, NOT backed up by git.
@@ -138,8 +139,14 @@ Each show entry may include:
 
 ## Deployment
 
-Push to `main`. `.github/workflows/pages.yml` does a shallow checkout, runs
-`npm ci && npm run build`, and publishes `out/`. Content edits in `data/`
-deploy the same way; the site is live a minute or two after the build passes
-(check the Actions tab). Settings → Pages → Source must be "GitHub Actions". (The full history carries about 1 GB of old camera
-originals, too much for GitHub's built-in Pages builder.)
+Push to `main`. `.github/workflows/deploy.yml` does a shallow checkout
+(the full history carries about 1 GB of old camera originals), runs
+`npm ci && npm run build`, and deploys `out/` to the Cloudflare Worker in
+`wrangler.jsonc` with `wrangler deploy`. Content edits in `data/` deploy the
+same way; the site is live a minute or two after the build passes (check the
+Actions tab). The workflow needs the repo secrets `CLOUDFLARE_API_TOKEN`
+("Edit Cloudflare Workers" token) and `CLOUDFLARE_ACCOUNT_ID`.
+
+The Worker serves `/music` for `out/music.html` and redirects `/music.html`
+there; missing paths get `out/404.html`. The bare domain redirects to `www`
+with a Cloudflare redirect rule on the zone.

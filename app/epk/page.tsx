@@ -5,6 +5,7 @@ import Gallery, { type GalleryImage } from '@/components/epk/Gallery'
 import Members, { type Member } from '@/components/epk/Members'
 import TornPhoto from '@/components/epk/TornPhoto'
 import Reveal from '@/components/motion/Reveal'
+import SpotifyEmbed from '@/components/SpotifyEmbed'
 import SplitText from '@/components/motion/SplitText'
 import Tilt from '@/components/motion/Tilt'
 import { epkImages, type ImageEntry } from '@/lib/data'
@@ -16,7 +17,7 @@ export const metadata = pageMeta({
   title: 'EPK • Dirty Aesthetic',
   description: 'Official press kit for Dirty Aesthetic, a five piece indie garage rock band from Vancouver BC. Full band bio, lineup, press photo gallery, booking contact, and a downloadable EPK PDF.',
   ogDescription: 'Electronic Press Kit for Dirty Aesthetic, a five piece indie rock band from Vancouver. Debut album Modern Nostalgia out now.',
-  path: '/epk.html',
+  path: '/epk',
 })
 
 const lineup = epkImages.lineup as Record<string, ImageEntry>
@@ -60,8 +61,7 @@ export default function Epk() {
           {/* On desktop the player is exactly as tall as its ten top tracks (728px:
               the header plus ten fixed-height rows) and follows the bio as you scroll. */}
           <Reveal onMount delay={0.45} className="lg:sticky lg:top-28">
-            <iframe className="h-[380px] w-full rounded-xl lg:h-[728px]" src="https://open.spotify.com/embed/artist/6LJB3zSDmtQ3NxA6GjUwlt" title="Dirty Aesthetic on Spotify"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" />
+            <SpotifyEmbed className="h-[380px] lg:h-[728px]" />
           </Reveal>
         </div>
       </section>

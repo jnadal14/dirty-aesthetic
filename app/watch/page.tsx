@@ -14,7 +14,7 @@ export const metadata = pageMeta({
   title: 'Watch • Dirty Aesthetic',
   description: "Watch Dirty Aesthetic's music videos and live performances. Vancouver indie garage rock band.",
   ogDescription: "Watch Dirty Aesthetic's music videos and live performances.",
-  path: '/watch.html',
+  path: '/watch',
 })
 
 const clips = [
@@ -46,7 +46,7 @@ export default function Watch() {
       </div>
 
       <section className="mx-auto mt-12 max-w-[1000px] px-[clamp(16px,4vw,48px)]">
-        <Reveal onMount delay={0.5} scale={0.94} blur={false}>
+        <Reveal onMount delay={0.5} scale={0.94}>
           <YouTubeFacade id="WUQRlII35Ow" cover="modern-nostalgia" priority sizes="(min-width: 1100px) 1000px, 94vw"
             title="Dirty Aesthetic, Modern Nostalgia (Official Music Video)" label="Play the Modern Nostalgia music video" />
         </Reveal>

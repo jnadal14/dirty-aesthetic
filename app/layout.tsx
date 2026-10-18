@@ -3,7 +3,7 @@ import localFont from 'next/font/local'
 import { ViewTransition } from 'react'
 import Providers from '@/components/motion/Providers'
 import Nav from '@/components/nav/Nav'
-import Footer from '@/components/Footer'
+import LayoutFooter from '@/components/LayoutFooter'
 import MetaPixel, { MetaPixelHead, MetaPixelNoScript } from '@/components/MetaPixel'
 import { LightboxProvider } from '@/components/Lightbox'
 import { site } from '@/lib/site'
@@ -48,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ViewTransition>
               <main id="main" className="overflow-x-clip">{children}</main>
             </ViewTransition>
-            <Footer />
+            <LayoutFooter />
           </LightboxProvider>
         </Providers>
         <div className="grain" aria-hidden />

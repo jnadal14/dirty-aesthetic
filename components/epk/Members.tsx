@@ -3,7 +3,7 @@
 import { motion } from 'motion/react'
 import Picture from '../Picture'
 import { SPRING } from '@/lib/motion'
-import type { ImageEntry } from '@/lib/data'
+import { asset, type ImageEntry } from '@/lib/data'
 
 export type Member = { key: string; name: string; fullName: string; role: string; image?: ImageEntry }
 
@@ -17,11 +17,12 @@ export default function Members({ members }: { members: Member[] }) {
     <div className="mx-auto grid max-w-[1060px] grid-cols-2 justify-items-center gap-x-[clamp(32px,5vw,72px)] gap-y-[clamp(12px,2vw,20px)] px-[clamp(20px,5vw,64px)]">
       {members.map((m, i) => {
         const even = i % 2 === 1
+        // An odd one out spans both columns to sit centred, at one column's width.
         const last = i === members.length - 1 && members.length % 2 === 1
         return (
           <motion.figure
             key={m.key}
-            className={`flex w-full max-w-[380px] flex-col ${last ? 'col-span-2 max-w-[340px]' : ''}`}
+            className={`flex max-w-[380px] flex-col ${last ? 'col-span-2 w-[calc((100%-clamp(32px,5vw,72px))/2)]' : 'w-full'}`}
             style={{ paddingTop: drop[i] ?? 0, transformOrigin: even ? 'bottom right' : 'bottom left' }}
             initial={{ opacity: 0, rotate: even ? -8 : 8, y: 60, scale: 0.92 }}
             whileInView={{ opacity: 1, rotate: 0, y: 0, scale: 1 }}
@@ -31,6 +32,7 @@ export default function Members({ members }: { members: Member[] }) {
             <div className="group overflow-hidden rounded-sm shadow-[0_24px_60px_rgba(0,0,0,.5)]">
               {m.image && (
                 <Picture src={m.image.src} webp={m.image.webp} alt={m.fullName} width={m.image.width} height={m.image.height}
+                  webpSrcSet={m.image.webpSmall ? `${asset(m.image.webpSmall)} ${m.image.smallWidth}w, ${asset(m.image.webp)} ${m.image.width}w` : undefined}
                   sizes="(min-width: 900px) 380px, 42vw"
                   className="aspect-[4/5] w-full object-cover grayscale-[.15] transition-[transform,filter] duration-700 ease-out-expo group-hover:scale-[1.04] group-hover:grayscale-0" />
               )}

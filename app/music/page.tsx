@@ -7,6 +7,7 @@ import FlipCover, { type Release } from '@/components/music/FlipCover'
 import RecordSleeve from '@/components/music/RecordSleeve'
 import Tracklist from '@/components/music/Tracklist'
 import Reveal from '@/components/motion/Reveal'
+import SpotifyEmbed from '@/components/SpotifyEmbed'
 import SplitText from '@/components/motion/SplitText'
 import { credits } from '@/lib/data'
 import { pageMeta } from '@/lib/meta'
@@ -16,7 +17,7 @@ export const metadata = pageMeta({
   title: 'Music • Dirty Aesthetic',
   description: 'Modern Nostalgia is the debut album from Dirty Aesthetic, eleven tracks, out August 2026. Full tracklist, album notes, and every single and EP from the Vancouver indie garage rock five piece.',
   ogDescription: 'Modern Nostalgia, the debut album from Dirty Aesthetic, is out now.',
-  path: '/music.html',
+  path: '/music',
   image: '/assets/images/covers/cover_LP_modern_nostalgia.jpg',
 })
 
@@ -82,8 +83,7 @@ export default function Music() {
         </section>
 
         <Reveal className="mt-16">
-          <iframe className="w-full rounded-xl" src="https://open.spotify.com/embed/artist/6LJB3zSDmtQ3NxA6GjUwlt" height={380} title="Dirty Aesthetic on Spotify"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" />
+          <SpotifyEmbed className="h-[380px]" />
         </Reveal>
       </div>
     </div>

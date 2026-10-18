@@ -3,31 +3,39 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, useMotionValueEvent, useScroll } from 'motion/react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { nav } from '@/lib/site'
 import { nextShow } from '@/lib/data'
 import { SNAP } from '@/lib/motion'
 
 const ticketLong = nextShow ? nextShow.ticketLabel || nextShow.title || nextShow.venue : ''
 const ticketShort = nextShow ? nextShow.ticketLabelShort || ticketLong : ''
+const SLACK = 12
 
 /**
  * Splat logo with the next-show ticket pill beside it on the left, text links
- * on the right. No hamburger: on phones the links drop to their own row.
- * Hides while scrolling down and returns on any scroll up.
+ * on the right, all on one row at every width (no hamburger).
+ * Hides while scrolling down and returns on a scroll up.
  */
 export default function Nav() {
-  // /music, /music.html and /music/ are all the same page.
-  const path = (usePathname() || '/').replace(/(\.html|\/)$/, '') || '/'
+  // /music, /music.html and /music/ are all the same page (and /index.html is /).
+  const path = (usePathname() || '/').replace(/(\/index)?(\.html)?\/?$/, '') || '/'
   const [hidden, setHidden] = useState(false)
   const [solid, setSolid] = useState(false)
   const [hover, setHover] = useState<string | null>(null)
   const { scrollY } = useScroll()
+  // Where the last direction change was decided. Moves smaller than SLACK are
+  // ignored: a phone's collapsing address bar and the end of a fling nudge
+  // the scroll position back and forth, which used to flick the bar in and out.
+  const anchor = useRef(0)
 
   useMotionValueEvent(scrollY, 'change', y => {
-    const prev = scrollY.getPrevious() ?? 0
-    setHidden(y > prev && y > 160)
     setSolid(y > 40)
+    if (y < 160) { anchor.current = y; setHidden(false); return }
+    const d = y - anchor.current
+    if (Math.abs(d) < SLACK) return
+    anchor.current = y
+    setHidden(d > 0)
   })
 
   const active = nav.find(n => path === n.href)?.href ?? null
@@ -46,12 +54,12 @@ export default function Nav() {
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className={`nav-scrim border-b transition-[background-color,border-color] duration-500 ${solid ? 'border-bone/8 bg-umber/70' : 'border-transparent'}`}>
-        <div className="flex flex-col gap-1 py-3 pl-[max(clamp(16px,4vw,32px),env(safe-area-inset-left))] pr-[max(clamp(16px,4vw,32px),env(safe-area-inset-right))] md:flex-row md:items-center md:justify-between md:py-4 short:flex-row short:items-center short:justify-between short:gap-4 short:py-1.5">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-3 py-2 pl-[max(clamp(12px,4vw,32px),env(safe-area-inset-left))] pr-[max(clamp(12px,4vw,32px),env(safe-area-inset-right))] md:py-4 short:py-1.5">
+          <div className="flex min-w-0 items-center gap-[clamp(6px,2vw,12px)]">
             <Link href="/" aria-label="Dirty Aesthetic home" className="shrink-0">
               <motion.img
                 src="/assets/images/logos/da-splat.png" alt="" width={120} height={120}
-                className="h-9 w-auto md:h-12 short:h-8"
+                className="h-8 w-auto md:h-12"
                 whileHover={{ rotate: -10, scale: 1.08 }} transition={SNAP}
               />
             </Link>
@@ -64,14 +72,14 @@ export default function Nav() {
           </div>
 
           <nav aria-label="Primary">
-            <ul className="flex items-center justify-between gap-1 md:justify-end md:gap-6 short:justify-end short:gap-4" onMouseLeave={() => setHover(null)}>
+            <ul className="flex items-center gap-[clamp(9px,2.8vw,16px)] md:gap-6" onMouseLeave={() => setHover(null)}>
               {nav.map(item => (
                 <li key={item.href} className="relative">
                   <Link
                     href={item.href}
                     onMouseEnter={() => setHover(item.href)}
                     aria-current={active === item.href ? 'page' : undefined}
-                    className="block whitespace-nowrap py-2 text-[clamp(1rem,4.4vw,1.1rem)] tracking-wide text-bone/85 [text-shadow:0_1px_10px_rgba(0,0,0,.65)] transition-colors hover:text-bone aria-[current=page]:text-bone md:text-[1.2rem] short:py-1 short:text-[1rem]"
+                    className="block whitespace-nowrap py-2 text-[clamp(.8rem,3.7vw,1.05rem)] tracking-wide text-bone/85 [text-shadow:0_1px_10px_rgba(0,0,0,.65)] transition-colors hover:text-bone aria-[current=page]:text-bone md:text-[1.2rem] short:py-1"
                   >
                     {item.label}
                   </Link>

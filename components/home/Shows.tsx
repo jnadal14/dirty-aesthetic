@@ -31,8 +31,8 @@ function Row({ show, isNext, index }: { show: Show; isNext: boolean; index: numb
     <Tag
       {...linkProps}
       className={`group relative -mx-4 grid grid-cols-[auto_1fr_auto] items-center gap-[clamp(16px,3vw,36px)] rounded border-b border-bone/5 px-[clamp(16px,2vw,24px)] py-[clamp(18px,3vw,28px)] transition-colors hover:border-accent/15 hover:bg-accent/[.03] ${isNext ? 'border-b-sun/30 before:absolute before:inset-y-3 before:left-0 before:w-[3px] before:rounded before:bg-[linear-gradient(180deg,var(--color-sun),var(--color-flame))]' : ''}`}
-      initial={{ opacity: 0, y: 28, filter: 'blur(6px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '0px 0px -10% 0px' }}
       transition={{ ...SPRING, delay: 0.15 + index * 0.08 }}
     >

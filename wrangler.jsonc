@@ -1,0 +1,17 @@
+// Cloudflare Worker that serves the static export in out/ (no Worker script).
+// Deployed by .github/workflows/deploy.yml on every push to main.
+{
+  "$schema": "https://unpkg.com/wrangler@4.151.1/config-schema.json",
+  "name": "dirty-aesthetic",
+  "compatibility_date": "2026-10-13",
+  "workers_dev": false,
+  "assets": {
+    "directory": "./out",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "www.dirtyaesthetic.com", "custom_domain": true },
+    { "pattern": "dirtyaesthetic.com", "custom_domain": true }
+  ]
+}

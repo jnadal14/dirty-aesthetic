@@ -4,7 +4,7 @@ export const metadata = pageMeta({
   title: 'Privacy • Dirty Aesthetic',
   description: 'Privacy policy for Dirty Aesthetic website. How we handle your data and privacy.',
   ogDescription: 'Privacy policy for Dirty Aesthetic website.',
-  path: '/privacy.html',
+  path: '/privacy',
 })
 
 // Privacy has no entrance animation on purpose: it should simply be there.
