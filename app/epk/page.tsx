@@ -37,7 +37,9 @@ function SectionTitle({ text }: { text: string }) {
 
 export default function Epk() {
   return (
-    <div className="bg-[#0d0906]">
+    <div>
+      {/* The page's ground is fixed, so it runs on behind the layout's footer. */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-[#0d0906]" />
       <JsonLd data={jsonLd} />
 
       <section className="relative isolate px-[clamp(20px,6vw,80px)] pt-[clamp(120px,14vw,160px)] pb-24">

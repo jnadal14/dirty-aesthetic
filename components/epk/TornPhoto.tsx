@@ -21,11 +21,12 @@ const TEAR = tear(3)
 export default function TornPhoto() {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
-  const y = useTransform(scrollYProgress, [0, 1], ['-8%', '8%'])
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.15, 1.05, 1.15])
+  // One transform string, so Motion can run the drift on the browser's view
+  // timeline instead of repainting the clipped photo every frame.
+  const transform = useTransform(scrollYProgress, [0, 0.5, 1], ['translateY(-8%) scale(1.15)', 'translateY(0%) scale(1.05)', 'translateY(8%) scale(1.15)'])
   return (
     <div ref={ref} className="relative z-10 -my-4 h-[clamp(260px,46vw,620px)] overflow-hidden" style={{ clipPath: TEAR }}>
-      <motion.div className="absolute inset-0" style={{ y, scale }}>
+      <motion.div className="absolute inset-0" style={{ transform }}>
         <Picture src="assets/images/backgrounds/header-desktop.jpg" webp="assets/images/backgrounds/header-desktop.webp" alt="Dirty Aesthetic"
           className="h-full w-full object-cover" sizes="100vw" />
       </motion.div>

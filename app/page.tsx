@@ -127,7 +127,7 @@ export default function Home() {
               <ContactForm className="mt-10" />
             </div>
           </section>
-          <Footer transparent />
+          <Footer />
         </div>
       </div>
     </>

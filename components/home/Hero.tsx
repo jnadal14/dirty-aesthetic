@@ -20,12 +20,14 @@ export default function Hero() {
   const ref = useRef<HTMLDivElement>(null)
   const lenis = useLenis()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.85])
+  // Whole transform strings rather than scale/y: Motion runs those (and
+  // opacity) on the browser's own scroll timeline, off the main thread.
+  const transform = useTransform(scrollYProgress, [0, 1], ['scale(1)', 'scale(0.85)'])
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.3])
-  const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '-18%'])
+  const contentTransform = useTransform(scrollYProgress, [0, 1], ['translateY(0%)', 'translateY(-18%)'])
   // Once the marker has scrolled away, the sections have covered the hero
   // completely (it stays stuck behind them to the end of the page), so the
-  // stage stops painting and the timelapse pauses.
+  // stage stops painting, and the timelapse and the caption's loops pause.
   const showing = useInView(ref, { initial: true })
   const spotify = streamLink('spotify')
   const apple = streamLink('apple')
@@ -44,11 +46,11 @@ export default function Hero() {
     <>
     <div ref={ref} aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-svh min-h-[560px] short:min-h-[360px]" />
     <section id="top" className="sticky top-0 h-svh min-h-[560px] overflow-clip short:min-h-[360px]" aria-label="Modern Nostalgia, out now">
-      <motion.div className="hero-still absolute inset-0 bg-umber" style={{ scale, opacity, visibility: showing ? 'visible' : 'hidden' }}>
+      <motion.div className={`hero-still absolute inset-0 bg-umber ${showing ? '' : 'hero-covered'}`} style={{ transform, opacity, visibility: showing ? 'visible' : 'hidden' }}>
         <HeroVideo active={showing} />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(33,26,19,.4)_0%,rgba(33,26,19,.65)_50%,rgba(33,26,19,.9)_100%)]" />
 
-        <motion.div style={{ y: contentY }} className="absolute inset-0 flex flex-col items-center justify-center px-[clamp(16px,5vw,40px)] text-center">
+        <motion.div style={{ transform: contentTransform }} className="absolute inset-0 flex flex-col items-center justify-center px-[clamp(16px,5vw,40px)] text-center">
           <h1>
             <Tilt max={8}>
               {/* eslint-disable-next-line @next/next/no-img-element */}

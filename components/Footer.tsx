@@ -1,10 +1,13 @@
 import Link from 'next/link'
 import { landAcknowledgment, social } from '@/lib/site'
 
-/** `transparent` drops the black ground so a background behind it shows through. */
-export default function Footer({ transparent = false }: { transparent?: boolean }) {
+/**
+ * No ground of its own: the page's background (its backdrop photo or colour,
+ * on the homepage the contact photo) runs on behind it.
+ */
+export default function Footer() {
   return (
-    <footer className={`relative z-10 flex flex-col items-center gap-4 border-t border-bone/6 ${transparent ? '' : 'bg-ink'} px-4 pt-10 pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-center`}>
+    <footer className="relative z-10 flex flex-col items-center gap-4 border-t border-bone/6 px-4 pt-10 pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-center">
       <ul className="flex flex-wrap justify-center gap-x-5 gap-y-1">
         {social.map(s => (
           <li key={s.href}>

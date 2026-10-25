@@ -42,7 +42,7 @@ export default function Artwork({ src, webp, webpSrcSet, fullSrc, alt, width, he
 
   return (
     <div className={`relative [perspective:1200px] ${className}`}>
-      {glow && <div aria-hidden className="absolute -inset-[8%] -z-10 rounded-full bg-accent/15 blur-3xl" />}
+      {glow && <div aria-hidden className="art-glow absolute -inset-[8%] -z-10" />}
       <motion.button
         ref={ref}
         type="button"

@@ -24,6 +24,9 @@
 }
 
 @custom-variant short (@media (max-height: 540px));
+/* Backdrop blur only here: a phone re-blurs whatever scrolls under a frosted
+   panel on every frame. Same query as the nav's frosted scrim. */
+@custom-variant desktop (@media (min-width: 768px) and (pointer: fine));
 
 @layer base {
   html {
@@ -36,6 +39,9 @@
        viewport, and decoration that sticks out (the record, cover glows)
        would widen a phone's layout. clip, unlike hidden, keeps sticky working. */
     overflow-x: clip;
+    /* The lightbox locks scroll with overflow: hidden; without a reserved
+       gutter a classic scrollbar disappearing would reflow the whole page. */
+    scrollbar-gutter: stable;
   }
   body {
     font-family: var(--font-body);
@@ -223,12 +229,15 @@
   .field-label { display: block; margin-bottom: 6px; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-sand) }
 }
 
-/* Film grain over everything. One fixed layer, pointer-transparent. */
+/* Film grain over everything. One fixed layer, pointer-transparent. It gets a
+   compositor layer of its own: otherwise the browser merges it with the fixed
+   nav, and every repaint of the bar re-rasters a screen-sized layer. */
 .grain {
   position: fixed;
   inset: 0;
   z-index: 70;
   pointer-events: none;
+  will-change: transform;
   background: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.03"/></svg>');
 }
 
@@ -248,11 +257,16 @@
    and hydrate (seconds on a slow phone, all of it spent looking at a blank
    hero). Same curves and offsets as the Motion versions used further down
    the page; `--d` is the delay. Under reduced motion only the fade is kept,
-   matching MotionConfig reducedMotion="user". */
+   matching MotionConfig reducedMotion="user". The fill is backwards only: the
+   end state is the element's own style, and a forwards fill would keep every
+   finished element (each letter of a title) on a compositor layer for good.
+   Fades start at 1% opacity, not 0: Chrome doesn't count an element painted
+   at opacity 0 as the page's main content (LCP) until it is repainted, which
+   for an animation on the compositor is only when the animation has ended. */
 .enter-rise, .enter-up, .enter-wordmark, .enter-backdrop, .enter-art {
   animation-duration: .9s;
   animation-timing-function: var(--ease-out-expo);
-  animation-fill-mode: both;
+  animation-fill-mode: backwards;
   animation-delay: var(--d, 0s);
 }
 .enter-rise { animation-name: enter-rise; transform-origin: bottom left }
@@ -261,11 +275,12 @@
 .enter-backdrop { animation-name: enter-backdrop; animation-duration: 1.6s }
 .enter-art { animation-name: enter-art; animation-duration: .55s }
 @keyframes enter-rise { from { transform: translateY(110%) rotate(4deg) } }
-@keyframes enter-up { from { opacity: 0; transform: translateY(var(--y, 24px)) scale(var(--s, 1)) } }
-@keyframes enter-wordmark { from { opacity: 0; transform: scale(1.08); filter: blur(12px) } }
-@keyframes enter-backdrop { from { opacity: 0; transform: scale(1.08) } }
-@keyframes enter-art { from { opacity: 0; transform: translateY(20px) scale(.98) } }
-@keyframes enter-fade { from { opacity: 0 } }
+@keyframes enter-up { from { opacity: .01; transform: translateY(var(--y, 24px)) scale(var(--s, 1)) } }
+/* No blur: a filter can't interpolate into the logo's drop-shadow, so it jumped. */
+@keyframes enter-wordmark { from { opacity: .01; transform: scale(1.08) } }
+@keyframes enter-backdrop { from { opacity: .01; transform: scale(1.08) } }
+@keyframes enter-art { from { opacity: .01; transform: translateY(20px) scale(.98) } }
+@keyframes enter-fade { from { opacity: .01 } }
 .scroll-bob { animation: scroll-bob 1.8s ease-in-out infinite }
 @keyframes scroll-bob { 50% { transform: translateY(6px) } }
 @media (prefers-reduced-motion: reduce) {
@@ -275,6 +290,19 @@
 
 .page-backdrop-img { background-image: var(--bg-d) }
 @media (max-width: 768px) { .page-backdrop-img { background-image: var(--bg-m) } }
+
+/* The glow behind cover art: a gradient plus a soft shadow instead of a blurred
+   disc. Same look (a 64px filter blur is a 128px shadow blur), but a filter that
+   size is re-rasterized every time a reveal nearby repaints its tiles, while a
+   shadow is drawn without an offscreen pass. */
+.art-glow {
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    color-mix(in oklab, var(--color-accent) 15%, transparent) calc(100% - 128px),
+    color-mix(in oklab, var(--color-accent) 12.6%, transparent) calc(100% - 64px),
+    color-mix(in oklab, var(--color-accent) 7.5%, transparent));
+  box-shadow: 0 0 128px color-mix(in oklab, var(--color-accent) 15%, transparent);
+}
 
 /* The record behind the Modern Nostalgia sleeve. The sheen is what reads as it turning. */
 .record-vinyl {
@@ -312,3 +340,7 @@
   50% { opacity: .38; transform: scale(.988) }
 }
 @media (prefers-reduced-motion: reduce) { .hero-caption { animation: none } }
+/* Once the sections cover the hero (Hero adds .hero-covered) its loops pause. The
+   hero is sticky, so it never leaves the screen, and two endless animations would
+   keep the page from ever going idle. */
+.hero-covered .hero-caption, .hero-covered .scroll-bob { animation-play-state: paused }

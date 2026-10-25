@@ -17,7 +17,7 @@ const row: Variants = {
 /** Modern Nostalgia's tracklist panel. Rows rise one after another. */
 export default function Tracklist({ className = '' }: { className?: string }) {
   return (
-    <div className={`rounded-md border border-bone/10 bg-black/45 p-[clamp(16px,2.4vw,28px)] backdrop-blur-sm ${className}`}>
+    <div className={`rounded-md border border-bone/10 bg-black/60 p-[clamp(16px,2.4vw,28px)] desktop:bg-black/45 desktop:backdrop-blur-sm ${className}`}>
       <p className="mb-2 border-b border-bone/10 pb-3 text-xs uppercase tracking-[.22em] text-sand">Tracklist</p>
       <motion.ol initial="hidden" whileInView="show" viewport={{ once: true, margin: '0px 0px -10% 0px' }}
         transition={{ staggerChildren: 0.05, delayChildren: 0.15 }}>

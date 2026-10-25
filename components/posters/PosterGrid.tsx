@@ -35,9 +35,8 @@ function Details({ show, large }: { show: Show; large?: boolean }) {
 }
 
 /**
- * Archived posters, newest first. Cards settle in one after another, reflow
- * with a layout animation when the column count changes, and open into the
- * lightbox with the show's details beside the poster.
+ * Archived posters, newest first. Cards settle in one after another and open
+ * into the lightbox with the show's details beside the poster.
  */
 export default function PosterGrid({ posters }: { posters: ArchivedPoster[] }) {
   const { open } = useLightbox()
@@ -59,14 +58,13 @@ export default function PosterGrid({ posters }: { posters: ArchivedPoster[] }) {
       {posters.map(({ show, image }, i) => {
         const delay = Math.min((i % 5) * 0.08, 0.36)
         // The first rows are on screen at load: they enter in CSS from the
-        // first paint (on the wrapper, so Motion's hover and layout transforms
-        // on the card never fight the animation). The rest enter on scroll.
+        // first paint (on the wrapper, so Motion's hover transform on the
+        // card never fights the animation). The rest enter on scroll.
         const first = i < ABOVE_FOLD
         return (
         <div key={show.poster} className={first ? 'enter-up' : undefined}
           style={first ? { '--d': `${0.15 + delay}s`, '--y': '36px', '--s': 0.96 } as React.CSSProperties : undefined}>
         <motion.article
-          layout
           className="group h-full overflow-hidden rounded-[10px] border border-bone/8 bg-[linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.018))] max-sm:rounded-lg"
           {...(!first && {
             initial: { opacity: 0, y: 36, scale: 0.96 },

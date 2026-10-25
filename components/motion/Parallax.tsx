@@ -7,10 +7,11 @@ import { useRef } from 'react'
 export default function Parallax({ children, offset = 80, className }: { children: React.ReactNode; offset?: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
-  const y = useTransform(scrollYProgress, [0, 1], [offset, -offset])
+  // A transform string, not y: Motion runs it on the browser's view timeline.
+  const transform = useTransform(scrollYProgress, [0, 1], [`translateY(${offset}px)`, `translateY(${-offset}px)`])
   return (
     <div ref={ref} className={className}>
-      <motion.div style={{ y }} className="h-full w-full">{children}</motion.div>
+      <motion.div style={{ transform }} className="h-full w-full">{children}</motion.div>
     </div>
   )
 }

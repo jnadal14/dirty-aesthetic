@@ -4,9 +4,11 @@ import { usePathname } from 'next/navigation'
 import Footer from './Footer'
 
 /**
- * The layout's footer, on every page but the homepage: there it is rendered
- * inside the contact section (app/page.tsx) so the section's photo runs on
- * behind it instead of stopping at a black band.
+ * The layout's footer, on every page but the homepage. It has no ground of its
+ * own, so an inner page's fixed background (PageBackdrop's photo, or the plain
+ * ground on the EPK and posters) shows through it. On the homepage it is
+ * rendered inside the contact section instead (app/page.tsx), so that
+ * section's photo runs on behind it.
  */
 export default function LayoutFooter() {
   // /, /index.html, /music.html and /music/ normalize like the nav does.

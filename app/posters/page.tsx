@@ -29,7 +29,9 @@ function Back() {
 
 export default function Posters() {
   return (
-    <div className="min-h-svh bg-[radial-gradient(circle_at_14%_5%,rgba(176,122,63,.15),transparent_28rem),radial-gradient(circle_at_88%_28%,rgba(122,54,0,.12),transparent_34rem),#050403]">
+    <div className="min-h-svh bg-[radial-gradient(circle_at_14%_5%,rgba(176,122,63,.15),transparent_28rem),radial-gradient(circle_at_88%_28%,rgba(122,54,0,.12),transparent_34rem)]">
+      {/* The page's ground colour is fixed, so it runs on behind the layout's footer. */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-[#050403]" />
       <JsonLd data={jsonLd} />
       <div className="container-x pt-32 pb-24 md:pt-40 short:pt-20 max-sm:px-3">
         <PageTitle

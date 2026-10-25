@@ -29,7 +29,7 @@ export default function Store() {
           className="mx-auto w-full max-w-[460px] short:sticky short:top-20 short:max-w-[70svh]"
         />
 
-        <Reveal onMount delay={0.2} className="rounded-md border border-bone/10 bg-umber/70 p-[clamp(24px,3.5vw,44px)] backdrop-blur-md">
+        <Reveal onMount delay={0.2} className="rounded-md border border-bone/10 bg-umber/85 p-[clamp(24px,3.5vw,44px)] desktop:bg-umber/70 desktop:backdrop-blur-md">
           <header>
             <span className="inline-block rounded-sm bg-accent px-3 py-1 text-xs font-bold uppercase tracking-[.16em] text-[#120c07]">Preorder</span>
             <div className="mt-4 flex flex-wrap items-baseline gap-x-4">

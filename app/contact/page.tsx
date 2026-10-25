@@ -34,7 +34,7 @@ export default function Contact() {
             ['Stage & input list', <>Five players: lead vocals, lead guitar, rhythm guitar with backing vocals, bass, and drums. A standard advance covers two vocal mics, two electric guitars, one acoustic, one bass, and a full kit.</>],
             ['Prefer email?', <><a className="prose-link" href={`mailto:${site.email}`}>{site.email}</a>. Bio, lineup, and press photos in full resolution live in the <Link className="prose-link" href="/epk">press kit</Link>; past bills are in the <Link className="prose-link" href="/posters">poster archive</Link>.</>],
           ].map(([h, body]) => (
-            <StaggerItem key={h as string} as="article" className="rounded-sm border border-bone/10 bg-ink/40 p-6 backdrop-blur-sm">
+            <StaggerItem key={h as string} as="article" className="rounded-sm border border-bone/10 bg-ink/55 p-6 desktop:bg-ink/40 desktop:backdrop-blur-sm">
               <h2 className="kicker mb-3 text-[.85rem]">{h}</h2>
               <p className="text-sand">{body}</p>
             </StaggerItem>

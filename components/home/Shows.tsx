@@ -100,7 +100,7 @@ export default function Shows({ shows }: { shows: Show[] }) {
         ))}
       </div>
       <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ ...SPRING, delay: 0.3 }}>
-        <Link href="/posters" className="group mt-[clamp(28px,4vw,44px)] flex items-center gap-4 rounded border border-bone/10 bg-black/35 px-5 py-4 backdrop-blur-sm transition-colors hover:border-accent/40">
+        <Link href="/posters" className="group mt-[clamp(28px,4vw,44px)] flex items-center gap-4 rounded border border-bone/10 bg-black/50 px-5 py-4 transition-colors hover:border-accent/40 desktop:bg-black/35 desktop:backdrop-blur-sm">
           <span className="text-xs uppercase tracking-[.2em] text-accent">Past Shows</span>
           <strong className="font-normal">Explore the Poster Archive</strong>
           <span aria-hidden className="ml-auto transition-transform duration-300 group-hover:translate-x-1.5">→</span>

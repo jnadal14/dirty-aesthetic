@@ -91,18 +91,24 @@ export function LightboxProvider({ children }: { children: React.ReactNode }) {
   }, [item])
 
   const from = !reduce && item ? poseOver(item.origin?.(), fit.w, fit.h) : null
+  // Stable, so opening or paging the lightbox doesn't re-render every thumbnail on the page.
+  const ctx = useMemo(() => ({ open }), [open])
 
   return (
-    <LightboxContext.Provider value={{ open }}>
+    <LightboxContext.Provider value={ctx}>
       {children}
       <AnimatePresence>
         {item && (
+          // No backdrop blur: under a 95% fill it barely showed, but the whole
+          // screen was re-blurred on every frame of the open and close.
+          // touch-none keeps a swipe on the overlay from scrolling the page
+          // behind it (phones have no Lenis to stop).
           <motion.div
             key="lightbox"
             role="dialog"
             aria-modal="true"
             aria-label={item.alt}
-            className="fixed inset-0 z-[90] flex cursor-zoom-out items-center justify-center gap-[clamp(18px,3vw,44px)] bg-umber/95 backdrop-blur-md max-[900px]:flex-col"
+            className="fixed inset-0 z-[90] flex cursor-zoom-out touch-none overscroll-contain items-center justify-center gap-[clamp(18px,3vw,44px)] bg-umber/95 max-[900px]:flex-col"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.25 } }}
