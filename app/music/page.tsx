@@ -15,7 +15,7 @@ import jsonLd from '@/content/jsonld/music.json'
 
 export const metadata = pageMeta({
   title: 'Music • Dirty Aesthetic',
-  description: 'Modern Nostalgia is the debut album from Dirty Aesthetic, eleven tracks, out August 2026. Full tracklist, album notes, and every single and EP from the Vancouver indie garage rock five piece.',
+  description: 'Modern Nostalgia is the debut album from Dirty Aesthetic, eleven tracks, out now. Full tracklist, album notes, and every single and EP from the Vancouver indie garage rock five piece.',
   ogDescription: 'Modern Nostalgia, the debut album from Dirty Aesthetic, is out now.',
   path: '/music',
   image: '/assets/images/covers/cover_LP_modern_nostalgia.jpg',

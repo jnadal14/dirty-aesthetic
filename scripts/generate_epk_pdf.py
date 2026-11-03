@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate the downloadable Dirty Aesthetic electronic press kit."""
 
+import json
 from pathlib import Path
 
 from reportlab.lib.colors import Color, HexColor, white
@@ -18,6 +19,22 @@ OUTPUT = ROOT / "assets" / "downloads" / "dirtyaesthetic_epk.pdf"
 GROUP_PHOTO = ROOT / "assets" / "images" / "backgrounds" / "header-desktop.jpg"
 ALBUM_COVER = ROOT / "assets" / "images" / "covers" / "cover_LP_modern_nostalgia.jpg"
 WORDMARK = ROOT / "_source" / "logos" / "FULL_NAME" / "FULL-OFF_WHITE.png"
+RELEASE = json.loads((ROOT / "data" / "release.json").read_text())
+
+# Streaming links come from data/release.json, the same file the site reads,
+# so an empty URL drops that line here too.
+LISTEN_LINKS = [
+    (label, url)
+    for label, url in [
+        ("Spotify", RELEASE["album"]["links"].get("spotify", "")),
+        ("Apple Music", RELEASE["album"]["links"].get("apple", "")),
+        ("Bandcamp", RELEASE["album"]["links"].get("bandcamp", "")),
+        ("YouTube", RELEASE["album"]["links"].get("youtube", "")),
+        ("SoundCloud", RELEASE["album"]["links"].get("soundcloud", "")),
+        ("Title-track video", RELEASE["video"].get("url", "")),
+    ]
+    if url
+]
 
 PAGE_W, PAGE_H = A4
 BLACK = HexColor("#060504")
@@ -29,29 +46,29 @@ RULE = Color(1, 1, 1, alpha=0.13)
 
 BIO_PARAGRAPHS = [
     (
-        "Dirty Aesthetic is a five-piece indie-rock band from Vancouver, British Columbia. "
+        "Dirty Aesthetic is a five piece indie rock band from Vancouver, British Columbia. "
         "Formed in the summer of 2024, the band combines garage and surf energy with "
         "alternative and folk textures, moving between volatile live peaks and more exposed, "
         "emotionally direct songwriting."
     ),
     (
         "Their debut EP, <i>Sugar on the Rocks</i>, followed the excitement and eventual "
-        "collapse of first love. Their debut full-length, <i>Modern Nostalgia</i>, begins in "
-        "the aftermath. Across eleven songs, the album explores grief, longing, mental-health "
-        "strain, changing relationships, and the decisions people make when they are trying "
-        "to move forward."
+        "collapse of first love. Their debut album, <i>Modern Nostalgia</i>, begins in "
+        "the aftermath. Across eleven songs, the album explores grief, longing, strain on "
+        "mental health, changing relationships, and the decisions people make when they are "
+        "trying to move forward."
     ),
     (
         "The album expands the band's sound without losing the immediacy of its live show. "
-        "Guitars shift between sharp garage-rock movement, melodic surf colour, and quieter "
+        "Guitars shift between sharp garage rock movement, melodic surf colour, and quieter "
         "passages that leave more room for the songs' emotional weight."
     ),
     (
-        "Dirty Aesthetic have built their early audience through Vancouver's independent "
-        "music community, appearing at rooms including Green Auto, The Roxy, and the Biltmore "
-        "Cabaret. <i>Modern Nostalgia</i> arrives August 13, 2026, with an album-release "
-        "performance at the Biltmore and an official video for the title track following the "
-        "release."
+        "Dirty Aesthetic have built their audience through Vancouver's independent music "
+        "community, playing rooms including Green Auto, Red Gate, The Roxy and the Biltmore "
+        "Cabaret, and festival stages across the region. <i>Modern Nostalgia</i> arrived on "
+        "August 13, 2026 alongside an official video for the title track, and the band "
+        "continues to play regularly across the Lower Mainland."
     ),
 ]
 
@@ -145,31 +162,43 @@ def draw_page_one(pdf):
     pdf.drawString(info_x, 244, "NOSTALGIA")
     pdf.setFillColor(ACCENT)
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.drawString(info_x, 219, "AUGUST 12, 2026")
+    pdf.drawString(info_x, 219, "OUT NOW / AUGUST 13, 2026")
     pdf.setFillColor(MUTED)
     pdf.setFont("Helvetica", 8.8)
     pdf.drawString(info_x, 194, "11 songs / debut album")
 
     pdf.setFillColor(INK)
     pdf.setFont("Helvetica-Bold", 7.5)
-    pdf.drawString(info_x, 159, "PRE-SAVE")
-    presave = "distrokid.com/hyperfollow/dirtyaesthetic/modern-nostalgia-2"
-    pdf.setFillColor(MUTED)
-    pdf.setFont("Helvetica", 6.8)
-    pdf.drawString(info_x, 145, presave)
-    pdf.linkURL(
-        "https://distrokid.com/hyperfollow/dirtyaesthetic/modern-nostalgia-2?ref=release",
-        (info_x, 140, PAGE_W - 38, 154),
-        relative=0,
-    )
+    pdf.drawString(info_x, 172, "LISTEN")
+    pdf.setFont("Helvetica", 7.4)
+    link_y = 158
+    for label, url in LISTEN_LINKS:
+        pdf.setFillColor(MUTED)
+        pdf.drawString(info_x, link_y, label)
+        label_w = stringWidth(label, "Helvetica", 7.4)
+        pdf.setFillColor(ACCENT)
+        pdf.drawString(info_x + label_w + 4, link_y, "->")
+        pdf.linkURL(url, (info_x, link_y - 3, info_x + label_w + 14, link_y + 8), relative=0)
+        link_y -= 12
 
+    contact_y = min(link_y - 14, 111)
     pdf.setFillColor(INK)
     pdf.setFont("Helvetica-Bold", 7.5)
-    pdf.drawString(info_x, 111, "CONTACT")
+    pdf.drawString(info_x, contact_y, "CONTACT")
     pdf.setFillColor(MUTED)
     pdf.setFont("Helvetica", 7.4)
-    pdf.drawString(info_x, 97, "dirtyaestheticmusic@gmail.com")
-    pdf.drawString(info_x, 84, "dirtyaesthetic.com")
+    pdf.drawString(info_x, contact_y - 14, "dirtyaestheticmusic@gmail.com")
+    pdf.drawString(info_x, contact_y - 27, "dirtyaesthetic.com")
+    pdf.linkURL(
+        "mailto:dirtyaestheticmusic@gmail.com",
+        (info_x, contact_y - 17, PAGE_W - 38, contact_y - 6),
+        relative=0,
+    )
+    pdf.linkURL(
+        "https://www.dirtyaesthetic.com",
+        (info_x, contact_y - 30, PAGE_W - 38, contact_y - 19),
+        relative=0,
+    )
 
     draw_footer(pdf, 1)
     pdf.showPage()
@@ -221,7 +250,7 @@ def draw_page_two(pdf):
         [
             "Bardia Tarjoman - lead guitar",
             "Dylan Iwaschuk - lead vocals",
-            "Jacob Nadal - rhythm guitar, vocals",
+            "Jacob Nadal - rhythm guitar, backing vocals",
             "Josh Chapman - drums",
             "Josh Seaman - bass",
         ],
@@ -254,7 +283,7 @@ def draw_page_two(pdf):
     draw_label(pdf, "Selected rooms", sidebar_x, side_y)
     side_y = draw_lines(
         pdf,
-        ["Green Auto", "The Roxy Cabaret", "The Biltmore Cabaret"],
+        ["Green Auto", "Red Gate", "The Roxy Cabaret", "The Biltmore Cabaret"],
         sidebar_x,
         side_y - 17,
         leading=13,
@@ -266,10 +295,10 @@ def draw_page_two(pdf):
     draw_label(pdf, "Press and contact", sidebar_x, side_y)
     pdf.setFillColor(INK)
     pdf.setFont("Helvetica", 7.2)
-    pdf.drawString(sidebar_x, side_y - 17, "dirtyaesthetic.com/epk.html")
+    pdf.drawString(sidebar_x, side_y - 17, "dirtyaesthetic.com/epk")
     pdf.drawString(sidebar_x, side_y - 30, "dirtyaestheticmusic@gmail.com")
     pdf.linkURL(
-        "https://www.dirtyaesthetic.com/epk.html",
+        "https://www.dirtyaesthetic.com/epk",
         (sidebar_x, side_y - 21, PAGE_W - 40, side_y - 7),
         relative=0,
     )

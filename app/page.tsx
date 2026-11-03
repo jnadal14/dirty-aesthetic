@@ -21,14 +21,14 @@ import jsonLd from '@/content/jsonld/home.json'
 
 export const metadata = {
   ...pageMeta({
-    title: 'Dirty Aesthetic • Modern Nostalgia',
+    title: 'Dirty Aesthetic • Vancouver Indie Rock Band',
     description: 'Modern Nostalgia, the debut album from Dirty Aesthetic, is out now. Stream it everywhere and watch the official music video.',
     ogDescription: 'The debut album from Dirty Aesthetic is out now. Stream Modern Nostalgia everywhere.',
     path: '/',
     image: '/assets/images/covers/cover_LP_modern_nostalgia.jpg',
     imageSize: [1200, 1200],
   }),
-  title: { absolute: 'Dirty Aesthetic • Modern Nostalgia' },
+  title: { absolute: 'Dirty Aesthetic • Vancouver Indie Rock Band' },
 }
 
 const EP_TRACKS = ['Corduroy', 'Take What You Need', 'Heart Home', 'Sugar Bottom', 'Out of Key', 'White Flag']

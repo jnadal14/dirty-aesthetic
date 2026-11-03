@@ -1,0 +1,19 @@
+# Read by the Cloudflare Worker (not served). Permanent (301) redirects for the
+# old .html addresses, so search engines replace them with the clean URLs.
+# Without these the Worker's own html handling answers with a temporary 307.
+/index.html    /         301
+/music.html    /music    301
+/watch.html    /watch    301
+/store.html    /store    301
+/epk.html      /epk      301
+/posters.html  /posters  301
+/contact.html  /contact  301
+/privacy.html  /privacy  301
+/lab.html      /         301
+/music/        /music    301
+/watch/        /watch    301
+/store/        /store    301
+/epk/          /epk      301
+/posters/      /posters  301
+/contact/      /contact  301
+/privacy/      /privacy  301

@@ -15,7 +15,7 @@ const icon = (file: string, sizes: string, media: string) => ({ url: `/assets/im
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: 'Dirty Aesthetic • Modern Nostalgia', template: '%s' },
+  title: { default: 'Dirty Aesthetic • Vancouver Indie Rock Band', template: '%s' },
   openGraph: { type: 'website', siteName: site.name },
   twitter: { card: 'summary_large_image' },
   icons: {
@@ -53,6 +53,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Providers>
         <div className="grain" aria-hidden />
         <MetaPixel />
+        {/* Cloudflare Web Analytics (cookieless). Added by hand because the zone's
+            automatic install never reaches pages a Worker serves. It follows
+            client-side route changes on its own. */}
+        <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "53b01d069c114097bb7635dd33b665d0"}' />
       </body>
     </html>
   )
