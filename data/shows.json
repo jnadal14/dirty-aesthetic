@@ -5,7 +5,16 @@
       "ticketLabel": "Nov 14 at The Roxy",
       "ticketLabelShort": "Nov 14 Roxy",
       "venue": "The Roxy Cabaret",
-      "city": "932 Granville St"
+      "city": "932 Granville St",
+      "time": "Doors 8 PM · 19+ · $12 adv / $16 door",
+      "lineup": "special guest",
+      "link": "https://www.showpass.com/satnov14/",
+      "linkLabel": "Tickets",
+      "posterSource": "_source/posters/ROXY_11:14:26_4x5.jpg",
+      "posterSlug": "roxy-nov14-2026",
+      "poster": "assets/images/posters/roxy-nov14-2026.webp",
+      "posterWidth": 900,
+      "posterHeight": 1125
     }
   ],
   "past": [
