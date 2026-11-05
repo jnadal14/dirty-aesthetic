@@ -5,6 +5,7 @@ export const site = {
   email: 'dirtyaestheticmusic@gmail.com',
   formspree: 'https://formspree.io/f/xjgvzapo',
   metaPixelId: '1503298771840666',
+  googleTagId: 'GTM-M8F3RT2Q',
 }
 
 export const nav = [

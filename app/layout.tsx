@@ -5,6 +5,7 @@ import Providers from '@/components/motion/Providers'
 import Nav from '@/components/nav/Nav'
 import LayoutFooter from '@/components/LayoutFooter'
 import MetaPixel, { MetaPixelHead, MetaPixelNoScript } from '@/components/MetaPixel'
+import GoogleTagHead from '@/components/GoogleTag'
 import { LightboxProvider } from '@/components/Lightbox'
 import { site } from '@/lib/site'
 import './globals.css'
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={nafta.variable}>
       <head>
         <MetaPixelHead />
+        <GoogleTagHead />
       </head>
       <body>
         <MetaPixelNoScript />
